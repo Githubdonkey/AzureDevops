@@ -1,0 +1,45 @@
+{
+  "variables": {
+	"azure_app_id": "{{env `azure_app_id`}}",
+    "azure_client_secret": "{{env `azure_client_secret`}}",
+    "azure_tenant_id": "{{env `azure_tenant_id`}}",
+    "azure_sub_id": "{{env `azure_sub_id`}}"
+  },
+  "builders": [{
+    "type": "azure-arm",
+
+    "client_id": "{{user `azure_app_id`}}",
+    "client_secret": "{{user `azure_client_secret`}}",
+    "subscription_id": "{{user `azure_sub_id`}}",
+
+    "managed_image_resource_group_name": "myResourceGroup",
+    "managed_image_name": "win2019PackImage-{{timestamp}}",
+
+    "os_type": "Windows",
+    "image_publisher": "MicrosoftWindowsServer",
+    "image_offer": "WindowsServer",
+    "image_sku": "2019-Datacenter",
+
+    "communicator": "winrm",
+	"winrm_port": 5986,
+    "winrm_use_ssl": "true",
+    "winrm_insecure": "true",
+    "winrm_timeout": "5m",
+    "winrm_username": "packer",
+
+    "location": "East US",
+    "vm_size": "Standard_DS2_v2"
+  }],
+  "provisioners": [{
+    "type": "powershell",
+      "inline": [
+        "  while ((Get-Service RdAgent).Status -ne 'Running') { Start-Sleep -s 5 }",
+        "  while ((Get-Service WindowsAzureTelemetryService).Status -ne 'Running') { Start-Sleep -s 5 }",
+        "  while ((Get-Service WindowsAzureGuestAgent).Status -ne 'Running') { Start-Sleep -s 5 }",
+
+        "if( Test-Path $Env:SystemRoot\\windows\\system32\\Sysprep\\unattend.xml ){ rm $Env:SystemRoot\\windows\\system32\\Sysprep\\unattend.xml -Force}",
+        "& $env:SystemRoot\\System32\\Sysprep\\Sysprep.exe /oobe /generalize /quiet /quit /mode:vm",
+        "while($true) { $imageState = Get-ItemProperty HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Setup\\State | Select ImageState; Write-Output $imageState.ImageState; if($imageState.ImageState -ne 'IMAGE_STATE_GENERALIZE_RESEAL_TO_OOBE') { Start-Sleep -s 10 } else { break } }"
+    ]
+  }]
+}
