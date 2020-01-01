@@ -3,12 +3,18 @@ Sign up for an account
 
 connect git hub : Approve & Install Azure Pipelines
 
-# Azure Portal Cloud Shell(Powershell)
+# Azure
+## Portal Cloud Shell(Powershell)
+##### Create Service Principle 
 ```
+#get Subscription ID info from output(ID value)
+az account list
+#Set Subscription ID
 az account set --subscription="SUBSCRIPTION_ID"
+# Create SP
 az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/SUBSCRIPTION_ID"
 ```
-##### output
+Output(appId is the client_id)
 ```
 {
   "appId": "00000000-0000-0000-0000-000000000000",
@@ -18,15 +24,20 @@ az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/SUBSCRIPT
   "tenant": "00000000-0000-0000-0000-000000000000"
 }
 ```
-# packer
-Packer builds
+###### Set Envirornment Var for build machine
+```
+export azure_app_id=
+export azure_client_secret=
+export azure_sub_id=
+export azure_tenant_id=
+```
+###### Service Principal login
+```
+az login --service-principal --username $azure_app_id --password $azure_client_secret --tenant $azure_tenant_id
+# Test access
+az vm list-sizes --location eastus
+```
 
-## Azure Portal Cloud Shell(Powershell)
-```
-$sp = Get-AzureRmADServicePrincipal -DisplayNameBeginsWith Packer
-$sp.applicationId.guid # Application ID	
-$sp.Id.ToString() # Object ID	
-```
 ```
 $sub = Get-AzureRmSubscription
 $sub.TenantId # Tenant ID	
@@ -99,12 +110,4 @@ wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
 unzip packer_${VER}_linux_amd64.zip
 sudo mv packer /usr/local/bin
 ```
-###### Set Envirornment Var for build machine
-```
-export azure_app_id=
-export azure_client_secret=
-export azure_sub_id=
-export azure_tenant_id=
-```
-###### Service Principal login
-az login --service-principal --username $azure_app_id --password $azure_client_secret --tenant $azure_tenant_id
+
