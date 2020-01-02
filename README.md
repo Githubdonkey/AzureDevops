@@ -26,10 +26,10 @@ Output(appId is the client_id)
 ```
 ###### Set Envirornment Var for build machine
 ```
-export azure_app_id=
-export azure_client_secret=
-export azure_sub_id=
-export azure_tenant_id=
+export ARM_CLIENT_ID=""
+export ARM_CLIENT_SECRET=""
+export ARM_SUBSCRIPTION_ID=""
+export ARM_TENANT_ID=""
 ```
 ###### Service Principal login
 ```
@@ -38,19 +38,6 @@ az login --service-principal --username $azure_app_id --password $azure_client_s
 az vm list-sizes --location eastus
 ```
 
-```
-$sub = Get-AzureRmSubscription
-$sub.TenantId # Tenant ID	
-$sub.SubscriptionId # Subscription ID	
-```
-###### Create Service Principal
-```
-$spc = New-AzADServicePrincipal -DisplayName "PackerServicePrincipal"
-$BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($spc.Secret)
-$plainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
-$plainPassword
-$spc.ApplicationId
-```
 ###### setup azure packer
 ```
 * create resource group
@@ -58,23 +45,6 @@ $spc.ApplicationId
 ```
 
 
-
-###### Portal
-https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal
-```
-All services > Active Directory > App registrations
-```
-
-## Set up Packer Logging
-###### UNIX
-* Build machine: export PACKER_LOG_PATH="/home/test/packer.log"
-* Build machine: export PACKER_LOG=1
-* Build machine: packer build -debug ubuntu_64.json
-
-###### WINDOWS
-* Build machine: set PACKER_LOG=1
-* Build machine: set PACKER_LOG_PATH=c:\temp\packer log
-* Build machine: packer build -debug ubuntu_64.json
 
 ## Azure List images
 * https://docs.microsoft.com/en-us/azure/virtual-machines/linux/cli-ps-findimage
@@ -103,6 +73,10 @@ sudo apt-get update
 sudo apt-get install azure-functions-core-tools
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 ```
+###### Terraform
+```
+terraform-install.sh
+```
 ###### Packer - install or update(sudo rm -r /usr/local/bin/)
 ```
 VER=1.4.5
@@ -110,4 +84,13 @@ wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
 unzip packer_${VER}_linux_amd64.zip
 sudo mv packer /usr/local/bin
 ```
+## Set up Packer Logging
+###### UNIX
+* Build machine: export PACKER_LOG_PATH="/home/test/packer.log"
+* Build machine: export PACKER_LOG=1
+* Build machine: packer build -debug ubuntu_64.json
 
+###### WINDOWS
+* Build machine: set PACKER_LOG=1
+* Build machine: set PACKER_LOG_PATH=c:\temp\packer log
+* Build machine: packer build -debug ubuntu_64.json
