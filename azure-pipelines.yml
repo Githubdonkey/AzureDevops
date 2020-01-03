@@ -38,3 +38,10 @@ steps:
     targetType: 'inline'
     script: |
         packer validate ubuntu16.json
+
+- task: Bash@3
+  displayName: 'Packer Create Image'
+  inputs:
+    targetType: 'inline'
+    script: |
+        packer build ubuntu16.json
