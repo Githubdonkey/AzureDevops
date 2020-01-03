@@ -27,7 +27,7 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-        VER=0.12.9
-        wget --no-verbose https://releases.hashicorp.com/terraform/${VER}/terraform_${VER}_linux_amd64.zip
+        VER=0.12.12
+        wget https://releases.hashicorp.com/terraform/${VER}/terraform_${VER}_linux_amd64.zip
         sudo unzip ./terraform_${VER}_linux_amd64.zip -d /usr/local/bin/
         terraform -v
