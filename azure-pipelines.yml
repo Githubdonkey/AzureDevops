@@ -40,17 +40,17 @@ stages:
   displayName: 'Initialize2'
   jobs:
     job: Stage2_Job1
-    displayName: 'Initialize - Job1'
+    displayName: 'Initialize - Job12'
     steps:
       task: Bash@3
-      displayName: packer wget, unzip
+      displayName: packer wget, unzip2
       inputs:
         targetType: 'inline'
         script:
           packer --version
 
       task: Bash@3
-      displayName: terraform
+      displayName: terraform2
       inputs:
         targetType: 'inline'
         script:
