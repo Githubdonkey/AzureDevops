@@ -48,10 +48,3 @@ stages:
         targetType: 'inline'
         script:
           packer --version
-
-      task: Bash@3
-      displayName: terraform2
-      inputs:
-        targetType: 'inline'
-        script:
-          terraform -v
