@@ -9,42 +9,29 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-stages:
-  stage: One_Initialize
-  displayName: 'Initialize'
-  jobs:
-    job: Stage1_Job1
-    displayName: 'Initialize - Job1'
-    steps:
-      task: Bash@3
-      displayName: packer wget, unzip
-      inputs:
-        targetType: 'inline'
-        script:
-          VER=1.4.5
-          wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
-          unzip packer_${VER}_linux_amd64.zip
-          sudo mv packer /usr/local/bin
-          packer --version
 
-      task: Bash@3
-      displayName: terraform
-      inputs:
-        targetType: 'inline'
-        script:
-          VER=0.12.9
-          wget --no-verbose https://releases.hashicorp.com/terraform/${VER}/terraform_${VER}_linux_amd64.zip
-          sudo unzip ./terraform_${VER}_linux_amd64.zip -d /usr/local/bin/
-          terraform -v
-  stage: Two_Initialize
-  displayName: 'Initialize2'
-  jobs:
-    job: Stage2_Job1
-    displayName: 'Initialize - Job12'
-    steps:
-      task: Bash@3
-      displayName: packer wget, unzip2
-      inputs:
-        targetType: 'inline'
-        script:
-          packer --version
+steps:
+- task: Bash@3
+  inputs:
+    versionSpec: '10.x'
+  displayName: 'Install Packer'
+
+- script: |
+    VER=1.4.5
+    wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
+    unzip packer_${VER}_linux_amd64.zip
+    sudo mv packer /usr/local/bin
+    packer --version
+  displayName: 'Packer install and build'
+
+- task: Bash@3
+  inputs:
+    versionSpec: '11.x'
+  displayName: 'Install Terraform'
+
+- script: |
+    VER=0.12.9
+    wget --no-verbose https://releases.hashicorp.com/terraform/${VER}/terraform_${VER}_linux_amd64.zip
+    sudo unzip ./terraform_${VER}_linux_amd64.zip -d /usr/local/bin/
+    terraform -v
+  displayName: 'Terraform install and build'
