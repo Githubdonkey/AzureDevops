@@ -1,27 +1,10 @@
-variable "custom_image_name" {
-  type = string
-  default = "ubuntu16PackImage-1577839873"
-}
-variable "location" {
-  type = string
-  default = "eastus"
-}
-variable "custom_image_resource_group_name" {
-  type = string
-  default = "myResourceGroup"
-}
-variable "prefix" {
-  type = string
-  default = "test"
-}
-
 provider "azurerm" {
   # whilst the `version` attribute is optional, we recommend pinning to a given version of the Provider
   version = "=1.38.0"
 }
 
 resource "azurerm_resource_group" "example" {
-  name     = "${var.prefix}-resources"
+  name     = "${var.custom_image_resource_group_name}"
   location = "${var.location}"
 }
 

@@ -33,7 +33,7 @@ export ARM_TENANT_ID=""
 ```
 ###### Service Principal login
 ```
-az login --service-principal --username $azure_app_id --password $azure_client_secret --tenant $azure_tenant_id
+az login --service-principal --username $ARM_CLIENT_ID --password $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
 # Test access
 az vm list-sizes --location eastus
 ```
