@@ -15,7 +15,7 @@ steps:
   inputs:
     versionSpec: '10.x'
   displayName: 'Install Packer'
-
+  targetType: 'inline'
 - script: |
     VER=1.4.5
     wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
@@ -28,7 +28,7 @@ steps:
   inputs:
     versionSpec: '11.x'
   displayName: 'Install Terraform'
-
+  targetType: 'inline'
 - script: |
     VER=0.12.9
     wget --no-verbose https://releases.hashicorp.com/terraform/${VER}/terraform_${VER}_linux_amd64.zip
