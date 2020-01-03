@@ -21,7 +21,7 @@
     "image_sku": "2019-Datacenter",
 
     "communicator": "winrm",
-	"winrm_port": 5986,
+	  "winrm_port": 5986,
     "winrm_use_ssl": "true",
     "winrm_insecure": "true",
     "winrm_timeout": "5m",
