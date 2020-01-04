@@ -34,7 +34,7 @@ resource "azurerm_network_interface" "example" {
   }
 }
 
-resource "azurerm_virtual_machine" "example" {
+data "azurerm_virtual_machine" "example" {
   name                  = "${var.prefix}-vm"
   location              = "${azurerm_resource_group.example.location}"
   resource_group_name   = "${azurerm_resource_group.example.name}"
@@ -48,19 +48,16 @@ resource "azurerm_virtual_machine" "example" {
   # This means the Data Disk Disk will be deleted when Terraform destroys the Virtual Machine
   # NOTE: This may not be optimal in all cases.
   delete_data_disks_on_termination = true
-
+  
   storage_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "16.04-LTS"
-    version   = "latest"
+    id = "/subscriptions/603917ef-28ce-417f-8107-d905c3fc11b2/resourceGroups/myResourceGroup/providers/Microsoft.Compute/images/ubuntu16PackImage-1578096919"
   }
 
   storage_os_disk {
-    name              = "myosdisk1"
-    caching           = "ReadWrite"
-    create_option     = "FromImage"
+    name          = "mydisk"
     managed_disk_type = "Standard_LRS"
+    create_option = "FromImage"
+    os_type       = "linux"
   }
 
   os_profile {
@@ -71,5 +68,9 @@ resource "azurerm_virtual_machine" "example" {
 
   os_profile_linux_config {
     disable_password_authentication = false
+  }
+
+  tags = {
+    environment = "Production"
   }
 }

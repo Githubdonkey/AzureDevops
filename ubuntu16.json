@@ -42,9 +42,9 @@
 		  "output": "manifest.json",
 		  "strip_path": true,
 		  "custom_data": {
-			"image_sku": "{{user `image_sku`}}",
-			"resource_group_name": "myResourceGroup",
-			"my_custom_data1": "example"
+			"managed_image_name": "{{user `managed_image_name`}}",
+			"build_resource_group_name": "{{user `resource_group_name`}}",
+			"image_sku": "{{user `image_sku`}}"
 		  }
 		}
 	  ]
