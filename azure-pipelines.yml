@@ -49,3 +49,18 @@ steps:
       export ARM_SUBSCRIPTION_ID=$(ARM_SUBSCRIPTION_ID)
       export ARM_TENANT_ID=$(ARM_TENANT_ID)
       packer build ubuntu16.json
+
+- task: Bash@3
+  displayName: 'Terraform Create VM'
+  inputs:
+    targetType: 'inline'
+    script: |
+      export ARM_CLIENT_ID=$(ARM_CLIENT_ID)
+      export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET)
+      export ARM_SUBSCRIPTION_ID=$(ARM_SUBSCRIPTION_ID)
+      export ARM_TENANT_ID=$(ARM_TENANT_ID)
+      export TF_VAR_packer_image=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.managed_image_name' | tr -d '"')
+      terraform init
+      terraform apply -auto-approve
+      sleep 3m
+      terraform destroy -auto-approve

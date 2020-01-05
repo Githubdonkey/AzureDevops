@@ -26,3 +26,6 @@ variable "custom_network_interface" {
   type = "string"
   default = "test-nic"
 }
+variable "packer_image" {
+  type = "string"
+}

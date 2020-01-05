@@ -3,6 +3,12 @@ provider "azurerm" {
   version = "=1.38.0"
 }
 
+#declare local
+locals {
+  timestamp = "${timestamp()}"
+  timestamp_sanitized = "${replace("${local.timestamp}", "/[- TZ:]/", "")}"
+}
+
 data "azurerm_resource_group" "example" {
   name     = "${var.custom_image_resource_group_name}"
 }
@@ -30,7 +36,7 @@ data "azurerm_network_interface" "example" {
   #}
 }
 data "azurerm_image" "search" {
-  name                = "ubuntu16PackImage-1578100172"
+  name                = "${var.packer_image}"
   resource_group_name = "${var.custom_image_resource_group_name}"
 }
 
@@ -39,7 +45,7 @@ data "azurerm_image" "search" {
 #}
 
 resource "azurerm_virtual_machine" "example" {
-  name                  = "${var.custom_image_name}"
+  name                  = "${var.custom_image_name}-${local.timestamp_sanitized}"
   location              = "${data.azurerm_resource_group.example.location}"
   resource_group_name   = "${data.azurerm_resource_group.example.name}"
   network_interface_ids = ["${data.azurerm_network_interface.example.id}"]
@@ -58,7 +64,7 @@ resource "azurerm_virtual_machine" "example" {
   }
 
   storage_os_disk {
-    name              = "myosdisk1"
+    name              = "os_${var.custom_image_name}"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
