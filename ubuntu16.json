@@ -44,7 +44,8 @@
 		  "custom_data": {
 			"managed_image_name": "{{user `managed_image_name`}}",
 			"build_resource_group_name": "{{user `resource_group_name`}}",
-			"image_sku": "{{user `image_sku`}}"
+			"image_sku": "{{user `image_sku`}}",
+			"image_created": "{{ .artifact_id }}"
 		  }
 		}
 	  ]

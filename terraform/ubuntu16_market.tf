@@ -29,14 +29,6 @@ data "azurerm_network_interface" "example" {
    # private_ip_address_allocation = "Dynamic"
   #}
 }
-data "azurerm_image" "search" {
-  name                = "ubuntu16PackImage-1578100172"
-  resource_group_name = "${var.custom_image_resource_group_name}"
-}
-
-#output "image_id" {
-#  value = "${data.azurerm_image.search.id}"
-#}
 
 resource "azurerm_virtual_machine" "example" {
   name                  = "${var.custom_image_name}"
@@ -54,7 +46,10 @@ resource "azurerm_virtual_machine" "example" {
   delete_data_disks_on_termination = true
 
   storage_image_reference {
-    id="${data.azurerm_image.search.id}"
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "16.04-LTS"
+    version   = "latest"
   }
 
   storage_os_disk {
