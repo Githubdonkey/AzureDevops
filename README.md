@@ -25,7 +25,27 @@ Output(appId is the client_id)
 }
 ```
 ###### Set Envirornment Var for build machine
+
 ```
+# AWS account info
+
+# Powershell
+PS C:\> $Env:AWS_ACCESS_KEY_ID="AKIAIOSFODNN7EXAMPLE"
+PS C:\> $Env:AWS_SECRET_ACCESS_KEY="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+PS C:\> $Env:AWS_DEFAULT_REGION="us-east-1"
+# Linux
+$ export AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
+$ export AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+$ export AWS_DEFAULT_REGION=us-west-2
+
+# Azure account info
+
+# Powershell
+PS C:\> $Env:ARM_CLIENT_ID=""
+PS C:\> $Env:ARM_CLIENT_SECRET=""
+PS C:\> $Env:ARM_SUBSCRIPTION_ID=""
+PS C:\> $Env:ARM_TENANT_ID=""
+# Linux
 export ARM_CLIENT_ID=""
 export ARM_CLIENT_SECRET=""
 export ARM_SUBSCRIPTION_ID=""
