@@ -15,6 +15,9 @@ touch .gitignore # add files to this to exclude
 git add .
 git commit -m "your comment"
 git push
+
+# First push "git push --set-upstream origin pipeline_work"
+
 ```
 # AzureDevops
 Sign up for an account
