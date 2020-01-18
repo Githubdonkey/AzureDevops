@@ -46,6 +46,11 @@ Output(appId is the client_id)
 }
 ```
 # AWS Setup
+Create User
+```
+pip3 install awscli
+pip3 install awscli --upgrade
+```
 
 ### Set Envirornment Var for build machine
 
@@ -81,25 +86,8 @@ az login --service-principal --username $ARM_CLIENT_ID --password $ARM_CLIENT_SE
 az vm list-sizes --location eastus
 ```
 
-###### setup azure packer
-```
-* create resource group
-* New-AzResourceGroup -Name "myResourceGroup" -Location "East US"
-```
-
-
-
-## Azure List images
-* https://docs.microsoft.com/en-us/azure/virtual-machines/linux/cli-ps-findimage
-```
-az vm image list --output table
-az vm image list --offer Debian --all --output table
-az vm image list --location westeurope --offer Deb --publisher credativ --sku 8 --all --output table
-az vm image list-skus --location westus --publisher Canonical --offer UbuntuServer --output table
-az vm image show --location westus --urn Canonical:UbuntuServer:18.04-LTS:latest
-```
-
-## Setup linux machine
+# Setup linux machine
+###### Install
 ```
 sudo apt-get install unzip
 wget -q https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
@@ -127,13 +115,20 @@ wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
 unzip packer_${VER}_linux_amd64.zip
 sudo mv packer /usr/local/bin
 ```
-## Set up Packer Logging
-###### UNIX
+######  Set Variables
 * Build machine: export PACKER_LOG_PATH="/home/test/packer.log"
 * Build machine: export PACKER_LOG=1
 * Build machine: packer build -debug ubuntu_64.json
 
-###### WINDOWS
-* Build machine: set PACKER_LOG=1
-* Build machine: set PACKER_LOG_PATH=c:\temp\packer log
-* Build machine: packer build -debug ubuntu_64.json
+
+
+# Useful commands
+###### Azure List images
+* https://docs.microsoft.com/en-us/azure/virtual-machines/linux/cli-ps-findimage
+```
+az vm image list --output table
+az vm image list --offer Debian --all --output table
+az vm image list --location westeurope --offer Deb --publisher credativ --sku 8 --all --output table
+az vm image list-skus --location westus --publisher Canonical --offer UbuntuServer --output table
+az vm image show --location westus --urn Canonical:UbuntuServer:18.04-LTS:latest
+```
