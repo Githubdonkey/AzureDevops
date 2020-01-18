@@ -1,9 +1,27 @@
+# Git
+```
+git clone https://github.com/Githubdonkey/AzureDevops.git # Create repository on local machine
+git status # Get current status of repo
+
+#Branches
+git branch login # this creates the login branch
+git checkout login # this changes to your login branch
+git checkout master # this changes to master branch
+
+#Git ignore
+touch .gitignore # add files to this to exclude
+
+# push Local (script available ./gitPush.sh)
+git add .
+git commit -m "your comment"
+git push
+```
 # AzureDevops
 Sign up for an account
 
 connect git hub : Approve & Install Azure Pipelines
 
-# Azure
+# Azure Setup
 ## Portal Cloud Shell(Powershell)
 ##### Create Service Principle 
 ```
@@ -24,7 +42,9 @@ Output(appId is the client_id)
   "tenant": "00000000-0000-0000-0000-000000000000"
 }
 ```
-###### Set Envirornment Var for build machine
+# AWS Setup
+
+### Set Envirornment Var for build machine
 
 ```
 # AWS account info
