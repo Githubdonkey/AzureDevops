@@ -40,6 +40,17 @@ case $n in
      export TF_VAR_packer_image=$(cat packer/manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"')
      aws s3 cp packer/manifest.json s3://gitdonkey/devops/${TF_VAR_packer_image}.json;;
   13)echo "AWS check for latest Packer Image"
+     if [ "$(cat packer/manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"'| cut -d':' -f2)" ]
+      then
+        echo "AWS is NOT empty"
+     elif [ $(cat packer/manifest.json | jq '.builds | to_entries[] | .value.custom_data.managed_image_name' | tr -d '"') ]
+      then
+        echo "Azure is NOT empty"
+     else
+        echo "packer/manifest.json not found"
+     fi
+     
+     
      if [ -z "$(cat packer/manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"'| cut -d':' -f2)" ]
       then
       echo "$(tput setaf 1) \$TF_VAR_packer_image is empty$(tput sgr 0)"
