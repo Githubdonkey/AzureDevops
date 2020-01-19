@@ -1,12 +1,12 @@
 {
 	"variables": {
-	"managed_image_name": "ubuntu16PackImage-{{timestamp}}",
+	"managed_image_name": "ubuntu18PackImage-{{timestamp}}",
 	"azure_app_id": "{{env `ARM_CLIENT_ID`}}",
     "azure_client_secret": "{{env `ARM_CLIENT_SECRET`}}",
     "azure_tenant_id": "{{env `ARM_TENANT_ID`}}",
 	"azure_sub_id": "{{env `ARM_SUBSCRIPTION_ID`}}",
 	"resource_group_name": "myResourceGroup",
-	"image_sku": "16.04-LTS"
+	"image_sku": "18.04-LTS"
   },
 	"builders": [{
 	"type": "azure-arm",
@@ -40,13 +40,7 @@
 		{
 		  "type": "manifest",
 		  "output": "manifest.json",
-		  "strip_path": true,
-		  "custom_data": {
-			"managed_image_name": "{{user `managed_image_name`}}",
-			"build_resource_group_name": "{{user `resource_group_name`}}",
-			"image_sku": "{{user `image_sku`}}",
-			"image_created": "{{ .artifact_id }}"
-		  }
+		  "strip_path": true
 		}
 	  ]
 }

@@ -11,7 +11,15 @@
       "secret_key": "{{ user `aws_secret_key` }}",
       "region": "{{ user `region` }}",
       "instance_type": "t2.micro",
-      "source_ami": "ami-0b91c01eb7fffd30b",
+      "source_ami_filter": {
+        "filters": {
+        "virtualization-type": "hvm",
+        "name": "Windows*2016*English*Full*Base*",
+        "root-device-type": "ebs"
+        },
+        "owners": ["amazon"],
+        "most_recent": true
+      },
       "ami_name": "packer-demo-{{timestamp}}",
       "user_data_file": "./bootstrap_win.txt",
       "communicator": "winrm",

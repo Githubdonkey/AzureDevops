@@ -40,14 +40,7 @@
 		{
 		  "type": "manifest",
 		  "output": "manifest.json",
-		  "strip_path": true,
-		  "custom_data": {
-			"managed_image_name": "{{user `managed_image_name`}}",
-			"build_resource_group_name": "{{user `resource_group_name`}}",
-			"image_sku": "{{user `image_sku`}}",
-			"image_created": "{{ .artifact_id }}",
-			"image_id": "{{ .ManagedImageId }}"
+		  "strip_path": true
 		  }
-		}
 	  ]
 }

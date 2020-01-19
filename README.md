@@ -56,35 +56,17 @@ pip3 install awscli --upgrade
 
 ```
 # AWS account info
-
-# Powershell
-PS C:\> $Env:AWS_ACCESS_KEY_ID="AKIAIOSFODNN7EXAMPLE"
-PS C:\> $Env:AWS_SECRET_ACCESS_KEY="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
-PS C:\> $Env:AWS_DEFAULT_REGION="us-east-1"
-# Linux
-$ export AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
-$ export AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-$ export AWS_DEFAULT_REGION=us-west-2
+export AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
+export AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+export AWS_DEFAULT_REGION=us-west-2
 
 # Azure account info
-
-# Powershell
-PS C:\> $Env:ARM_CLIENT_ID=""
-PS C:\> $Env:ARM_CLIENT_SECRET=""
-PS C:\> $Env:ARM_SUBSCRIPTION_ID=""
-PS C:\> $Env:ARM_TENANT_ID=""
-# Linux
 export ARM_CLIENT_ID=""
 export ARM_CLIENT_SECRET=""
 export ARM_SUBSCRIPTION_ID=""
 export ARM_TENANT_ID=""
 ```
-###### Service Principal login
-```
-az login --service-principal --username $ARM_CLIENT_ID --password $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
-# Test access
-az vm list-sizes --location eastus
-```
+
 
 # Setup linux machine
 ###### Install
@@ -131,4 +113,11 @@ az vm image list --offer Debian --all --output table
 az vm image list --location westeurope --offer Deb --publisher credativ --sku 8 --all --output table
 az vm image list-skus --location westus --publisher Canonical --offer UbuntuServer --output table
 az vm image show --location westus --urn Canonical:UbuntuServer:18.04-LTS:latest
+```
+
+###### Service Principal login
+```
+az login --service-principal --username $ARM_CLIENT_ID --password $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
+# Test access
+az vm list-sizes --location eastus
 ```
