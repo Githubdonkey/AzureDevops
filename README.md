@@ -88,14 +88,11 @@ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 ```
 ###### Terraform
 ```
-terraform-install.sh
+installScripts/install-terraform.sh
 ```
 ###### Packer - install or update(sudo rm -r /usr/local/bin/)
 ```
-VER=1.4.5
-wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
-unzip packer_${VER}_linux_amd64.zip
-sudo mv packer /usr/local/bin
+installScripts/install-packer.sh
 ```
 ######  Set Variables
 * Build machine: export PACKER_LOG_PATH="/home/test/packer.log"
