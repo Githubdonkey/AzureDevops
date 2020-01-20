@@ -14,6 +14,7 @@
     "source_name_filter":   "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*",
     "ssh_username":         "ubuntu"
   },
+
   "builders": [
    {
     "type":                     "amazon-ebs",
@@ -44,6 +45,7 @@
     "force_delete_snapshot":    "true"
    }
   ],
+
 	"provisioners": [{
 		"execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E sh '{{ .Path }}'",
 		"inline": [
@@ -51,7 +53,8 @@
 		],
 		"inline_shebang": "/bin/sh -x",
 		"type": "shell"
-	}],
+  }],
+  
 	"post-processors": [
 		{
 		  "type": "manifest",

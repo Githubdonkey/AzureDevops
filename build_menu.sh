@@ -19,9 +19,11 @@ echo "************** select the operation ************"
 echo ""
 echo "************** AWS ******************************"
 echo "  11) Packer Build Ubuntu 18 Market Place"
-echo "  12) Packer Build Windows 2016 Market Place"
-echo "  13) Terraform Ubuntu 18"
-echo "  14) Terraform modules"
+echo "  12) Packer Build Windows 2012R2 Market Place"
+echo "  13) Packer Build Windows 2016 Market Place"
+echo "  14) Packer Build Windows 2019 Market Place"
+echo "  15) Terraform Ubuntu 18"
+echo "  16) Terraform modules"
 echo ""
 echo "************** Azure ****************************"
 echo "  21) Packer Build Ubuntu 18 Market Place"
@@ -35,19 +37,56 @@ case $n in
   11) echo "You chose Option 11" 
      cd packer/
      packer build aws_ubuntu18_latest_marketplace.json
+
      export TF_VAR_packer_image=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
      export TF_VAR_packer_name=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.AMI_Name' | tr -d '"')
-     aws s3 rm s3://bucket-name/ami --recursive
+     export TF_VAR_packer_name_os=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name_os' | tr -d '"')
+
+     #aws s3 rm s3://gitdonkey/devops/ --recursive --exclude "*" --include "${TF_VAR_packer_name_os}*"
      aws s3 cp manifest.json s3://gitdonkey/devops/image_build_repo/${TF_VAR_packer_image}.json
+     aws s3 cp manifest.json s3://gitdonkey/devops/image_build_repo/${TF_VAR_packer_name}.json
      aws s3 cp manifest.json s3://gitdonkey/devops/${TF_VAR_packer_name}.json;;
 
   12) echo "You chose Option 12" 
      cd packer/
-     packer build aws_win2016_latest_marketplace.json
-     export TF_VAR_packer_image=$(cat packer/manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"')
-     aws s3 cp packer/manifest.json s3://gitdonkey/devops/${TF_VAR_packer_image}.json;;
+     packer build aws_win2012R2_latest_marketplace.json
 
-  13) string=$(cat packer/manifest.json | jq '.builds | to_entries[] | .value.name')
+     export TF_VAR_packer_image=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
+     export TF_VAR_packer_name=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.AMI_Name' | tr -d '"')
+     export TF_VAR_packer_name_os=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name_os' | tr -d '"')
+
+     #aws s3 rm s3://gitdonkey/devops/ --recursive --exclude "*" --include "${TF_VAR_packer_name_os}*"
+     aws s3 cp manifest.json s3://gitdonkey/devops/image_build_repo/${TF_VAR_packer_image}.json
+     aws s3 cp manifest.json s3://gitdonkey/devops/image_build_repo/${TF_VAR_packer_name}.json
+     aws s3 cp manifest.json s3://gitdonkey/devops/${TF_VAR_packer_name}.json;;
+
+  13) echo "You chose Option 13" 
+     cd packer/
+     packer build aws_win2016_latest_marketplace.json
+
+     export TF_VAR_packer_image=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
+     export TF_VAR_packer_name=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.AMI_Name' | tr -d '"')
+     export TF_VAR_packer_name_os=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name_os' | tr -d '"')
+
+     #aws s3 rm s3://gitdonkey/devops/ --recursive --exclude "*" --include "${TF_VAR_packer_name_os}*"
+     aws s3 cp manifest.json s3://gitdonkey/devops/image_build_repo/${TF_VAR_packer_image}.json
+     aws s3 cp manifest.json s3://gitdonkey/devops/image_build_repo/${TF_VAR_packer_name}.json
+     aws s3 cp manifest.json s3://gitdonkey/devops/${TF_VAR_packer_name}.json;;
+   
+   14) echo "You chose Option 14" 
+     cd packer/
+     packer build aws_win2019_latest_marketplace.json
+
+     export TF_VAR_packer_image=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
+     export TF_VAR_packer_name=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.AMI_Name' | tr -d '"')
+     export TF_VAR_packer_name_os=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name_os' | tr -d '"')
+
+     #aws s3 rm s3://gitdonkey/devops/ --recursive --exclude "*" --include "${TF_VAR_packer_name_os}*"
+     aws s3 cp manifest.json s3://gitdonkey/devops/image_build_repo/${TF_VAR_packer_image}.json
+     aws s3 cp manifest.json s3://gitdonkey/devops/image_build_repo/${TF_VAR_packer_name}.json
+     aws s3 cp manifest.json s3://gitdonkey/devops/${TF_VAR_packer_name}.json;;
+
+  15) string=$(cat packer/manifest.json | jq '.builds | to_entries[] | .value.name')
      if [[ $string == *"amazon"* ]]; then
         echo "AWS is NOT empty"
         export TF_VAR_packer_image=$(cat packer/manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
@@ -68,7 +107,7 @@ case $n in
      sleep 4m
      terraform destroy -var="image_id=$TF_VAR_packer_image" -auto-approve;;
 
-  14) string=$(cat packer/manifest.json | jq '.builds | to_entries[] | .value.name')
+  16) string=$(cat packer/manifest.json | jq '.builds | to_entries[] | .value.name')
      if [[ $string == *"amazon"* ]]; then
         echo "AWS is NOT empty"
         export TF_VAR_packer_image=$(cat packer/manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
@@ -91,7 +130,15 @@ case $n in
 
   21) echo "You chose Option 21" 
      cd packer/
-     packer build azure_ubuntu18_latest_marketplace.json;;
+     packer build azure_ubuntu18_latest_marketplace.json
+     export TF_VAR_packer_image=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d'/' -f9)
+     export TF_VAR_packer_name=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.Name' | tr -d '"')
+     #export TF_VAR_packer_name_os=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name_os' | tr -d '"')
+
+     #aws s3 rm s3://gitdonkey/devops/ --recursive --exclude "*" --include "${TF_VAR_packer_name_os}*"
+     #aws s3 cp manifest.json s3://gitdonkey/devops/image_build_repo/${TF_VAR_packer_image}.json
+     aws s3 cp manifest.json s3://gitdonkey/devops/image_build_repo/${TF_VAR_packer_name}.json;;
+     aws s3 cp manifest.json s3://gitdonkey/devops/${TF_VAR_packer_name}.json;;
   22) echo "You chose Option 22" 
      cd packer/
      packer build azure_win2019_latest_marketplace.json;;

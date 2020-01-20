@@ -1,9 +1,9 @@
 {
   "variables": {
     "build":                "{{timestamp}}",
-    "os_version":           "Windows2016",
+    "os_version":           "Windows2012R2",
     "pre":                  "SICFactory",
-    "source_name_filter":   "Windows_Server-2016-English-Full-Base-*",
+    "source_name_filter":   "Windows_Server-2012-R2_RTM-English-64Bit-Base-*",
     "owners":               "amazon",
     "instance_type":        "t2.medium",
 
@@ -23,7 +23,7 @@
     "source_ami_filter": {
       "filters": {
         "virtualization-type":  "hvm",
-        "name":                 "{{user `source_name_filter`}}",
+        "name":                 "{{ user `source_name_filter` }}",
         "root-device-type":     "ebs"
       },
       "owners": [

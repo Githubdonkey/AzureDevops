@@ -1,9 +1,9 @@
 {
   "variables": {
     "build":                "{{timestamp}}",
-    "os_version":           "Windows2016",
+    "os_version":           "Windows2019",
     "pre":                  "SICFactory",
-    "source_name_filter":   "Windows_Server-2016-English-Full-Base-*",
+    "source_name_filter":   "Windows_Server-2019-English-Full-Base-*",
     "owners":               "amazon",
     "instance_type":        "t2.medium",
 
