@@ -61,7 +61,7 @@
 		  "output": "manifest.json",
       "strip_path": true,
       "custom_data": {
-        "AMI_Name": "{{ user `name` }}",
+        "name": "{{ user `name` }}",
         "Base_AMI_NameTag": "{{ user `source_name_filter` }}",
         "Base_AMI_Name": "{{ .SourceAMIName }}",
         "owner": "{{user `owners`}}",
