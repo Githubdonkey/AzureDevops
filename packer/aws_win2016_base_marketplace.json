@@ -23,7 +23,7 @@
     "source_ami_filter": {
       "filters": {
         "virtualization-type":  "hvm",
-        "name":                 "{{user `source_name_filter`}}",
+        "name":                 "Windows_Server-2016-English-Full-Base-*",
         "root-device-type":     "ebs"
       },
       "owners": [
@@ -71,12 +71,17 @@
 		  "output": "manifest.json",
       "strip_path": true,
       "custom_data": {
-        "AMI_Name": "{{ user `name` }}",
-        "Base_AMI_Name": "{{ .SourceAMIName }}",
-        "owner": "{{user `owners`}}",
-        "artifatt": "{{ .artifact_id }}",
-        "OS_version": "{{ user `os_version` }}",
-        "name_os": "{{ user `pre` }}-{{ user `os_version` }}"
+        "name":                   "{{ user `name` }}",
+        "Base_AMI_Name":          "{{ .SourceAMIName }}",
+        "type":                     "amazon-ebs",
+        "region":                   "{{user `region`}}",
+        "owners":                   "{{user `owners`}}",
+        "instance_type":            "{{user `instance_type`}}",
+        "ami_name":                 "{{user `name`}}",
+        "communicator":             "winrm",
+        "artifatt":                 "{{ .artifact_id }}",
+        "OS_version":               "{{ user `os_version` }}",
+        "name_os":                  "{{ user `pre` }}-{{ user `os_version` }}"
       }
 		  }
 	  ]
