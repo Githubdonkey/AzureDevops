@@ -14,49 +14,51 @@ pool:
 stages:
 - stage: Build_Initialize
   displayName: 'Build_Initialize'
-  steps:
-  - task: Bash@3
-    displayName: 'Install PreReq packages'
-    inputs:
-      targetType: 'inline'
-      script: |
-          sudo apt-get update
-          sudo apt-get install curl jq -y
-  - task: Bash@3
-    displayName: 'Install_AWS_CLI'
-    inputs:
-      targetType: 'inline'
-      script: |
-          sudo apt-get install awscli -y
-          export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
-          export AWS_SECRET_ACCESS_KEY=$(aws_secret_access_key)
-          export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
-          aws --version
-          aws s3 ls
-  - task: Bash@3
-    displayName: 'Install_AZURE_AZ'
-    inputs:
-      targetType: 'inline'
-      script: |
-          az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
-  - task: Bash@3
-    displayName: 'Install_Packer'
-    inputs:
-      targetType: 'inline'
-      script: |
-        # VER=1.4.5
-        # wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
-        # unzip packer_${VER}_linux_amd64.zip
-        # sudo mv packer /usr/local/bin
-        packer --version
-  - task: Bash@3
-    displayName: 'Install_Terraform'
-    inputs:
-      targetType: 'inline'
-      script: |
-        # VER=0.12.18
-        # wget https://releases.hashicorp.com/terraform/${VER}/terraform_${VER}_linux_amd64.zip
-        terraform -v
+  jobs:
+  - job: Install_software
+    steps:
+    - task: Bash@3
+      displayName: 'Install PreReq packages'
+      inputs:
+        targetType: 'inline'
+        script: |
+            sudo apt-get update
+            sudo apt-get install curl jq -y
+    - task: Bash@3
+      displayName: 'Install_AWS_CLI'
+      inputs:
+        targetType: 'inline'
+        script: |
+            sudo apt-get install awscli -y
+            export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
+            export AWS_SECRET_ACCESS_KEY=$(aws_secret_access_key)
+            export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
+            aws --version
+            aws s3 ls
+    - task: Bash@3
+      displayName: 'Install_AZURE_AZ'
+      inputs:
+        targetType: 'inline'
+        script: |
+            az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
+    - task: Bash@3
+      displayName: 'Install_Packer'
+      inputs:
+        targetType: 'inline'
+        script: |
+          # VER=1.4.5
+          # wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
+          # unzip packer_${VER}_linux_amd64.zip
+          # sudo mv packer /usr/local/bin
+          packer --version
+    - task: Bash@3
+      displayName: 'Install_Terraform'
+      inputs:
+        targetType: 'inline'
+        script: |
+          # VER=0.12.18
+          # wget https://releases.hashicorp.com/terraform/${VER}/terraform_${VER}_linux_amd64.zip
+          terraform -v
 
 - stage: Build_SecureImage
   displayName: 'Build'
