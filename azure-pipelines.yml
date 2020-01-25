@@ -4,7 +4,9 @@
 # https://aka.ms/yaml
 
 trigger:
-- none
+#- none
+- master
+- releases/*
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -32,6 +34,8 @@ stages:
           export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
           aws --version
           aws s3 ls
+          aws s3 cp s3://gitdonkey/devops/SICFactory-Ubuntu1804-1579569816.json manifest.json
+          ls
   - job: azure
     dependsOn: Foo
     condition: eq(dependencies.Foo.outputs['DetermineResult.doThing'], 'azure')
@@ -41,24 +45,6 @@ stages:
 - stage: Build_SecureImage2
   displayName: 'Build2'
   jobs:
-  - job: Install
-    steps:
-      - script: |
-          echo "apt-get update"
-          sudo apt-get install curl jq -y
-          sudo apt-get update
-          echo "##vso[task.setvariable variable=doThing2;isOutput=true]azure"
-        name: DetermineResult2
-  - job: aws
-    dependsOn: Install
-    condition: eq(dependencies.Install.outputs['DetermineResult2.doThing2'], 'aws') 
-    steps:
-      - script: echo "Job aws ran and doThing is aws."
-  - job: azure
-    dependsOn: Install
-    condition: eq(dependencies.Install.outputs['DetermineResult2.doThing2'], 'azure') 
-    steps:
-      - script: echo "Job azure ran and doThing is azure."
   - job: test
     steps:
     - task: Bash@3
