@@ -40,12 +40,12 @@ stages:
           echo "##vso[task.setvariable variable=doThing2;isOutput=true]azure"
         name: DetermineResult2
   - job: aws
-    dependsOn: Foo
+    dependsOn: Install
     condition: eq(dependencies.Foo.outputs['DetermineResult2.doThing2'], 'aws') 
     steps:
       - script: echo "Job aws ran and doThing is aws."
   - job: azure
-    dependsOn: Foo
+    dependsOn: Install
     condition: eq(dependencies.Foo.outputs['DetermineResult2.doThing2'], 'azure') 
     steps:
       - script: echo "Job azure ran and doThing is azure."
