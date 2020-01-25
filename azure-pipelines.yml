@@ -41,6 +41,8 @@ stages:
           export ImagePath=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
           echo "ImageName: $ImageName"
           echo "ImagePath: $ImagePath"
+          echo "ImageBuilder: $ImageBuilder"
+          echo "##vso[task.setvariable variable=imageNamePipeline;isOutput=true]$ImageName"
           echo "##vso[task.setvariable variable=imageNamePipeline;isOutput=true]$ImageName"
           echo "##vso[task.setvariable variable=imageBuilderPipeline;isOutput=true]$ImageBuilder"
         name: DetermineImageInfo
@@ -51,12 +53,12 @@ stages:
       - script: echo "Job azure ran and doThing is azure."
   - job: AWS_Set_Image_Info
     dependsOn: Foo
-    condition: eq(dependencies.Foo.outputs['DetermineImageInfo.ImageBuilder'], 'amazon-ebs')
+    condition: eq(dependencies.Foo.outputs['DetermineImageInfo.imageBuilderPipeline'], 'amazon-ebs')
     steps:
       - script: echo "Job aws ran and doThing is aws."
   - job: Azure_Set_Image_Info
     dependsOn: Foo
-    condition: eq(dependencies.Foo.outputs['DetermineImageInfo.ImageBuilder'], 'azure-arm')
+    condition: eq(dependencies.Foo.outputs['DetermineImageInfo.imageBuilderPipeline'], 'azure-arm')
     steps:
       - script: echo "Job azure ran and doThing is azure."
 
