@@ -22,6 +22,58 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
+            ls /usr/local/bin
+            ls
+            sudo apt-get update
+            sudo apt-get install curl jq unzip -y
+    - task: Bash@3
+      displayName: 'Install_AWS_CLI'
+      inputs:
+        targetType: 'inline'
+        script: |
+            sudo apt-get install awscli -y
+            export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
+            export AWS_SECRET_ACCESS_KEY=$(aws_secret_access_key)
+            export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
+            aws --version
+            aws s3 ls
+    - task: Bash@3
+      displayName: 'Install_AZURE_AZ'
+      inputs:
+        targetType: 'inline'
+        script: |
+            az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
+    - task: Bash@3
+      displayName: 'Install_Packer'
+      inputs:
+        targetType: 'inline'
+        script: |
+          # VER=1.5.1
+          # wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
+          aws s3 cp s3://gitdonkey/devops/installers/packer_1.5.1_linux_amd64.zip packer_linux_amd64.zip
+          unzip packer_linux_amd64.zip
+          # sudo mv packer /usr/local/bin
+          # packer --version
+    - task: Bash@3
+      displayName: 'Install_Terraform'
+      inputs:
+        targetType: 'inline'
+        script: |
+          # VER=0.12.18
+          # wget https://releases.hashicorp.com/terraform/${VER}/terraform_${VER}_linux_amd64.zip
+          aws s3 cp s3://gitdonkey/devops/installers/terraform_0.12.20_linux_amd64.zip terraform_linux_amd64.zip
+          # terraform -v
+
+- stage: Packer_Build
+  displayName: 'Packer_Build'
+  jobs:
+  - job: Packer_Build
+    steps:
+    - task: Bash@3
+      displayName: 'Install PreReq packages'
+      inputs:
+        targetType: 'inline'
+        script: |
             sudo apt-get update
             sudo apt-get install curl jq unzip -y
     - task: Bash@3
@@ -87,7 +139,6 @@ stages:
           echo "##vso[task.setvariable variable=imageNamePipeline;isOutput=true]$ImageName"
           echo "##vso[task.setvariable variable=imagePathPipeline;isOutput=true]$ImagePath"
           echo "ImageBuilder: $ImageBuilder ImageName: $ImageName ImagePath: $ImagePath"
-          echo "ImageBuilder: $imageBuilderPipeline ImageName: $imageNamePipeline ImagePath: $imagePathPipeline"
         name: DetermineImageInfo
   - job: AWS_Set_Image_Info
     dependsOn: aws
