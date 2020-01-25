@@ -36,7 +36,7 @@ stages:
           aws s3 ls
           aws s3 cp s3://gitdonkey/devops/SICFactory-Ubuntu1804-1579569816.json manifest.json
           ls
-          export ImageBuilder=$(cat packer/manifest.json | jq '.builds | to_entries[] | .value.name')
+          export ImageBuilder=$(cat manifest.json | jq '.builds | to_entries[] | .value.name')
           export ImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
           export ImagePath=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
           echo "ImageName: $ImageName"
