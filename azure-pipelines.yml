@@ -36,6 +36,7 @@ stages:
   - job: Install
     steps:
       - script: |
+          echo "apt-get update"
           sudo apt-get update
           echo "##vso[task.setvariable variable=doThing2;isOutput=true]azure"
         name: DetermineResult2
