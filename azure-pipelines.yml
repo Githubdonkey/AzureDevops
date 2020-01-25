@@ -120,9 +120,6 @@ stages:
       inputs:
         targetType: 'inline'
         script: | 
-          echo "ImageBuilder: $ImageBuilder ImageName: $ImageName ImagePath: $ImagePath"
-          echo "ImageBuilder: $(DetermineImageInfo.imageBuilderPipeline) ImageName: $imageNamePipeline ImagePath: $imagePathPipeline"
-          echo $[ dependencies.aws.outputs['DetermineImageInfo.imageBuilderPipeline'] ]
           echo "MySecret: $FOOO"
           echo $FOOO
     - task: Bash@3
