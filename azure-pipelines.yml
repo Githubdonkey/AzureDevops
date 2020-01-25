@@ -6,37 +6,21 @@
 trigger:
 - none
 
+pool:
+  vmImage: 'ubuntu-latest'
+
 stages:
 - stage: Build_SecureImage
   displayName: 'Build'
   jobs:
-  # Set an output variable from a job with a matrix
-  - job: A
-    pool:
-      vmImage: 'ubuntu-latest'
-    strategy:
-      maxParallel: 2
-      matrix:
-        debugJob:
-          configuration: debug
-          platform: x64
-        releaseJob:
-          configuration: release
-          platform: x64
+  - job: Foo
     steps:
-    - script: echo "##vso[task.setvariable variable=myOutputVar;isOutput=true]this is the $(configuration) value"
-      name: setvarStep
-    - script: echo $(setvarStep.myOutputVar)
-      name: echovar
-
-  # Map the variable from the debug job
-  - job: B
-    dependsOn: A
-    pool:
-      vmImage: 'ubuntu-16.04'
-    variables:
-      myVarFromJobADebug: $[ dependencies.A.outputs['debugJob.setvarStep.myOutputVar'] ]
+      - script: |
+          echo "This is job Foo."
+          echo "##vso[task.setvariable variable=doThing;isOutput=true]Yes" #The variable doThing is set to true
+        name: DetermineResult
+  - job: Bar
+    dependsOn: Foo
+    condition: eq(dependencies.Foo.outputs['DetermineResult.doThing'], 'Yes') #map doThing and check if true
     steps:
-    - script: echo $(myVarFromJobADebug)
-      name: echovar
-
+      - script: echo "Job Foo ran and doThing is true."
