@@ -52,6 +52,9 @@ stages:
     steps:
       - script: echo "Job azure ran and doThing is azure."
 
+- stage: Build_SecureImage3
+  displayName: 'Build3'
+  jobs:
   - job: Install AWS CLI
     steps:
     - task: Bash@3
