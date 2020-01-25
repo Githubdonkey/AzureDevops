@@ -92,16 +92,17 @@ stages:
   - job: AWS_Set_Image_Info
     dependsOn: aws
     condition: eq(dependencies.aws.outputs['DetermineImageInfo.imageBuilderPipeline'], 'amazon-ebs' )
+    variables:
+      # Define the variable FOO from the previous job
+      # Note the use of single quotes!
+      FOOO: $[ dependencies.aws.outputs['DetermineImageInfo.imageBuilderPipeline'] ]
     steps:
       - script: | 
           echo $(FOOO)
           echo $FOOO
           echo "ImageBuilder: $ImageBuilder ImageName: $ImageName ImagePath: $ImagePath"
           echo "ImageBuilder: $[ dependencies.aws.outputs['DetermineImageInfo.imageBuilderPipeline'] ] ImageName: $imageNamePipeline ImagePath: $imagePathPipeline"
-        variables:
-      # Define the variable FOO from the previous job
-      # Note the use of single quotes!
-          FOOO: $[ dependencies.aws.outputs['DetermineImageInfo.imageBuilderPipeline'] ]
+        
   - job: Azure_Set_Image_Info
     dependsOn: aws
     condition: eq(dependencies.aws.outputs['DetermineImageInfo.imageBuilderPipeline'], 'azure-arm')
@@ -112,6 +113,10 @@ stages:
   displayName: 'Build2'
   jobs:
   - job: test
+    variables:
+      # Define the variable FOO from the previous job
+      # Note the use of single quotes!
+      FOOO: $[ dependencies.aws.outputs['DetermineImageInfo.imageBuilderPipeline'] ]
     steps:
     - task: Bash@3
       inputs:
@@ -122,10 +127,6 @@ stages:
           echo $[ dependencies.aws.outputs['DetermineImageInfo.imageBuilderPipeline'] ]
           echo "MySecret: $FOOO"
           echo $FOOO
-      variables:
-      # Define the variable FOO from the previous job
-      # Note the use of single quotes!
-          FOOO: $[ dependencies.aws.outputs['DetermineImageInfo.imageBuilderPipeline'] ]
     - task: Bash@3
       inputs:
         targetType: 'inline'
