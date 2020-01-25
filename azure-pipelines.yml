@@ -120,8 +120,8 @@ stages:
       inputs:
         targetType: 'inline'
         script: | 
-          echo "MySecret: $FOOO"
           echo $FOOO
+          echo $(FOOO)
     - task: Bash@3
       inputs:
         targetType: 'inline'
