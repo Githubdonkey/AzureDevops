@@ -96,7 +96,7 @@ stages:
       - script: | 
           echo "Job aws ran and doThing is aws."
           echo "ImageBuilder: $ImageBuilder ImageName: $ImageName ImagePath: $ImagePath"
-          echo "ImageBuilder: $imageBuilderPipeline ImageName: $imageNamePipeline ImagePath: $imagePathPipeline"
+          echo "ImageBuilder: $(DetermineImageInfo.imageBuilderPipeline) ImageName: $imageNamePipeline ImagePath: $imagePathPipeline"
   - job: Azure_Set_Image_Info
     dependsOn: aws
     condition: eq(dependencies.aws.outputs['DetermineImageInfo.imageBuilderPipeline'], 'azure-arm')
@@ -113,11 +113,11 @@ stages:
         targetType: 'inline'
         script: | 
           echo "ImageBuilder: $ImageBuilder ImageName: $ImageName ImagePath: $ImagePath"
-          echo "ImageBuilder: $imageBuilderPipeline ImageName: $imageNamePipeline ImagePath: $imagePathPipeline"
+          echo "ImageBuilder: $(DetermineImageInfo.imageBuilderPipeline) ImageName: $imageNamePipeline ImagePath: $imagePathPipeline"
           echo "MySecret: $MySecret"
           echo '##vso[variable=imageBuilderPipeline]'
       env:
-        MySecret: $imageBuilderPipeline
+        MySecret: $(DetermineImageInfo.imageBuilderPipeline)
     - task: Bash@3
       inputs:
         targetType: 'inline'
