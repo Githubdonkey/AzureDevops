@@ -4,9 +4,9 @@
 # https://aka.ms/yaml
 
 trigger:
-#- none
-- master
-- releases/*
+  branches:
+    include:
+    - '*'  # must quote since "*" is a YAML reserved character; we want a string
 
 pool:
   vmImage: 'ubuntu-latest'
