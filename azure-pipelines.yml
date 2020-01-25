@@ -41,11 +41,11 @@ stages:
         name: DetermineResult2
   - job: aws
     dependsOn: Install
-    condition: eq(dependencies.Foo.outputs['DetermineResult2.doThing2'], 'aws') 
+    condition: eq(dependencies.Install.outputs['DetermineResult2.doThing2'], 'aws') 
     steps:
       - script: echo "Job aws ran and doThing is aws."
   - job: azure
     dependsOn: Install
-    condition: eq(dependencies.Foo.outputs['DetermineResult2.doThing2'], 'azure') 
+    condition: eq(dependencies.Install.outputs['DetermineResult2.doThing2'], 'azure') 
     steps:
       - script: echo "Job azure ran and doThing is azure."
