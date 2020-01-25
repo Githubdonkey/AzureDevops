@@ -1,0 +1,68 @@
+{
+	"variables": {
+		"build":                "{{timestamp}}",
+		"os_version":           "Ubuntu1804",
+		"pre":                  "SICFactory",
+
+		"azure_app_id": 		"{{env `ARM_CLIENT_ID`}}",
+    	"azure_client_secret": 	"{{env `ARM_CLIENT_SECRET`}}",
+    	"azure_tenant_id": 		"{{env `ARM_TENANT_ID`}}",
+		"azure_sub_id": 		"{{env `ARM_SUBSCRIPTION_ID`}}",
+
+		"name":                 "{{user `pre`}}-{{user `os_version`}}-{{user `build`}}",
+		"description":          "{{user `pre`}}-{{user `os_version`}}-{{user `build`}} built from latest Market place image",
+		"vm_size":        		"Standard_DS2_v2",
+		"ssh_username":         "ubuntu",
+		"resource_group_name": 	"myResourceGroup",
+		"os_type": 				"Linux",
+		"image_sku": 			"18.04-LTS",
+		"image_publisher": 		"Canonical",
+		"image_offer": 			"UbuntuServer"
+  },
+	"builders": [{
+		"type": 								"azure-arm",
+    	"client_id": 							"{{user `azure_app_id`}}",
+    	"client_secret": 						"{{user `azure_client_secret`}}",
+    	"tenant_id": 							"{{user `azure_tenant_id`}}",
+		"subscription_id": 						"{{user `azure_sub_id`}}",
+		"build_resource_group_name": 			"{{user `resource_group_name`}}",
+		"managed_image_resource_group_name": 	"{{user `resource_group_name`}}",
+		"managed_image_name": 					"{{user `name`}}",
+		"os_type": 								"{{user `os_type`}}",
+		"image_publisher": 						"{{user `image_publisher`}}",
+		"image_offer": 							"{{user `image_offer`}}",
+		"image_sku": 							"{{user `image_sku`}}",
+		"azure_tags": {
+			"Name":                 			"{{ user `name` }}",
+      		"Description":            			"{{ user `description` }}",
+      		"OS_Version":             			"{{ user `os_version` }}",
+      		"Base_AMI_Name":          			"{{ .artifact_id }}"
+			},
+		"vm_size": 								"{{ user `vm_size` }}",
+	"async_resourcegroup_delete":true
+	}],
+	"provisioners": [{
+		"execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E sh '{{ .Path }}'",
+		"inline": [
+			"apt-get update"
+		],
+		"inline_shebang": "/bin/sh -x",
+		"type": "shell"
+	}],
+	"post-processors": [
+		{
+		  "type": "manifest",
+		  "output": "manifest.json",
+      "strip_path": true,
+      "custom_data": {
+        "Name": "{{ user `name` }}",
+        "Base_AMI_NameTag": "{{ user `source_name_filter` }}",
+        "Base_AMI_Name": "{{ .SourceAMIName }}",
+        "owner": "{{user `owners`}}",
+        "artifatt": "{{ .artifact_id }}",
+        "OS_version": "{{ user `os_version` }}",
+        "name_os": "{{ user `pre` }}-{{ user `os_version` }}"
+      }
+		  }
+	  ]
+ }

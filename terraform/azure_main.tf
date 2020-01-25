@@ -1,3 +1,59 @@
+variable "aws_builder" {
+  type = "string"
+  default = ""
+}
+variable "azure_builder" {
+  type = "string"
+  default = ""
+}
+variable "custom_image_name" {
+  type = "string"
+  default = ""
+}
+variable "custom_image_resource_group_name" {
+  type = "string"
+  default = "myResourceGroup"
+}
+variable "custom_virtual_network" {
+  type = "string"
+  default = "test-network"
+}
+variable "custom_subnet" {
+  type = "string"
+  default = "internal"
+}
+variable "custom_network_interface" {
+  type = "string"
+  default = "test-nic"
+}
+variable "packer_image" {
+  type = "string"
+}
+
+variable "google_vpc_cidr" {
+    description = "Google Compute Engine VPC CIDR"
+    default = ""
+}
+
+resource "aws_security_group" "queue" {
+    name = "queue"
+    description = "Queue role"
+}
+
+resource "aws_security_group_rule" "rabbitmq_tcp_5672_google" {
+    count = "${var.google_vpc_cidr != "" ? 1 : 0}"
+
+    type = "ingress"
+    from_port = 5672
+    to_port = 5672
+    protocol = "tcp"
+    cidr_blocks = [
+       "${var.google_vpc_cidr}"
+    ]
+    security_group_id = "${aws_security_group.queue.id}"
+}
+
+
 provider "azurerm" {
   # whilst the `version` attribute is optional, we recommend pinning to a given version of the Provider
   version = "=1.38.0"
@@ -26,14 +82,7 @@ data "azurerm_subnet" "example" {
 
 data "azurerm_network_interface" "example" {
   name                = "${var.custom_network_interface}"
-  #location            = "${data.azurerm_resource_group.example.location}"
   resource_group_name = "${data.azurerm_resource_group.example.name}"
-
-  #ip_configuration {
-   # name                          = "testconfiguration1"
-   # subnet_id                     = "${data.azurerm_subnet.example.id}"
-   # private_ip_address_allocation = "Dynamic"
-  #}
 }
 data "azurerm_image" "search" {
   name                = "${var.packer_image}"

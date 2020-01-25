@@ -15,6 +15,9 @@ touch .gitignore # add files to this to exclude
 git add .
 git commit -m "your comment"
 git push
+
+# First push "git push --set-upstream origin pipeline_work"
+
 ```
 # AzureDevops
 Sign up for an account
@@ -43,60 +46,30 @@ Output(appId is the client_id)
 }
 ```
 # AWS Setup
+Create User
+```
+pip3 install awscli
+pip3 install awscli --upgrade
+```
 
 ### Set Envirornment Var for build machine
 
 ```
 # AWS account info
-
-# Powershell
-PS C:\> $Env:AWS_ACCESS_KEY_ID="AKIAIOSFODNN7EXAMPLE"
-PS C:\> $Env:AWS_SECRET_ACCESS_KEY="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
-PS C:\> $Env:AWS_DEFAULT_REGION="us-east-1"
-# Linux
-$ export AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
-$ export AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-$ export AWS_DEFAULT_REGION=us-west-2
+export AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
+export AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+export AWS_DEFAULT_REGION=us-west-2
 
 # Azure account info
-
-# Powershell
-PS C:\> $Env:ARM_CLIENT_ID=""
-PS C:\> $Env:ARM_CLIENT_SECRET=""
-PS C:\> $Env:ARM_SUBSCRIPTION_ID=""
-PS C:\> $Env:ARM_TENANT_ID=""
-# Linux
 export ARM_CLIENT_ID=""
 export ARM_CLIENT_SECRET=""
 export ARM_SUBSCRIPTION_ID=""
 export ARM_TENANT_ID=""
 ```
-###### Service Principal login
-```
-az login --service-principal --username $ARM_CLIENT_ID --password $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
-# Test access
-az vm list-sizes --location eastus
-```
-
-###### setup azure packer
-```
-* create resource group
-* New-AzResourceGroup -Name "myResourceGroup" -Location "East US"
-```
 
 
-
-## Azure List images
-* https://docs.microsoft.com/en-us/azure/virtual-machines/linux/cli-ps-findimage
-```
-az vm image list --output table
-az vm image list --offer Debian --all --output table
-az vm image list --location westeurope --offer Deb --publisher credativ --sku 8 --all --output table
-az vm image list-skus --location westus --publisher Canonical --offer UbuntuServer --output table
-az vm image show --location westus --urn Canonical:UbuntuServer:18.04-LTS:latest
-```
-
-## Setup linux machine
+# Setup linux machine
+###### Install
 ```
 sudo apt-get install unzip
 wget -q https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
@@ -115,22 +88,33 @@ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 ```
 ###### Terraform
 ```
-terraform-install.sh
+installScripts/install-terraform.sh
 ```
 ###### Packer - install or update(sudo rm -r /usr/local/bin/)
 ```
-VER=1.4.5
-wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
-unzip packer_${VER}_linux_amd64.zip
-sudo mv packer /usr/local/bin
+installScripts/install-packer.sh
 ```
-## Set up Packer Logging
-###### UNIX
+######  Set Variables
 * Build machine: export PACKER_LOG_PATH="/home/test/packer.log"
 * Build machine: export PACKER_LOG=1
 * Build machine: packer build -debug ubuntu_64.json
 
-###### WINDOWS
-* Build machine: set PACKER_LOG=1
-* Build machine: set PACKER_LOG_PATH=c:\temp\packer log
-* Build machine: packer build -debug ubuntu_64.json
+
+
+# Useful commands
+###### Azure List images
+* https://docs.microsoft.com/en-us/azure/virtual-machines/linux/cli-ps-findimage
+```
+az vm image list --output table
+az vm image list --offer Debian --all --output table
+az vm image list --location westeurope --offer Deb --publisher credativ --sku 8 --all --output table
+az vm image list-skus --location westus --publisher Canonical --offer UbuntuServer --output table
+az vm image show --location westus --urn Canonical:UbuntuServer:18.04-LTS:latest
+```
+
+###### Service Principal login
+```
+az login --service-principal --username $ARM_CLIENT_ID --password $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
+# Test access
+az vm list-sizes --location eastus
+```

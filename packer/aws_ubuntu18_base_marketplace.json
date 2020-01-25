@@ -1,0 +1,74 @@
+{
+  "variables": {
+    "build":                "{{timestamp}}",
+    "os_version":           "Ubuntu1804",
+    "pre":                  "SICFactory",
+
+    "aws_access_key":       "{{env `AWS_ACCESS_KEY_ID`}}",
+    "aws_secret_key":       "{{env `AWS_SECRET_ACCESS_KEY`}}",
+    "region":               "{{env `AWS_DEFAULT_REGION`}}",
+    "name":                 "{{user `pre`}}-{{user `os_version`}}-{{user `build`}}",
+    "description":          "{{user `pre`}}-{{user `os_version`}}-{{user `build`}} built from latest Market place image",
+    "owners":               "099720109477",
+    "instance_type":        "t2.medium",
+    "source_name_filter":   "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*",
+    "ssh_username":         "ubuntu"
+  },
+
+  "builders": [
+   {
+    "type":                     "amazon-ebs",
+    "access_key":               "{{user `aws_access_key`}}",
+    "secret_key":               "{{user `aws_secret_key`}}",
+    "region":                   "{{user `region`}}",
+    "source_ami_filter": {
+      "filters": {
+        "virtualization-type":  "hvm",
+        "name":                 "{{user `source_name_filter`}}",
+        "root-device-type":     "ebs"
+      },
+      "owners": [
+                                "{{user `owners`}}"
+      ],
+      "most_recent":            true
+    },
+    "instance_type":            "{{user `instance_type`}}",
+    "ssh_username":             "{{user `ssh_username`}}",
+    "ami_name":                 "{{user `name`}}",
+    "tags": {
+      "Name":                   "{{ user `name` }}",
+      "Description":            "{{ user `description` }}",
+      "OS_Version":             "{{ user `os_version` }}",
+      "Base_AMI_Name":          "{{ .SourceAMIName }}"
+    },
+    "force_deregister":         "true",
+    "force_delete_snapshot":    "true"
+   }
+  ],
+
+	"provisioners": [{
+		"execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E sh '{{ .Path }}'",
+		"inline": [
+			"apt-get update"
+		],
+		"inline_shebang": "/bin/sh -x",
+		"type": "shell"
+  }],
+  
+	"post-processors": [
+		{
+		  "type": "manifest",
+		  "output": "manifest.json",
+      "strip_path": true,
+      "custom_data": {
+        "name": "{{ user `name` }}",
+        "Base_AMI_NameTag": "{{ user `source_name_filter` }}",
+        "Base_AMI_Name": "{{ .SourceAMIName }}",
+        "owner": "{{user `owners`}}",
+        "artifatt": "{{ .artifact_id }}",
+        "OS_version": "{{ user `os_version` }}",
+        "name_os": "{{ user `pre` }}-{{ user `os_version` }}"
+      }
+		  }
+	  ]
+ }
