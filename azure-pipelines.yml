@@ -29,3 +29,17 @@ stages:
     condition: eq(dependencies.Foo.outputs['DetermineResult.doThing'], 'azure') #map doThing and check if true
     steps:
       - script: echo "Job azure ran and doThing is azure."
+
+- stage: Build_SecureImage2
+  displayName: 'Build2'
+  jobs:
+  - job: aws
+    dependsOn: Foo
+    condition: eq(dependencies.Foo.outputs['DetermineResult.doThing'], 'aws') #map doThing and check if true
+    steps:
+      - script: echo "Job aws ran and doThing is aws."
+  - job: azure
+    dependsOn: Foo
+    condition: eq(dependencies.Foo.outputs['DetermineResult.doThing'], 'azure') #map doThing and check if true
+    steps:
+      - script: echo "Job azure ran and doThing is azure."
