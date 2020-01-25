@@ -100,8 +100,6 @@ stages:
       - script: | 
           echo $(FOOO)
           echo $FOOO
-          echo "ImageBuilder: $ImageBuilder ImageName: $ImageName ImagePath: $ImagePath"
-          echo "ImageBuilder: $[ dependencies.aws.outputs['DetermineImageInfo.imageBuilderPipeline'] ] ImageName: $imageNamePipeline ImagePath: $imagePathPipeline"
         
   - job: Azure_Set_Image_Info
     dependsOn: aws
