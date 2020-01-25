@@ -59,3 +59,12 @@ stages:
     condition: eq(dependencies.Install.outputs['DetermineResult2.doThing2'], 'azure') 
     steps:
       - script: echo "Job azure ran and doThing is azure."
+  - job: test
+    steps:
+    - task: Bash@3
+      inputs:
+        targetType: 'inline'
+        script: echo $MYSECRET
+      env:
+        MySecret: $(Foo)
+# echo '##vso[task.setVariable variable=myVar]myValue'
