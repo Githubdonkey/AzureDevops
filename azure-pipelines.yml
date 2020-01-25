@@ -33,6 +33,12 @@ stages:
 - stage: Build_SecureImage2
   displayName: 'Build2'
   jobs:
+  - job: Foo
+    steps:
+      - script: |
+          echo "This is job Foo."
+          echo "##vso[task.setvariable variable=doThing;isOutput=true]azure" #The variable doThing is set to aws
+        name: DetermineResult
   - job: aws
     dependsOn: Foo
     condition: eq(dependencies.Foo.outputs['DetermineResult.doThing'], 'aws') #map doThing and check if true
