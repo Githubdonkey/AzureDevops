@@ -115,7 +115,6 @@ stages:
           echo "ImageBuilder: $ImageBuilder ImageName: $ImageName ImagePath: $ImagePath"
           echo "ImageBuilder: $(DetermineImageInfo.imageBuilderPipeline) ImageName: $imageNamePipeline ImagePath: $imagePathPipeline"
           echo "MySecret: $MySecret"
-          echo '##vso[variable=imageBuilderPipeline]'
       env:
         MySecret: $(DetermineImageInfo.imageBuilderPipeline)
     - task: Bash@3
