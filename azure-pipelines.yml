@@ -51,16 +51,7 @@ stages:
     condition: eq(dependencies.Install.outputs['DetermineResult2.doThing2'], 'azure') 
     steps:
       - script: echo "Job azure ran and doThing is azure."
-  - job: Check Software
-    steps:
-    - task: Bash@3
-    displayName: 'CheckSoftwareInstalled'
-    inputs:
-      targetType: 'inline'
-      script: |
-          aws --version
-          packer --version
-          terraform -v
+
   - job: Install AWS CLI
     steps:
     - task: Bash@3
@@ -84,6 +75,6 @@ stages:
         script: |
             VER=1.4.5
             wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
-            unzip packer_${VER}_linux_amd64.zip
-            sudo mv packer /usr/local/bin
+            # unzip packer_${VER}_linux_amd64.zip
+            # sudo mv packer /usr/local/bin
             packer --version
