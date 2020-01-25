@@ -53,7 +53,7 @@ stages:
       - script: echo "Job azure ran and doThing is azure."
   - job: AWS_Set_Image_Info
     dependsOn: Foo
-    condition: eq(dependencies.Foo.outputs['DetermineImageInfo.imageBuilderPipeline'], 'amazon-ebs')
+    condition: eq(dependencies.Foo.outputs['DetermineImageInfo.imageBuilderPipeline'], amazon-ebs )
     steps:
       - script: echo "Job aws ran and doThing is aws."
   - job: Azure_Set_Image_Info
