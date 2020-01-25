@@ -6,84 +6,37 @@
 trigger:
 - none
 
-pool:
-  vmImage: 'ubuntu-latest'
+stages:
+- stage: Build_SecureImage
+  displayName: 'Build'
+  jobs:
+  # Set an output variable from a job with a matrix
+  - job: A
+    pool:
+      vmImage: 'ubuntu-latest'
+    strategy:
+      maxParallel: 2
+      matrix:
+        debugJob:
+          configuration: debug
+          platform: x64
+        releaseJob:
+          configuration: release
+          platform: x64
+    steps:
+    - script: echo "##vso[task.setvariable variable=myOutputVar;isOutput=true]this is the $(configuration) value"
+      name: setvarStep
+    - script: echo $(setvarStep.myOutputVar)
+      name: echovar
 
-steps:
-- task: Bash@3
-  displayName: 'Install Packer'
-  inputs:
-    targetType: 'inline'
-    script: |
-        VER=1.4.5
-        wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
-        unzip packer_${VER}_linux_amd64.zip
-        sudo mv packer /usr/local/bin
-        packer --version
+  # Map the variable from the debug job
+  - job: B
+    dependsOn: A
+    pool:
+      vmImage: 'ubuntu-16.04'
+    variables:
+      myVarFromJobADebug: $[ dependencies.A.outputs['debugJob.setvarStep.myOutputVar'] ]
+    steps:
+    - script: echo $(myVarFromJobADebug)
+      name: echovar
 
-- task: Bash@3
-  displayName: 'Install Terraform'
-  inputs:
-    targetType: 'inline'
-    script: |
-        VER=0.12.18
-        wget https://releases.hashicorp.com/terraform/${VER}/terraform_${VER}_linux_amd64.zip
-        terraform -v
-
-- task: Bash@3
-  displayName: 'Install AWS CLI'
-  inputs:
-    targetType: 'inline'
-    script: |
-        sudo apt-get update
-        sudo apt-get install awscli -y
-        export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
-        export AWS_SECRET_ACCESS_KEY=$(aws_secret_access_key)
-        export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
-        aws --version
-        aws s3 ls
-
-- task: Bash@3
-  displayName: 'Validate Packer'
-  inputs:
-    targetType: 'inline'
-    script: |
-        packer validate ubuntu16.json
-
-- task: Bash@3
-  displayName: 'Packer Create Image'
-  inputs:
-    targetType: 'inline'
-    script: |
-        export ARM_CLIENT_ID=$(ARM_CLIENT_ID)
-        export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET)
-        export ARM_SUBSCRIPTION_ID=$(ARM_SUBSCRIPTION_ID)
-        export ARM_TENANT_ID=$(ARM_TENANT_ID)
-        packer build ubuntu16.json
-
-- task: Bash@3
-  displayName: 'Terraform Create VM'
-  inputs:
-    targetType: 'inline'
-    script: |
-        export TF_VAR_packer_image=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.managed_image_name' | tr -d '"')
-        export ARM_CLIENT_ID=$(ARM_CLIENT_ID)
-        export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET)
-        export ARM_SUBSCRIPTION_ID=$(ARM_SUBSCRIPTION_ID)
-        export ARM_TENANT_ID=$(ARM_TENANT_ID)
-        terraform init
-        terraform apply -auto-approve
-        sleep 3m
-        terraform destroy -auto-approve
-
-- task: Bash@3
-  displayName: 'S3 Upload manifest'
-  inputs:
-    targetType: 'inline'
-    script: |
-        export TF_VAR_packer_image=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.managed_image_name' | tr -d '"')
-        export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
-        export AWS_SECRET_ACCESS_KEY=$(aws_secret_access_key)
-        export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
-        
-        aws s3 cp manifest.json s3://gitdonkey/devops/${TF_VAR_packer_image}.json
