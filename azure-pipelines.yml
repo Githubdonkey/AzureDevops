@@ -12,6 +12,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 stages:
+
 - stage: Build_Initialize
   displayName: 'Build_Initialize'
   jobs:
@@ -23,7 +24,6 @@ stages:
         targetType: 'inline'
         script: |
             ls /usr/local/bin
-            ls
             sudo apt-get update
             sudo apt-get install curl jq unzip -y
     - task: Bash@3
@@ -32,37 +32,45 @@ stages:
         targetType: 'inline'
         script: |
             sudo apt-get install awscli -y
-            export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
-            export AWS_SECRET_ACCESS_KEY=$(aws_secret_access_key)
-            export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
-            aws --version
-            aws s3 ls
+            #export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
+            #export AWS_SECRET_ACCESS_KEY=$(aws_secret_access_key)
+            #export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
+            #aws --version
+            #aws s3 ls
     - task: Bash@3
       displayName: 'Install_AZURE_AZ'
       inputs:
         targetType: 'inline'
         script: |
-            az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
+            #az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
     - task: Bash@3
       displayName: 'Install_Packer'
       inputs:
         targetType: 'inline'
         script: |
-          # VER=1.5.1
-          # wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
-          aws s3 cp s3://gitdonkey/devops/installers/packer_1.5.1_linux_amd64.zip packer_linux_amd64.zip
-          unzip packer_linux_amd64.zip
-          # sudo mv packer /usr/local/bin
-          # packer --version
+          VER=1.5.1
+          echo "Download File"
+          wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
+          echo "Unzip File"
+          unzip packer_${VER}_linux_amd64.zip
+          echo "move to local bin"
+          sudo mv packer /usr/local/bin
+          echo "Get version"
+          packer --version
     - task: Bash@3
       displayName: 'Install_Terraform'
       inputs:
         targetType: 'inline'
         script: |
-          # VER=0.12.18
-          # wget https://releases.hashicorp.com/terraform/${VER}/terraform_${VER}_linux_amd64.zip
-          aws s3 cp s3://gitdonkey/devops/installers/terraform_0.12.20_linux_amd64.zip terraform_linux_amd64.zip
-          # terraform -v
+          VER="0.12.19"
+          echo "Download File"
+          wget https://releases.hashicorp.com/terraform/${VER}/terraform_${VER}_linux_amd64.zip
+          echo "Unzip File"
+          unzip terraform_${VER}_linux_amd64.zip
+          echo "move to local bin"
+          sudo mv terraform /usr/local/bin/
+          echo "Get version"
+          terraform -v
 
 - stage: Packer_Build
   displayName: 'Packer_Build'
@@ -70,48 +78,73 @@ stages:
   - job: Packer_Build
     steps:
     - task: Bash@3
-      displayName: 'Install PreReq packages'
+      displayName: 'Packer Create Image'
       inputs:
         targetType: 'inline'
         script: |
-            sudo apt-get update
-            sudo apt-get install curl jq unzip -y
-    - task: Bash@3
-      displayName: 'Install_AWS_CLI'
-      inputs:
-        targetType: 'inline'
-        script: |
-            sudo apt-get install awscli -y
             export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
             export AWS_SECRET_ACCESS_KEY=$(aws_secret_access_key)
             export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
-            aws --version
-            aws s3 ls
+
+            cp packer/aws_ubuntu18_base_marketplace.json dev/aws_ubuntu18_base_marketplace.json
+            cp packer/bootstrap_win.txt dev/bootstrap_win.txt
+            cd dev/
+            packer build aws_ubuntu18_base_marketplace.json
+            cd ..
+    
     - task: Bash@3
-      displayName: 'Install_AZURE_AZ'
+      displayName: 'AWS_OR_AZURE'
       inputs:
         targetType: 'inline'
         script: |
-            az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
+          export ImageBuilder=$(cat dev/manifest.json | jq '.builds | to_entries[] | .value.name' | tr -d '"')
+          echo "##vso[task.setvariable variable=imageBuilderPipeline;isOutput=true]$ImageBuilder"
+        name: DetermineProvider
     - task: Bash@3
-      displayName: 'Install_Packer'
+      displayName: 'AWS_VARS'
+      dependsOn: AWS_OR_AZURE
+      condition: eq(dependencies.AWS_OR_AZURE.outputs['DetermineProvider.imageBuilderPipeline'], 'amazon-ebs' 
       inputs:
         targetType: 'inline'
         script: |
-          # VER=1.5.1
-          # wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
-          # unzip packer_${VER}_linux_amd64.zip
-          ls
-          # sudo mv packer /usr/local/bin
-          # packer --version
+          export ImageBuilder=$(cat dev/manifest.json | jq '.builds | to_entries[] | .value.name' | tr -d '"')
+          export ImageName=$(cat dev/manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
+          export ImagePath=$(cat dev/manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
+          export imagePacker=$(cat dev/manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
+          export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
+          export AWS_SECRET_ACCESS_KEY=$(aws_secret_access_key)
+          export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
+
+          echo "##vso[task.setvariable variable=imageBuilderPipeline;isOutput=true]$ImageBuilder"
+          echo "##vso[task.setvariable variable=imageNamePipeline;isOutput=true]$ImageName"
+          echo "##vso[task.setvariable variable=imagePathPipeline;isOutput=true]$ImagePath"
+          echo "ImageBuilder: $ImageBuilder ImageName: $ImageName ImagePath: $ImagePath"
+
+          aws s3 cp manifest.json s3://gitdonkey/devops/${imagePacker}.json
+        name: DetermineInfo
     - task: Bash@3
-      displayName: 'Install_Terraform'
+      displayName: 'AZURE_VARS'
+      dependsOn: AWS_OR_AZURE
+      condition: eq(dependencies.AWS_OR_AZURE.outputs['DetermineProvider.imageBuilderPipeline'], 'azure-arm' 
       inputs:
         targetType: 'inline'
         script: |
-          # VER=0.12.18
-          # wget https://releases.hashicorp.com/terraform/${VER}/terraform_${VER}_linux_amd64.zip
-          # terraform -v
+          export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
+          export AWS_SECRET_ACCESS_KEY=$(aws_secret_access_key)
+          export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
+
+          export ImageBuilder=$(cat dev/manifest.json | jq '.builds | to_entries[] | .value.name' | tr -d '"')
+          export ImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d'/' -f9)
+          export TF_VAR_packer_name=$(cat dev/manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
+          export imagePacker=$(cat dev/manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
+          
+          echo "##vso[task.setvariable variable=imageBuilderPipeline;isOutput=true]$ImageBuilder"
+          echo "##vso[task.setvariable variable=imageNamePipeline;isOutput=true]$ImageName"
+          echo "##vso[task.setvariable variable=imagePathPipeline;isOutput=true]$ImagePath"
+          echo "ImageBuilder: $ImageBuilder ImageName: $ImageName ImagePath: $ImagePath"
+        
+          aws s3 cp manifest.json s3://gitdonkey/devops/${imagePacker}.json
+        name: DetermineInfo
 
 - stage: Build_SecureImage
   displayName: 'Build'
@@ -130,7 +163,7 @@ stages:
           export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
           export AWS_SECRET_ACCESS_KEY=$(aws_secret_access_key)
           export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
-          aws s3 cp s3://gitdonkey/devops/SICFactory-Ubuntu1804-1579569816.json manifest.json
+          #aws s3 cp s3://gitdonkey/devops/SICFactory-Ubuntu1804-1579569816.json manifest.json
           export ImageBuilder=$(cat manifest.json | jq '.builds | to_entries[] | .value.name' | tr -d '"')
           export ImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
           export ImagePath=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
