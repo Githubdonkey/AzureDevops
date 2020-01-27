@@ -23,7 +23,8 @@ stages:
         inputs:
           targetType: 'inline'
           script: |
-              ls /usr/local/bin
+              ls
+              packer --version
               sudo apt-get update
               sudo apt-get install curl jq unzip -y
       - task: Bash@3
