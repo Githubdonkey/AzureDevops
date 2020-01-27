@@ -38,7 +38,7 @@ stages:
       - task: ExtractFiles@1
         inputs:
           archiveFilePatterns: 'packer_linux_amd64.zip' 
-          destinationFolder: '/usr/local/bin'
+          #destinationFolder:
           cleanDestinationFolder: false 
       
       - task: Bash@3
