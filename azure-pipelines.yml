@@ -51,12 +51,17 @@ stages:
             VER=1.5.1
             echo "Download File"
             wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
-            echo "Unzip File"
-            unzip packer_${VER}_linux_amd64.zip
-            echo "move to local bin"
-            sudo mv packer /usr/local/bin
-            echo "Get version"
-            packer --version
+            #echo "Unzip File"
+            #unzip packer_${VER}_linux_amd64.zip
+            #echo "move to local bin"
+            #sudo mv packer /usr/local/bin
+            #echo "Get version"
+            #packer --version
+      - task: ExtractFiles@1
+        inputs:
+          archiveFilePatterns: 'packer_1.5.1_linux_amd64.zip' 
+          destinationFolder: 
+          #cleanDestinationFolder: true 
       - task: Bash@3
         displayName: 'Install_Terraform'
         inputs:
