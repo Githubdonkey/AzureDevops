@@ -87,7 +87,8 @@ stages:
 
             ImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
             ImagePath=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
-            imagePacker=$(cat dev/manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
+            imagePacker=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
+            
             mkdir -p $(Pipeline.Workspace)/variables
 
             echo "$ImageName" > $(Pipeline.Workspace)/variables/ImageName
@@ -99,13 +100,13 @@ stages:
       - publish: $(Pipeline.Workspace)/variables
         artifact: variables
 
-  - stage: firststage
-    jobs:
-      - job: firstjob
-        steps:
-          # To pass the variable FOO, write it to a file
-          # While the file name doesn't matter, naming it like the variable and putting it inside the $(Pipeline.Workspace)/variables folder could be a good pattern
-          - bash: |
+    - job: testing
+      steps:
+      - task: Bash@3
+        displayName: 'test'
+        inputs:
+          targetType: 'inline'
+          script: |
               ls
 
   - stage: secondstage
