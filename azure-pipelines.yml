@@ -76,19 +76,29 @@ stages:
             export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
             export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
             packer build packer/aws_ubuntu18_base_marketplace.json
-            ls
       - task: Bash@3
-        displayName: 'Packer Create Image'
+        displayName: 'Create Variable Upload S3'
         inputs:
           targetType: 'inline'
           script: |
+            export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
+            export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
+            export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
+
             ImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
             ImagePath=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
+            imagePacker=$(cat dev/manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
             mkdir -p $(Pipeline.Workspace)/variables
+
             echo "$ImageName" > $(Pipeline.Workspace)/variables/ImageName
             echo "$ImagePath" > $(Pipeline.Workspace)/variables/ImagePath
+            echo "$imagePacker" > $(Pipeline.Workspace)/variables/imagePacker
+
+            aws s3 cp manifest.json s3://gitdonkey/devops/${imagePacker}.json
+
       - publish: $(Pipeline.Workspace)/variables
         artifact: variables
+
   - stage: firststage
     jobs:
       - job: firstjob
@@ -111,11 +121,15 @@ stages:
               echo "##vso[task.setvariable variable=ImageName]$ImageName"
               ImagePath=$(cat $(Pipeline.Workspace)/variables/ImagePath)
               echo "##vso[task.setvariable variable=ImagePath]$ImagePath"
+              imagePacker=$(cat $(Pipeline.Workspace)/variables/imagePacker)
+              echo "##vso[task.setvariable variable=imagePacker]$imagePacker"
           # Just like in the first example, we can expand the variable within Azure Pipelines itself
           - bash: |
               echo "$(ImageName)"
               echo "$(ImagePath)"
+              echo "$(imagePacker)"
           # Or we can expand it within bash, reading it as environmental variable
           - bash: |
               echo "$ImageName"
               echo "$ImagePath"
+              echo "$imagePacker"
