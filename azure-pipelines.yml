@@ -67,20 +67,20 @@ stages:
             # sudo unzip terraform_${VER}_linux_amd64.zip -d /usr/local/bin
             # echo "Get version"
             # terraform -v
+    - job: Packer
+      steps:
+      - task: Bash@3
+        displayName: 'Packer Create Image'
+        inputs:
+          targetType: 'inline'
+          script: |
+            export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
+            export AWS_SECRET_ACCESS_KEY=$(aws_secret_access_key)
+            export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
+            sudo packer build packer/aws_ubuntu18_base_marketplace.json
 
   - stage: firststage
     jobs:
-      - job: Packer_Build
-        steps:
-        - task: Bash@3
-          displayName: 'Packer Create Image'
-          inputs:
-            targetType: 'inline'
-            script: |
-              export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
-              export AWS_SECRET_ACCESS_KEY=$(aws_secret_access_key)
-              export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
-              sudo packer build packer/aws_ubuntu18_base_marketplace.json
       - job: firstjob
         steps:
           # To pass the variable FOO, write it to a file
