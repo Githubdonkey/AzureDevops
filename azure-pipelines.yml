@@ -23,8 +23,6 @@ stages:
         inputs:
           targetType: 'inline'
           script: |
-              ls /usr/local/bin
-              terraform -v
               sudo apt-get update
               sudo apt-get install curl jq unzip -y
       - task: Bash@3
@@ -61,13 +59,14 @@ stages:
         inputs:
           targetType: 'inline'
           script: |
-            VER="0.12.19"
-            echo "Download File"
-            wget https://releases.hashicorp.com/terraform/${VER}/terraform_${VER}_linux_amd64.zip
-            echo "Unzip File and move to local bin"
-            sudo unzip terraform_${VER}_linux_amd64.zip -d /usr/local/bin
-            echo "Get version"
-            terraform -v
+            # Terraform installed on latest image
+            # VER="0.12.19"
+            # echo "Download File"
+            # wget https://releases.hashicorp.com/terraform/${VER}/terraform_${VER}_linux_amd64.zip
+            # echo "Unzip File and move to local bin"
+            # sudo unzip terraform_${VER}_linux_amd64.zip -d /usr/local/bin
+            # echo "Get version"
+            # terraform -v
 
   - stage: firststage
     jobs:
@@ -81,7 +80,6 @@ stages:
           # While the file name doesn't matter, naming it like the variable and putting it inside the $(Pipeline.Workspace)/variables folder could be a good pattern
           - bash: |
               FOO="some value"
-              mkdir -p $(Pipeline.Workspace)/variables
               echo "$FOO" > $(Pipeline.Workspace)/variables/FOO
 
           # Publish the folder as pipeline artifact
@@ -112,3 +110,5 @@ stages:
           # Or we can expand it within bash, reading it as environmental variable
           - bash: |
               echo "$FOO"
+          - bash: |
+              echo "$(Pipeline.Workspace)/variables"
