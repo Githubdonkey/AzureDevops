@@ -50,14 +50,19 @@ stages:
           script: |
             VER=1.5.1
             echo "Download File"
-            wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
+            wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip -O packer_linux_amd64.zip
             #echo "Unzip File"
-            #unzip packer_${VER}_linux_amd64.zip
+            #unzip packer_linux_amd64.zip
             #echo "move to local bin"
             #sudo mv packer /usr/local/bin
             #echo "Get version"
             #packer --version
-          archiveFilePatterns: 'packer_${VER}_linux_amd64.zip'
+
+      - task: ExtractFiles@1
+        inputs:
+          archiveFilePatterns: 'packer_linux_amd64.zip' 
+          destinationFolder: '/usr/local/bin'
+          #cleanDestinationFolder: true 
 
       - task: Bash@3
         displayName: 'Install_Terraform'
