@@ -80,14 +80,13 @@ stages:
               export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
               export AWS_SECRET_ACCESS_KEY=$(aws_secret_access_key)
               export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
-              cd packer/
-              packer build aws_ubuntu18_base_marketplace.json
-              cd ..
+              packer build packer/aws_ubuntu18_base_marketplace.json
       - job: firstjob
         steps:
           # To pass the variable FOO, write it to a file
           # While the file name doesn't matter, naming it like the variable and putting it inside the $(Pipeline.Workspace)/variables folder could be a good pattern
           - bash: |
+              ls
               FOO="Testing"
               mkdir -p $(Pipeline.Workspace)/variables
               echo "$FOO" > $(Pipeline.Workspace)/variables/FOO
@@ -98,8 +97,6 @@ stages:
   - stage: secondstage
     jobs:
       - job: secondjob
-        pool:
-          vmImage: 'Ubuntu-16.04'
         steps:
           # Download the artifacts
           - download: current
