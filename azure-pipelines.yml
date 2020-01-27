@@ -27,26 +27,29 @@ stages:
               sudo apt-get update
               sudo apt-get install curl jq unzip -y
       - task: Bash@3
-        displayName: 'Install_Packer'
+        displayName: 'Download_Packer'
         inputs:
           targetType: 'inline'
           script: |
             VER=1.5.1
             echo "Download File"
             wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip -O packer_linux_amd64.zip
-            #echo "Unzip File"
-            #unzip packer_linux_amd64.zip
-            #echo "move to local bin"
-            #sudo mv packer /usr/local/bin
-            #echo "Get version"
-            #packer --version
-
+            
       - task: ExtractFiles@1
         inputs:
           archiveFilePatterns: 'packer_linux_amd64.zip' 
           destinationFolder: '/usr/local/bin'
           cleanDestinationFolder: false 
       
+      - task: Bash@3
+        displayName: 'Install_Packer'
+        inputs:
+          targetType: 'inline'
+          script: |
+            sudo mv packer /usr/local/bin
+            echo "Get version"
+            packer --version
+
       - task: Bash@3
         displayName: 'Install_AWS_CLI'
         inputs:
