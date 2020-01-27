@@ -28,6 +28,23 @@ stages:
               sudo apt-get update
               sudo apt-get install curl jq unzip -y
       - task: Bash@3
+        displayName: 'Install_AWS_CLI'
+        inputs:
+          targetType: 'inline'
+          script: |
+              sudo apt-get install awscli -y
+              #export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
+              #export AWS_SECRET_ACCESS_KEY=$(aws_secret_access_key)
+              #export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
+              aws --version
+              aws s3 ls
+      - task: Bash@3
+        displayName: 'Install_AZURE_AZ'
+        inputs:
+          targetType: 'inline'
+          script: |
+              #az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
+      - task: Bash@3
         displayName: 'Install_Packer'
         inputs:
           targetType: 'inline'
@@ -39,26 +56,6 @@ stages:
             sudo unzip packer_${VER}_linux_amd64.zip -d /usr/local/bin
             echo "Get version"
             packer --version
-
-      - task: Bash@3
-        displayName: 'Install_AWS_CLI'
-        inputs:
-          targetType: 'inline'
-          script: |
-              sudo apt-get install awscli -y
-              #export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
-              #export AWS_SECRET_ACCESS_KEY=$(aws_secret_access_key)
-              #export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
-              #aws --version
-              #aws s3 ls
-      - task: Bash@3
-        displayName: 'Install_AZURE_AZ'
-        inputs:
-          targetType: 'inline'
-          script: |
-              #az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
-      
-
       - task: Bash@3
         displayName: 'Install_Terraform'
         inputs:
@@ -67,10 +64,8 @@ stages:
             VER="0.12.19"
             echo "Download File"
             wget https://releases.hashicorp.com/terraform/${VER}/terraform_${VER}_linux_amd64.zip
-            echo "Unzip File"
-            unzip terraform_${VER}_linux_amd64.zip
-            echo "move to local bin"
-            sudo mv terraform /usr/local/bin/
+            echo "Unzip File and move to local bin"
+            sudo unzip terraform_${VER}_linux_amd64.zip -d /usr/local/bin
             echo "Get version"
             terraform -v
 
