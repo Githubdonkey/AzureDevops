@@ -82,9 +82,13 @@ stages:
         inputs:
           targetType: 'inline'
           script: |
-            ls
-            ls packer/
-
+            ImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
+            ImagePath=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
+            mkdir -p $(Pipeline.Workspace)/variables
+            echo "$ImageName" > $(Pipeline.Workspace)/variables/ImageName
+            echo "$ImagePath" > $(Pipeline.Workspace)/variables/ImagePath
+      - publish: $(Pipeline.Workspace)/variables
+        artifact: variables
   - stage: firststage
     jobs:
       - job: firstjob
@@ -93,13 +97,7 @@ stages:
           # While the file name doesn't matter, naming it like the variable and putting it inside the $(Pipeline.Workspace)/variables folder could be a good pattern
           - bash: |
               ls
-              FOO="Testing"
-              mkdir -p $(Pipeline.Workspace)/variables
-              echo "$FOO" > $(Pipeline.Workspace)/variables/FOO
 
-          # Publish the folder as pipeline artifact
-          - publish: $(Pipeline.Workspace)/variables
-            artifact: variables
   - stage: secondstage
     jobs:
       - job: secondjob
@@ -109,13 +107,15 @@ stages:
             artifact: variables
           # Read the variable from the file, then expose it in the job
           - bash: |
-              FOO=$(cat $(Pipeline.Workspace)/variables/FOO)
-              echo "##vso[task.setvariable variable=FOO]$FOO"
+              ImageName=$(cat $(Pipeline.Workspace)/variables/ImageName)
+              echo "##vso[task.setvariable variable=ImageName]$ImageName"
+              ImagePath=$(cat $(Pipeline.Workspace)/variables/ImagePath)
+              echo "##vso[task.setvariable variable=ImagePath]$ImagePath"
           # Just like in the first example, we can expand the variable within Azure Pipelines itself
           - bash: |
-              echo "$(FOO)"
+              echo "$(ImageName)"
+              echo "$(ImagePath)"
           # Or we can expand it within bash, reading it as environmental variable
           - bash: |
-              echo "$FOO"
-          - bash: |
-              echo "$(Pipeline.Workspace)/variables"
+              echo "$ImageName"
+              echo "$ImagePath"
