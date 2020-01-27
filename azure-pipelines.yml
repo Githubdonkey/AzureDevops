@@ -28,26 +28,15 @@ stages:
               sudo apt-get update
               sudo apt-get install curl jq unzip -y
       - task: Bash@3
-        displayName: 'Download_Packer'
+        displayName: 'Install_Packer'
         inputs:
           targetType: 'inline'
           script: |
             VER=1.5.1
             echo "Download File"
-            wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip -O packer_linux_amd64.zip
-            
-      - task: ExtractFiles@1
-        inputs:
-          archiveFilePatterns: 'packer_linux_amd64.zip' 
-          destinationFolder:
-          cleanDestinationFolder: false 
-      
-      - task: Bash@3
-        displayName: 'Install_Packer'
-        inputs:
-          targetType: 'inline'
-          script: |
-            sudo mv packer /usr/local/bin
+            wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
+            echo "Unzip File and move to local bin"
+            sudo unzip packer_${VER}_linux_amd64.zip -d /usr/local/bin
             echo "Get version"
             packer --version
 
