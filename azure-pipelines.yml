@@ -57,11 +57,8 @@ stages:
             #sudo mv packer /usr/local/bin
             #echo "Get version"
             #packer --version
-      - task: ExtractFiles@1
-        inputs:
-          archiveFilePatterns: 'packer_1.5.1_linux_amd64.zip' 
-          destinationFolder: 
-          #cleanDestinationFolder: true 
+          archiveFilePatterns: 'packer_${VER}_linux_amd64.zip'
+
       - task: Bash@3
         displayName: 'Install_Terraform'
         inputs:
