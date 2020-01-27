@@ -61,13 +61,16 @@
 		  "output": "manifest.json",
       "strip_path": true,
       "custom_data": {
-        "name": "{{ user `name` }}",
-        "Base_AMI_NameTag": "{{ user `source_name_filter` }}",
-        "Base_AMI_Name": "{{ .SourceAMIName }}",
-        "owner": "{{user `owners`}}",
-        "artifatt": "{{ .artifact_id }}",
-        "OS_version": "{{ user `os_version` }}",
-        "name_os": "{{ user `pre` }}-{{ user `os_version` }}"
+        "name":                   "{{ user `name` }}",
+        "Base_AMI_Name":          "{{ .SourceAMIName }}",
+        "type":                   "amazon-ebs",
+        "region":                 "{{user `region`}}",
+        "owners":                 "{{user `owners`}}",
+        "instance_type":          "{{user `instance_type`}}",
+        "ami_name":               "{{user `name`}}",
+        "artifatt":               "{{ .artifact_id }}",
+        "OS_version":             "{{ user `os_version` }}",
+        "name_os":                "{{ user `pre` }}-{{ user `os_version` }}"
       }
 		  }
 	  ]
