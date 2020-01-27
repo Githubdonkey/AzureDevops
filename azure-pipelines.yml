@@ -23,8 +23,8 @@ stages:
         inputs:
           targetType: 'inline'
           script: |
-              ls
-              packer --version
+              ls /usr/local/bin
+              terraform -v
               sudo apt-get update
               sudo apt-get install curl jq unzip -y
       - task: Bash@3
