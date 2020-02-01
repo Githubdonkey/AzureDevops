@@ -1,7 +1,7 @@
 {
 	"variables": {
 		"build":                  "{{timestamp}}",
-		"os_version":             "Windows2012R2",
+		"os_version":             "Windows2016",
     	"pre":                    "SICFactory",
     	"image_type":             "Default",
 
@@ -17,7 +17,7 @@
 		"os_type":                "Windows",
     	"image_publisher":        "MicrosoftWindowsServer",
     	"image_offer":            "WindowsServer",
-    	"image_sku":              "2012-R2-Datacenter"
+    	"image_sku":              "2016-Datacenter"
   },
 	"builders": [{
 		"type": 								    "azure-arm",

@@ -30,11 +30,6 @@ variable "packer_image" {
   type = "string"
 }
 
-variable "google_vpc_cidr" {
-    description = "Google Compute Engine VPC CIDR"
-    default = ""
-}
-
 resource "aws_security_group" "queue" {
     name = "queue"
     description = "Queue role"
