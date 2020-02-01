@@ -75,10 +75,10 @@ stages:
             export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
             export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
             export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
-            export ARM_CLIENT_ID="23d9b809-4704-40ea-aa0a-81ec2788ba5c"
-            export ARM_CLIENT_SECRET="005c329d-3355-4e4e-b4ed-633fc3438d8f"
-            export ARM_SUBSCRIPTION_ID="603917ef-28ce-417f-8107-d905c3fc11b2"
-            export ARM_TENANT_ID="cbc673c9-3052-4dc1-b14f-f56dcca14015"
+            export ARM_CLIENT_ID=$(ARM_CLIENT_ID)
+            export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET)
+            export ARM_SUBSCRIPTION_ID=$(ARM_SUBSCRIPTION_ID)
+            export ARM_TENANT_ID=$(ARM_TENANT_ID)
 
             az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
 
@@ -166,7 +166,7 @@ stages:
               echo "$(ImageName)"
               echo "$(ImagePath)"
               echo "$(imagePacker)"
-              cp terraform/${packerProvider}_main_modules.tf main.tf
+              cp terraform/azure_main_modules.tf main.tf
               terraform init
               terraform plan -var="image_id=$(ImagePath)"
               terraform apply -var="image_id=$(ImagePath)" -auto-approve
