@@ -10,7 +10,7 @@
     "name":                 "{{user `pre`}}-{{user `os_version`}}-{{user `build`}}",
     "description":          "{{user `pre`}}-{{user `os_version`}}-{{user `build`}} built from latest Market place image",
     "owners":               "099720109477",
-    "instance_type":        "t2.medium",
+    "instance_type":        "t2.xlarge",
     "source_name_filter":   "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*",
     "ssh_username":         "ubuntu"
   },
