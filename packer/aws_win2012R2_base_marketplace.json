@@ -5,7 +5,7 @@
     "pre":                  "SICFactory",
     "source_name_filter":   "Windows_Server-2012-R2_RTM-English-64Bit-Base-*",
     "owners":               "amazon",
-    "instance_type":        "t2.medium",
+    "instance_type":        "t2.xlarge",
 
     "aws_access_key":       "{{env `AWS_ACCESS_KEY_ID`}}",
     "aws_secret_key":       "{{env `AWS_SECRET_ACCESS_KEY`}}",
@@ -71,17 +71,12 @@
 		  "output": "manifest.json",
       "strip_path": true,
       "custom_data": {
-        "name":                   "{{ user `name` }}",
-        "Base_AMI_Name":          "{{ .SourceAMIName }}",
+        "name":                     "{{ user `name` }}",
         "type":                     "amazon-ebs",
-        "region":                   "{{user `region`}}",
-        "owners":                   "{{user `owners`}}",
-        "instance_type":            "{{user `instance_type`}}",
-        "ami_name":                 "{{user `name`}}",
-        "communicator":             "winrm",
-        "artifatt":                 "{{ .artifact_id }}",
+        "region":                   "{{ user `region`}}",
         "OS_version":               "{{ user `os_version` }}",
-        "name_os":                  "{{ user `pre` }}-{{ user `os_version` }}"
+        "name_os":                  "{{ user `pre` }}-{{ user `os_version` }}",
+		    "os_type": 									"{{ user `os_type`}}"
       }
 		  }
 	  ]
