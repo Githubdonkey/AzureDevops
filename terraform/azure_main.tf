@@ -40,20 +40,6 @@ resource "aws_security_group" "queue" {
     description = "Queue role"
 }
 
-resource "aws_security_group_rule" "rabbitmq_tcp_5672_google" {
-    count = "${var.google_vpc_cidr != "" ? 1 : 0}"
-
-    type = "ingress"
-    from_port = 5672
-    to_port = 5672
-    protocol = "tcp"
-    cidr_blocks = [
-       "${var.google_vpc_cidr}"
-    ]
-    security_group_id = "${aws_security_group.queue.id}"
-}
-
-
 provider "azurerm" {
   # whilst the `version` attribute is optional, we recommend pinning to a given version of the Provider
   version = "=1.38.0"

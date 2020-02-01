@@ -1,0 +1,108 @@
+{
+	"variables": {
+		"build":                  "{{timestamp}}",
+		"os_version":             "Windows2012R2",
+    	"pre":                    "SICFactory",
+    	"image_type":             "Default",
+
+		"azure_app_id": 		  "{{env `ARM_CLIENT_ID`}}",
+    	"azure_client_secret": 	  "{{env `ARM_CLIENT_SECRET`}}",
+    	"azure_tenant_id": 		  "{{env `ARM_TENANT_ID`}}",
+		"azure_sub_id": 		  "{{env `ARM_SUBSCRIPTION_ID`}}",
+
+		"name":                   "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}",
+		"description":            "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}} built from latest Market place image",
+		"vm_size":        		  "Standard_DS3_v2",
+		"resource_group_name": 	  "myResourceGroup",
+		"os_type":                "Windows",
+    	"image_publisher":        "MicrosoftWindowsServer",
+    	"image_offer":            "WindowsServer",
+		"image_sku":              "2012-R2-Datacenter",
+		
+		"image_folder": "C:\\image",
+        "commit_file": "C:\\image\\commit.txt",
+        "metadata_file": "C:\\image\\metadata.txt",
+        "helper_script_folder": "C:\\Program Files\\WindowsPowerShell\\Modules\\",
+        "commit_url": "LATEST",
+        "install_user": "installer",
+        "capture_name_prefix": "packer",
+        "image_version": "dev"
+  },
+	"builders": [{
+		"type": 								    "azure-arm",
+    	"client_id": 							    "{{user `azure_app_id`}}",
+    	"client_secret": 						    "{{user `azure_client_secret`}}",
+    	"tenant_id": 							    "{{user `azure_tenant_id`}}",
+		"subscription_id": 						    "{{user `azure_sub_id`}}",
+		"build_resource_group_name": 			  	"{{user `resource_group_name`}}",
+		"managed_image_resource_group_name":		"{{user `resource_group_name`}}",
+		"managed_image_name": 					    "{{user `name`}}",
+		"os_type": 								    "{{user `os_type`}}",
+		"image_publisher": 						    "{{user `image_publisher`}}",
+		"image_offer": 							    "{{user `image_offer`}}",
+    "image_sku": 							        "{{user `image_sku`}}",
+    
+    "communicator":                       "winrm",
+	"winrm_port":                         5986,
+    "winrm_use_ssl":                      "true",
+    "winrm_insecure":                     "true",
+    "winrm_timeout":                      "5m",
+    "winrm_username":                     "packer",
+
+		"azure_tags": {
+			"Name":                 			"{{ user `name` }}",
+      		"Description":            			"{{ user `description` }}",
+      		"OS_Version":             			"{{ user `os_version` }}",
+      		"Base_AMI_Name":          			"{{ .artifact_id }}"
+			},
+	"vm_size": 								    "{{ user `vm_size` }}",
+	"async_resourcegroup_delete":true
+	}],
+	"provisioners": [
+	{
+		"type": "powershell",
+		"inline":[
+			"New-Item -Path {{user `image_folder`}} -ItemType Directory -Force",
+			"Write-Output {{user `commit_url`}} > {{user `commit_file` }}",
+			"Write-Host (Get-Content -Path {{user `commit_file`}})"
+		]
+	},
+	{
+		"type": "file",
+		"source": "{{ template_dir }}/scripts/ImageHelpers",
+		"destination": "{{user `helper_script_folder`}}"
+	},
+	{
+		"type": "powershell",
+		"scripts":[
+			"{{ template_dir }}/scripts/Installers/Install-PowershellCore.ps1"
+		]
+	},	
+	{
+	"type": "powershell",
+      "inline": [
+        "if( Test-Path $Env:SystemRoot\\windows\\system32\\Sysprep\\unattend.xml ){ rm $Env:SystemRoot\\windows\\system32\\Sysprep\\unattend.xml -Force}",
+        "& $env:SystemRoot\\System32\\Sysprep\\Sysprep.exe /oobe /generalize /quiet /quit /mode:vm",
+        "while($true) { $imageState = Get-ItemProperty HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Setup\\State | Select ImageState; Write-Output $imageState.ImageState; if($imageState.ImageState -ne 'IMAGE_STATE_GENERALIZE_RESEAL_TO_OOBE') { Start-Sleep -s 10 } else { break } }"
+    	]
+  	}
+],
+	"post-processors": [
+		{
+		  "type": "manifest",
+		  "output": "manifest.json",
+      "strip_path": true,
+      "custom_data": {
+        "name":                             			"{{ user `name` }}",
+        "OS_version":                       			"{{ user `os_version` }}",
+        "type": 								        "azure-arm",
+		"build_resource_group_name": 				  	"{{user `resource_group_name`}}",
+		"managed_image_resource_group_name":			"{{user `resource_group_name`}}",
+		"os_type": 									    "{{user `os_type`}}",
+		"image_publisher": 							    "{{user `image_publisher`}}",
+		"image_offer": 								    "{{user `image_offer`}}",
+        "image_sku": 							        "{{user `image_sku`}}"
+      }
+		  }
+	  ]
+ }

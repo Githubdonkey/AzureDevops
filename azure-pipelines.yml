@@ -75,7 +75,7 @@ stages:
             export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
             export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
             export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
-            packer build packer/aws_ubuntu18_base_marketplace.json
+            packer build packer/azure_win2012R2_default_marketplace.json
       - task: Bash@3
         displayName: 'Create Variable Upload S3'
         inputs:
@@ -85,9 +85,13 @@ stages:
             export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
             export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
 
-            ImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
-            ImagePath=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
+            ImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d'/' -f9)
+            ImagePath=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"')
             imagePacker=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
+            
+            #ImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
+            #ImagePath=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
+            #imagePacker=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
             
             mkdir -p $(Pipeline.Workspace)/variables
 
@@ -129,6 +133,39 @@ stages:
               echo "$(ImageName)"
               echo "$(ImagePath)"
               echo "$(imagePacker)"
+          # Or we can expand it within bash, reading it as environmental variable
+          - bash: |
+              echo "$ImageName"
+              echo "$ImagePath"
+              echo "$imagePacker"            
+  - stage: terraform_stage3
+    jobs:
+      - job: thrirdjob
+        steps:
+          # Download the artifacts
+          - download: current
+            artifact: variables
+          # Read the variable from the file, then expose it in the job
+          - bash: |
+              ImageName=$(cat $(Pipeline.Workspace)/variables/ImageName)
+              echo "##vso[task.setvariable variable=ImageName]$ImageName"
+              ImagePath=$(cat $(Pipeline.Workspace)/variables/ImagePath)
+              echo "##vso[task.setvariable variable=ImagePath]$ImagePath"
+              imagePacker=$(cat $(Pipeline.Workspace)/variables/imagePacker)
+              echo "##vso[task.setvariable variable=imagePacker]$imagePacker"
+          # Just like in the first example, we can expand the variable within Azure Pipelines itself
+          - bash: |
+              echo "Starting Terraform build"
+              echo "$(ImageName)"
+              echo "$(ImagePath)"
+              echo "$(imagePacker)"
+              cp terraform/${packerProvider}_main_modules.tf main.tf
+              terraform init
+              terraform plan -var="image_id=$(ImagePath)"
+              terraform apply -var="image_id=$(ImagePath)" -auto-approve
+              echo "sleep 4m"
+              sleep 4m
+              terraform destroy -var="image_id=$(ImagePath)" -auto-approve
           # Or we can expand it within bash, reading it as environmental variable
           - bash: |
               echo "$ImageName"
