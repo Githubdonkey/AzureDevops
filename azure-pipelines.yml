@@ -82,7 +82,7 @@ stages:
 
             az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
 
-            ./ado_packer_image.sh 11
+            sudo ./ado_packer_image.sh 11
       - task: Bash@3
         displayName: 'Create Variable Upload S3'
         inputs:
@@ -92,13 +92,13 @@ stages:
             export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
             export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
 
-            ImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d'/' -f9)
-            ImagePath=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"')
-            imagePacker=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
-            
-            #ImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
-            #ImagePath=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
+            #ImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d'/' -f9)
+            #ImagePath=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"')
             #imagePacker=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
+            
+            ImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
+            ImagePath=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
+            imagePacker=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
             
             mkdir -p $(Pipeline.Workspace)/variables
 
