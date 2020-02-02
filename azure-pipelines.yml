@@ -166,7 +166,7 @@ stages:
               echo "$(ImageName)"
               echo "$(ImagePath)"
               echo "$(imagePacker)"
-              cp terraform/azure_main_modules.tf main.tf
+              cp terraform/aws_main_modules.tf main.tf
               terraform init
               terraform plan -var="image_id=$(ImagePath)"
               terraform apply -var="image_id=$(ImagePath)" -auto-approve
