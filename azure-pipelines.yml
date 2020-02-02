@@ -67,9 +67,6 @@ stages:
             # sudo unzip terraform_${VER}_linux_amd64.zip -d /usr/local/bin
             # echo "Get version"
             # terraform -v
-  - stage: PackerBuild
-    displayName: 'PackerBuild'
-    jobs:
     - job: Run_Packer
       steps:
       - task: Bash@3
