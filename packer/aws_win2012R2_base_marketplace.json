@@ -12,7 +12,7 @@
     "aws_secret_key":       "{{env `AWS_SECRET_ACCESS_KEY`}}",
     "region":               "{{env `AWS_DEFAULT_REGION`}}",
     "name": "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}",
-		"description": "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}} built from latest Market place image",
+		"description": "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}} built from latest Market place image"
   },
 
   "builders": [
