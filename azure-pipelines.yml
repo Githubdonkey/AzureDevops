@@ -67,8 +67,10 @@ stages:
             # sudo unzip terraform_${VER}_linux_amd64.zip -d /usr/local/bin
             # echo "Get version"
             # terraform -v
+  - stage: Install_Packer
+    displayName: 'Install_Packer'
+    jobs:
     - job: Run_Packer
-      dependsOn: Install_software
       steps:
       - task: Bash@3
         displayName: 'Install_Packer'
