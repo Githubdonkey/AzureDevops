@@ -112,7 +112,7 @@ stages:
           name: DetermineProvider
       - task: Bash@3
         displayName: 'AWS_Create_Variable_Upload_S3'
-        dependsOn: AWS_OR_AZURE
+        dependsOn: 'AWS_OR_AZURE'
         condition: eq(dependencies.AWS_OR_AZURE.outputs['DetermineProvider.imageBuilderPipeline'], 'amazon-ebs' 
         inputs:
           targetType: 'inline'
@@ -132,7 +132,7 @@ stages:
             aws s3 cp manifest.json s3://gitdonkey/devops/${ImagePacker}.json
       - task: Bash@3
         displayName: 'Azure_Create_Variable_Upload_S3'
-        dependsOn: AWS_OR_AZURE
+        dependsOn: 'AWS_OR_AZURE'
         condition: eq(dependencies.AWS_OR_AZURE.outputs['DetermineProvider.imageBuilderPipeline'], 'azure-arm' 
         inputs:
           targetType: 'inline'
