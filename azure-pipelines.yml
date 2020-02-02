@@ -100,6 +100,15 @@ stages:
             az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
             chmod +x ado_packer_image.sh
             ./ado_packer_image.sh 11
+
+            ${{ if ne( variables['Build.SourceBranchName'], 'merge' ) }}: 
+              environment: ${{ variables['Build.SourceBranchName'] }}
+            ${{ if endsWith( variables['System.PullRequest.TargetBranch'], 'dev' ) }}: 
+              environment: dev
+            ${{ if endsWith( variables['System.PullRequest.TargetBranch'], 'staging' ) }}: 
+              environment: staging
+            ${{ if endsWith( variables['System.PullRequest.TargetBranch'], 'master' ) }}: 
+              environment: prod
       - task: Bash@3
         displayName: 'AWS_OR_AZURE'
         inputs:
@@ -112,7 +121,7 @@ stages:
           name: DetermineProvider
       - task: Bash@3
         displayName: 'AWS_Create_Variable_Upload_S3'
-        condition: eq(dependencies.AWS_OR_AZURE.outputs['DetermineProvider.imageBuilderPipeline'], 'amazon-ebs' 
+        condition: eq(dependencies.AWS_OR_AZURE.outputs['DetermineProvider.imageBuilderPipeline'], 'amazon-ebs')
         inputs:
           targetType: 'inline'
           script: |
@@ -131,7 +140,7 @@ stages:
             aws s3 cp manifest.json s3://gitdonkey/devops/${ImagePacker}.json
       - task: Bash@3
         displayName: 'Azure_Create_Variable_Upload_S3'
-        condition: eq(dependencies.AWS_OR_AZURE.outputs['DetermineProvider.imageBuilderPipeline'], 'azure-arm' 
+        condition: eq(dependencies.AWS_OR_AZURE.outputs['DetermineProvider.imageBuilderPipeline'], 'azure-arm')
         inputs:
           targetType: 'inline'
           script: |
