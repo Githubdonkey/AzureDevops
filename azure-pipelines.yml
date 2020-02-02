@@ -90,7 +90,6 @@ stages:
             ./ado_packer_image.sh 11
       - task: Bash@3
         displayName: 'Create_Variable_Upload_S3'
-        dependsOn: 'Packer_Create_Image'
         inputs:
           targetType: 'inline'
           script: |
@@ -114,7 +113,6 @@ stages:
 
             aws s3 cp manifest.json s3://gitdonkey/devops/${imagePacker}.json
       - task: PublishBuildArtifacts@1
-        dependsOn: 'Create_Variable_Upload_S3'
         inputs:
           pathtoPublish: '$(Pipeline.Workspace)/variables' 
           artifactName: 'variables' 
