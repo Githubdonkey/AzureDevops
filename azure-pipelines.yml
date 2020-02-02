@@ -3,10 +3,10 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-trigger:
-  branches:
-    include:
-    - '*'  # must quote since "*" is a YAML reserved character; we want a string
+trigger: none
+  #branches:
+    #include:
+    #- '*'  # must quote since "*" is a YAML reserved character; we want a string
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -82,7 +82,7 @@ stages:
 
             az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
 
-            packer build packer/azure_win2012R2_default_marketplace.json
+            ./ado_packer_image.sh 11
       - task: Bash@3
         displayName: 'Create Variable Upload S3'
         inputs:

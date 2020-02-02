@@ -3,12 +3,13 @@
     "build":                "{{timestamp}}",
     "os_version":           "Ubuntu1804",
     "pre":                  "SICFactory",
+    "image_type": "Base",
 
     "aws_access_key":       "{{env `AWS_ACCESS_KEY_ID`}}",
     "aws_secret_key":       "{{env `AWS_SECRET_ACCESS_KEY`}}",
     "region":               "{{env `AWS_DEFAULT_REGION`}}",
-    "name":                 "{{user `pre`}}-{{user `os_version`}}-{{user `build`}}",
-    "description":          "{{user `pre`}}-{{user `os_version`}}-{{user `build`}} built from latest Market place image",
+    "name": "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}",
+		"description": "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}} built from latest Market place image",
     "owners":               "099720109477",
     "instance_type":        "t2.xlarge",
     "source_name_filter":   "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*",
@@ -61,16 +62,12 @@
 		  "output": "manifest.json",
       "strip_path": true,
       "custom_data": {
-        "name":                   "{{ user `name` }}",
-        "Base_AMI_Name":          "{{ .SourceAMIName }}",
-        "type":                   "amazon-ebs",
-        "region":                 "{{user `region`}}",
-        "owners":                 "{{user `owners`}}",
-        "instance_type":          "{{user `instance_type`}}",
-        "ami_name":               "{{user `name`}}",
-        "artifatt":               "{{ .artifact_id }}",
-        "OS_version":             "{{ user `os_version` }}",
-        "name_os":                "{{ user `pre` }}-{{ user `os_version` }}"
+        "name":                     "{{ user `name` }}",
+        "type":                     "amazon-ebs",
+        "region":                   "{{ user `region`}}",
+        "OS_version":               "{{ user `os_version` }}",
+        "name_os":                  "{{ user `pre` }}-{{ user `os_version` }}",
+		    "os_type": 									"{{ user `os_type`}}"
       }
 		  }
 	  ]
