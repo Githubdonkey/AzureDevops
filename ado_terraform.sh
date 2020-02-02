@@ -16,10 +16,9 @@ echo "  25) operation 4"
 
 case $selection in
   1) echo "You chose Option 1"
-      exit
-      ;;
+      exit;;
   11) echo "You chose Option 11"
-      packerState=true; packerProvider=aws; packerOs=ubuntu18; packerSource=marketplace; packerFunction=base; terraformState=false; s3upload=true;;
+      packerProvider=aws;;
   12) echo "You chose Option 12"
       packerState=true; packerProvider=aws; packerOs=win2012R2; packerSource=marketplace; packerFunction=base; terraformState=false; s3upload=true;;
   13) echo "You chose Option 13" 
@@ -76,47 +75,14 @@ case $selection in
   *) echo "invalid option";;
 esac
 
-if [[ $packerState == "true" ]]; then
-      packerBuildFile=${packerProvider}_${packerOs}_${packerFunction}_${packerSource}.json
-      cp packer/$packerBuildFile $packerBuildFile
-      cp packer/bootstrap_win.txt bootstrap_win.txt
-      packer build $packerBuildFile
-fi
-
-if [[ $packerProvider == "aws" ]]; then
-         echo "AWS provider"
-         export TF_VAR_packer_image=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
-         export TF_VAR_packer_name=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
-         echo "$TF_VAR_packer_image"
-         echo "$TF_VAR_packer_name"
-   elif [[ $packerProvider == "azure" ]]; then
-         echo "Azure provider"
-         export TF_VAR_packer_image=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"')
-         export TF_VAR_packer_name=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
-         echo "$TF_VAR_packer_image"
-         echo "$TF_VAR_packer_name"
-   else
-        echo "manifest.json not found"
-        exit 1
-fi
-
-if [[ $s3upload == "true" ]]; then
-      echo "s3Upload"
-      #aws s3 rm s3://gitdonkey/devops/ --recursive --exclude "*" --include "${TF_VAR_packer_name_os}*"
-      #aws s3 cp manifest.json s3://gitdonkey/devops/image_build_repo/${TF_VAR_packer_image}.json
-      #aws s3 cp manifest.json s3://gitdonkey/devops/image_build_repo/${TF_VAR_packer_name}.json
-      aws s3 cp manifest.json s3://gitdonkey/devops/${TF_VAR_packer_name}.json
-fi
-
 # Run Terraform
-if [[ $terraformState == "true" ]]; then
-         echo "Starting Terraform build"
-         cp terraform/${packerProvider}_main_modules.tf main.tf
-         echo $TF_VAR_packer_image
-         terraform init
-         terraform plan -var="image_id=$TF_VAR_packer_image"
-         terraform apply -var="image_id=$TF_VAR_packer_image" -auto-approve
-         echo "sleep 4m"
-         sleep 4m
-         terraform destroy -var="image_id=$TF_VAR_packer_image" -auto-approve
-fi
+
+   echo "Starting Terraform build"
+   cp terraform/${packerProvider}_main_modules.tf main.tf
+   echo $selectionImage
+   terraform init
+   terraform plan -var="image_id=$selectionImage"
+   terraform apply -var="image_id=$selectionImage" -auto-approve
+   echo "sleep 4m"
+   sleep 4m
+   terraform destroy -var="image_id=$selectionImage" -auto-approve
