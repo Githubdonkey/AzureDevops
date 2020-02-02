@@ -23,7 +23,7 @@
 	  "communicator": "winrm",
 	  "winrm_use_ssl": "true",
 	  "winrm_insecure": "true",
-	  "winrm_timeout": "10m",
+	  "winrm_timeout": "5m",
 	  "winrm_username": "packer",
   
 	  "location": "East US",
@@ -36,20 +36,5 @@
 		  "& $env:SystemRoot\\System32\\Sysprep\\Sysprep.exe /oobe /generalize /quiet /quit /mode:vm",
 		  "while($true) { $imageState = Get-ItemProperty HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Setup\\State | Select ImageState; Write-Output $imageState.ImageState; if($imageState.ImageState -ne 'IMAGE_STATE_GENERALIZE_RESEAL_TO_OOBE') { Start-Sleep -s 10 } else { break } }"
 	  ]
-	}],
-	"post-processors": [
-		{
-		"type": "manifest",
-		"output": "manifest.json",
-		"strip_path": true,
-		"custom_data": {
-			"name": "{{ user `name` }}",
-			"type": "azure-arm",
-			"region": "{{ user `region`}}",
-			"OS_version": "{{ user `os_version` }}",
-			"name_os": "{{ user `pre` }}-{{ user `os_version` }}",
-			"os_type": "{{ user `os_type`}}"
-      }
-		  }
-	  ]
- }
+	}]
+  }

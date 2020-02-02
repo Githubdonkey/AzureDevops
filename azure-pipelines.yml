@@ -71,6 +71,18 @@ stages:
       dependsOn: Install_software
       steps:
       - task: Bash@3
+        displayName: 'Install_Packer'
+        inputs:
+          targetType: 'inline'
+          script: |
+            VER=1.5.1
+            echo "Download File"
+            wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
+            echo "Unzip File and move to local bin"
+            sudo unzip packer_${VER}_linux_amd64.zip -d /usr/local/bin
+            echo "Get version"
+            packer --version
+      - task: Bash@3
         displayName: 'Packer_Create_Image'
         inputs:
           targetType: 'inline'
