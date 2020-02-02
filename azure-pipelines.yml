@@ -41,7 +41,7 @@ stages:
         inputs:
           targetType: 'inline'
           script: |
-              #az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
+            az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
       - task: Bash@3
         displayName: 'Install_Packer'
         inputs:
@@ -101,7 +101,19 @@ stages:
             chmod +x ado_packer_image.sh
             ./ado_packer_image.sh 11
       - task: Bash@3
-        displayName: 'Create_Variable_Upload_S3'
+        displayName: 'AWS_OR_AZURE'
+        inputs:
+          targetType: 'inline'
+          script: |
+            export ImageBuilder=$(cat manifest.json | jq '.builds | to_entries[] | .value.name' | tr -d '"')
+            echo "##vso[task.setvariable variable=imageBuilderPipeline;isOutput=true]$ImageBuilder"
+            mkdir -p $(Pipeline.Workspace)/variables
+            echo "$ImageBuilder" > $(Pipeline.Workspace)/variables/ImageBuilder
+          name: DetermineProvider
+      - task: Bash@3
+        displayName: 'AWS_Create_Variable_Upload_S3'
+        dependsOn: AWS_OR_AZURE
+        condition: eq(dependencies.AWS_OR_AZURE.outputs['DetermineProvider.imageBuilderPipeline'], 'amazon-ebs' 
         inputs:
           targetType: 'inline'
           script: |
@@ -109,21 +121,35 @@ stages:
             export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
             export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
 
-            #ImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d'/' -f9)
-            #ImagePath=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"')
-            #imagePacker=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
-            
             ImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
             ImagePath=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
-            imagePacker=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
-            
-            mkdir -p $(Pipeline.Workspace)/variables
+            ImagePacker=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
 
             echo "$ImageName" > $(Pipeline.Workspace)/variables/ImageName
             echo "$ImagePath" > $(Pipeline.Workspace)/variables/ImagePath
-            echo "$imagePacker" > $(Pipeline.Workspace)/variables/imagePacker
+            echo "$ImagePacker" > $(Pipeline.Workspace)/variables/ImagePacker
 
-            aws s3 cp manifest.json s3://gitdonkey/devops/${imagePacker}.json
+            aws s3 cp manifest.json s3://gitdonkey/devops/${ImagePacker}.json
+      - task: Bash@3
+        displayName: 'Azure_Create_Variable_Upload_S3'
+        dependsOn: AWS_OR_AZURE
+        condition: eq(dependencies.AWS_OR_AZURE.outputs['DetermineProvider.imageBuilderPipeline'], 'azure-arm' 
+        inputs:
+          targetType: 'inline'
+          script: |
+            export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
+            export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
+            export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
+
+            ImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d'/' -f9)
+            ImagePath=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"')
+            ImagePacker=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
+            
+            echo "$ImageName" > $(Pipeline.Workspace)/variables/ImageName
+            echo "$ImagePath" > $(Pipeline.Workspace)/variables/ImagePath
+            echo "$ImagePacker" > $(Pipeline.Workspace)/variables/ImagePacker
+
+            aws s3 cp manifest.json s3://gitdonkey/devops/${ImagePacker}.json
       - task: PublishBuildArtifacts@1
         inputs:
           pathtoPublish: '$(Pipeline.Workspace)/variables' 
@@ -141,8 +167,8 @@ stages:
               echo "##vso[task.setvariable variable=ImageName]$ImageName"
               ImagePath=$(cat $(Pipeline.Workspace)/variables/ImagePath)
               echo "##vso[task.setvariable variable=ImagePath]$ImagePath"
-              imagePacker=$(cat $(Pipeline.Workspace)/variables/imagePacker)
-              echo "##vso[task.setvariable variable=imagePacker]$imagePacker"
+              ImagePacker=$(cat $(Pipeline.Workspace)/variables/ImagePacker)
+              echo "##vso[task.setvariable variable=ImagePacker]$ImagePacker"
           # Just like in the first example, we can expand the variable within Azure Pipelines itself
           - bash: |
               export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
@@ -151,7 +177,7 @@ stages:
               echo "Starting Terraform build"
               echo "$(ImageName)"
               echo "$(ImagePath)"
-              echo "$(imagePacker)"
+              echo "$(ImagePacker)"
               cp terraform/aws_main_modules.tf main.tf
               terraform init
               terraform plan -var="image_id=$(ImagePath)"
@@ -163,4 +189,4 @@ stages:
           - bash: |
               echo "$ImageName"
               echo "$ImagePath"
-              echo "$imagePacker"
+              echo "$ImagePacker"
