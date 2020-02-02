@@ -106,13 +106,13 @@ stages:
           targetType: 'inline'
           script: |
             export ImageBuilder=$(cat manifest.json | jq '.builds | to_entries[] | .value.name' | tr -d '"')
-            echo "##vso[task.setvariable variable=imageBuilderPipeline;isOutput=true]$ImageBuilder"
+            echo "##vso[task.setvariable variable=imageBuilderPipeline]$ImageBuilder"
             mkdir -p $(Pipeline.Workspace)/variables
             echo "$ImageBuilder" > $(Pipeline.Workspace)/variables/ImageBuilder
           name: DetermineProvider
       - task: Bash@3
         displayName: 'AWS_Create_Variable_Upload_S3'
-        condition: eq(dependencies.AWS_OR_AZURE.outputs['DetermineProvider.imageBuilderPipeline'], 'amazon-ebs')
+        condition: eq(variables['imageBuilderPipeline'], 'amazon-ebs')
         inputs:
           targetType: 'inline'
           script: |
@@ -131,7 +131,7 @@ stages:
             aws s3 cp manifest.json s3://gitdonkey/devops/${ImagePacker}.json
       - task: Bash@3
         displayName: 'Azure_Create_Variable_Upload_S3'
-        condition: eq(dependencies.AWS_OR_AZURE.outputs['DetermineProvider.imageBuilderPipeline'], 'azure-arm')
+        condition: eq(variables['imageBuilderPipeline'], 'azure-arm')
         inputs:
           targetType: 'inline'
           script: |
