@@ -67,8 +67,9 @@ stages:
             # sudo unzip terraform_${VER}_linux_amd64.zip -d /usr/local/bin
             # echo "Get version"
             # terraform -v
-  - stage: Install_Packer
-    displayName: 'Install_Packer'
+  
+  - stage: Run_Packer
+    displayName: 'Run_Packer'
     jobs:
     - job: Run_Packer
       steps:
@@ -105,21 +106,17 @@ stages:
         inputs:
           targetType: 'inline'
           script: |
-            export ImageBuilder=$(cat manifest.json | jq '.builds | to_entries[] | .value.name' | tr -d '"')
+            ImageBuilder=$(cat manifest.json | jq '.builds | to_entries[] | .value.name' | tr -d '"')
             echo "##vso[task.setvariable variable=imageBuilderPipeline]$ImageBuilder"
             mkdir -p $(Pipeline.Workspace)/variables
             echo "$ImageBuilder" > $(Pipeline.Workspace)/variables/ImageBuilder
           name: DetermineProvider
       - task: Bash@3
-        displayName: 'AWS_Create_Variable_Upload_S3'
+        displayName: 'AWS_Create_Variables'
         condition: eq(variables['imageBuilderPipeline'], 'amazon-ebs')
         inputs:
           targetType: 'inline'
           script: |
-            export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
-            export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
-            export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
-
             ImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
             ImagePath=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
             ImagePacker=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
@@ -127,18 +124,13 @@ stages:
             echo "$ImageName" > $(Pipeline.Workspace)/variables/ImageName
             echo "$ImagePath" > $(Pipeline.Workspace)/variables/ImagePath
             echo "$ImagePacker" > $(Pipeline.Workspace)/variables/ImagePacker
-
-            aws s3 cp manifest.json s3://gitdonkey/devops/${ImagePacker}.json
+            echo "##vso[task.setvariable variable=ImagePacker]$ImagePacker"
       - task: Bash@3
-        displayName: 'Azure_Create_Variable_Upload_S3'
+        displayName: 'Azure_Create_Variables'
         condition: eq(variables['imageBuilderPipeline'], 'azure-arm')
         inputs:
           targetType: 'inline'
           script: |
-            export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
-            export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
-            export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
-
             ImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d'/' -f9)
             ImagePath=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"')
             ImagePacker=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
@@ -146,15 +138,25 @@ stages:
             echo "$ImageName" > $(Pipeline.Workspace)/variables/ImageName
             echo "$ImagePath" > $(Pipeline.Workspace)/variables/ImagePath
             echo "$ImagePacker" > $(Pipeline.Workspace)/variables/ImagePacker
+            echo "##vso[task.setvariable variable=ImagePacker]$ImagePacker"
+      - task: Bash@3
+        displayName: 'Upload_S3'
+        inputs:
+          targetType: 'inline'
+          script: |
+            export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
+            export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
+            export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
 
-            aws s3 cp manifest.json s3://gitdonkey/devops/${ImagePacker}.json
+            aws s3 cp manifest.json s3://gitdonkey/devops/$(ImageBuilder).json
       - task: PublishBuildArtifacts@1
         inputs:
           pathtoPublish: '$(Pipeline.Workspace)/variables' 
-          artifactName: 'variables' 
+          artifactName: 'variables'
+ 
   - stage: terraform_stage3
     jobs:
-      - job: thrirdjob
+      - job: terraform_stage3
         steps:
           # Download the artifacts
           - download: current
@@ -181,7 +183,7 @@ stages:
               terraform plan -var="image_id=$(ImagePath)"
               terraform apply -var="image_id=$(ImagePath)" -auto-approve
               echo "sleep 4m"
-              sleep 4m
+              sleep 1m
               terraform destroy -var="image_id=$(ImagePath)" -auto-approve
           # Or we can expand it within bash, reading it as environmental variable
           - bash: |
