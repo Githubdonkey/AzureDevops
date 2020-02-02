@@ -100,15 +100,6 @@ stages:
             az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
             chmod +x ado_packer_image.sh
             ./ado_packer_image.sh 11
-
-            ${{ if ne( variables['Build.SourceBranchName'], 'merge' ) }}: 
-              environment: ${{ variables['Build.SourceBranchName'] }}
-            ${{ if endsWith( variables['System.PullRequest.TargetBranch'], 'dev' ) }}: 
-              environment: dev
-            ${{ if endsWith( variables['System.PullRequest.TargetBranch'], 'staging' ) }}: 
-              environment: staging
-            ${{ if endsWith( variables['System.PullRequest.TargetBranch'], 'master' ) }}: 
-              environment: prod
       - task: Bash@3
         displayName: 'AWS_OR_AZURE'
         inputs:
