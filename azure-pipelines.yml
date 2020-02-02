@@ -73,7 +73,7 @@ stages:
     - job: Run_Packer
       steps:
       - task: Bash@3
-        displayName: 'Packer Create Image'
+        displayName: 'Packer_Create_Image'
         inputs:
           targetType: 'inline'
           script: |
@@ -89,7 +89,8 @@ stages:
             chmod +x ado_packer_image.sh
             ./ado_packer_image.sh 11
       - task: Bash@3
-        displayName: 'Create Variable Upload S3'
+        displayName: 'Create_Variable_Upload_S3'
+        dependsOn: 'Packer_Create_Image'
         inputs:
           targetType: 'inline'
           script: |
@@ -112,9 +113,11 @@ stages:
             echo "$imagePacker" > $(Pipeline.Workspace)/variables/imagePacker
 
             aws s3 cp manifest.json s3://gitdonkey/devops/${imagePacker}.json
-
-      - publish: $(Pipeline.Workspace)/variables
-        artifact: variables
+      - task: PublishBuildArtifacts@1
+        dependsOn: 'Create_Variable_Upload_S3'
+        inputs:
+          pathtoPublish: '$(Pipeline.Workspace)/variables' 
+          artifactName: 'variables' 
   - stage: terraform_stage3
     jobs:
       - job: thrirdjob
