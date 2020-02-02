@@ -68,6 +68,7 @@ stages:
             # echo "Get version"
             # terraform -v
     - job: Run_Packer
+      dependsOn: Install_software
       steps:
       - task: Bash@3
         displayName: 'Packer_Create_Image'
