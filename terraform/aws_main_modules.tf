@@ -4,6 +4,6 @@
 variable "image_id" {}
 
 module "ubuntu" {
-  source = "../modules/aws/ec2"
+  source = "./modules/aws/ec2"
   image_id = "${var.image_id}"
 }

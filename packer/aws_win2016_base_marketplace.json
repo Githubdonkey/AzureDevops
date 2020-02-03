@@ -3,15 +3,17 @@
     "build":                "{{timestamp}}",
     "os_version":           "Windows2016",
     "pre":                  "SICFactory",
+    "image_type": "Base",
+
     "source_name_filter":   "Windows_Server-2016-English-Full-Base-*",
     "owners":               "amazon",
-    "instance_type":        "t2.medium",
+    "instance_type":        "t2.xlarge",
 
     "aws_access_key":       "{{env `AWS_ACCESS_KEY_ID`}}",
     "aws_secret_key":       "{{env `AWS_SECRET_ACCESS_KEY`}}",
     "region":               "{{env `AWS_DEFAULT_REGION`}}",
-    "name":                 "{{user `pre`}}-{{user `os_version`}}-{{user `build`}}",
-    "description":          "{{user `pre`}}-{{user `os_version`}}-{{user `build`}} built from latest Market place image"
+    "name": "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}",
+		"description": "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}} built from latest Market place image"
   },
 
   "builders": [
@@ -23,7 +25,7 @@
     "source_ami_filter": {
       "filters": {
         "virtualization-type":  "hvm",
-        "name":                 "Windows_Server-2016-English-Full-Base-*",
+        "name":                 "{{user `source_name_filter`}}",
         "root-device-type":     "ebs"
       },
       "owners": [
@@ -41,29 +43,22 @@
     },
     "force_deregister":         "true",
     "force_delete_snapshot":    "true",
-    "user_data_file":           "./bootstrap_win.txt",
+    "user_data_file":           "./SetUpWinRM.ps1",
     "communicator":             "winrm",
     "winrm_username":           "Administrator",
-    "winrm_password":           "SuperS3cr3t!"
+    "winrm_insecure":           true,
+    "winrm_use_ssl":            true
    }
   ],
 
 	"provisioners": [
     {
       "type": "powershell",
-      "environment_vars": ["DEVOPS_LIFE_IMPROVER=PACKER"],
       "inline": [
-        "Write-Host \"HELLO NEW USER; WELCOME TO $Env:DEVOPS_LIFE_IMPROVER\"",
-        "Write-Host \"or in your own scripts.\""
+        "C:\\ProgramData\\Amazon\\EC2-Windows\\Launch\\Scripts\\InitializeInstance.ps1 -Schedule",
+        "C:\\ProgramData\\Amazon\\EC2-Windows\\Launch\\Scripts\\SysprepInstance.ps1 -NoShutdown"
       ]
-    },
-    {
-      "type": "powershell",
-      "inline": [
-        "C:/ProgramData/Amazon/EC2-Windows/Launch/Scripts/InitializeInstance.ps1 -Schedule",
-        "C:/ProgramData/Amazon/EC2-Windows/Launch/Scripts/SysprepInstance.ps1 -NoShutdown"
-      ]
-  }
+    }
   ],  
 	"post-processors": [
 		{
@@ -71,17 +66,12 @@
 		  "output": "manifest.json",
       "strip_path": true,
       "custom_data": {
-        "name":                   "{{ user `name` }}",
-        "Base_AMI_Name":          "{{ .SourceAMIName }}",
+        "name":                     "{{ user `name` }}",
         "type":                     "amazon-ebs",
-        "region":                   "{{user `region`}}",
-        "owners":                   "{{user `owners`}}",
-        "instance_type":            "{{user `instance_type`}}",
-        "ami_name":                 "{{user `name`}}",
-        "communicator":             "winrm",
-        "artifatt":                 "{{ .artifact_id }}",
+        "region":                   "{{ user `region`}}",
         "OS_version":               "{{ user `os_version` }}",
-        "name_os":                  "{{ user `pre` }}-{{ user `os_version` }}"
+        "name_os":                  "{{ user `pre` }}-{{ user `os_version` }}",
+		    "os_type": 									"{{ user `os_type`}}"
       }
 		  }
 	  ]
