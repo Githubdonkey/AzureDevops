@@ -95,11 +95,27 @@ installScripts/install-terraform.sh
 installScripts/install-packer.sh
 ```
 ######  Set Variables
-* Build machine: export PACKER_LOG_PATH="/home/test/packer.log"
+* Build machine: export PACKER_LOG_PATH="packer.log"
 * Build machine: export PACKER_LOG=1
 * Build machine: packer build -debug ubuntu_64.json
 
+###### Windows Update Provisioner
+Download latest binary https://github.com/rgl/packer-provisioner-windows-update/releases
+```
+tar -zxvf packer-provisioner-windows-update-linux.tgz
+chmod +x packer-provisioner-windows-update
+sudo cp packer-provisioner-windows-update /usr/local/bin/
 
+example JSON
+    {
+      "type": "windows-update",
+	  "search_criteria": "IsInstalled=0",
+	  "filters": [
+ 		  "exclude:$_.Title -like '*Windows Defender Antivirus*'",
+  		  "include:$true"
+	  ]
+    }
+```
 
 # Useful commands
 ###### Azure List images
@@ -118,3 +134,5 @@ az login --service-principal --username $ARM_CLIENT_ID --password $ARM_CLIENT_SE
 # Test access
 az vm list-sizes --location eastus
 ```
+
+
