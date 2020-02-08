@@ -83,7 +83,6 @@ stages:
             wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
             echo "Unzip File and move to local bin"
             sudo unzip packer_${VER}_linux_amd64.zip -d /usr/local/bin
-            cp packer/packer-provisioner-windows-update /usr/local/bin/packer-provisioner-windows-update
             echo "Get version"
             packer --version
       - task: Bash@3
@@ -102,12 +101,14 @@ stages:
             az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
             chmod +x ado_packer_image.sh
             #./ado_packer_image.sh 2
-            ls /usr/local/bin
-            echo "local-files"
-            ls
+            
             cp packer/aws_win2016_winUpdate_marketplace.json .
             cp packer/SetUpWinRM.ps1 SetUpWinRM.ps1
             cp packer/packer-provisioner-windows-update .
+            cp packer/packer-provisioner-windows-update /usr/local/bin/packer-provisioner-windows-update
+            ls /usr/local/bin
+            echo "local-files"
+            ls
             packer build aws_win2016_winUpdate_marketplace.json
       - task: Bash@3
         displayName: 'AWS_OR_AZURE'
