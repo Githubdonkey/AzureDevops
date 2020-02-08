@@ -103,7 +103,7 @@ stages:
 
             az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
             chmod +x ado_packer_image.sh
-            ./ado_packer_image.sh 11
+            ./ado_packer_image.sh 2
 
       - task: Bash@3
         displayName: 'AWS_OR_AZURE'
