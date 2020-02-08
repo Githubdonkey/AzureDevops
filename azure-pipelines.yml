@@ -152,8 +152,8 @@ stages:
             export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
             export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
 
-            aws s3 cp manifest.json s3://gitdonkey/devops/builds/$(ImageBuilder).json
-            aws s3 cp packer.log s3://gitdonkey/devops/packer_logs/$(ImageBuilder)-PackerLog.json
+            aws s3 cp manifest.json s3://gitdonkey/devops/builds/$(ImagePacker).json
+            aws s3 cp packer.log s3://gitdonkey/devops/packer_logs/$(ImagePacker)-PackerLog.json
       - task: PublishBuildArtifacts@1
         inputs:
           pathtoPublish: '$(Pipeline.Workspace)/variables' 
