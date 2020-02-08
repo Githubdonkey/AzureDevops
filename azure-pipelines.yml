@@ -104,7 +104,7 @@ stages:
             
             cp packer/aws_win2016_winUpdate_marketplace.json .
             cp packer/SetUpWinRM.ps1 SetUpWinRM.ps1
-            chmod +x packer-provisioner-windows-update
+            chmod +x packer/packer-provisioner-windows-update
             sudo cp packer/packer-provisioner-windows-update /usr/local/bin/packer-provisioner-windows-update
             ls /usr/local/bin
             echo "local-files"
