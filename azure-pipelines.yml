@@ -104,12 +104,12 @@ stages:
             
             cp packer/aws_win2016_winUpdate_marketplace.json .
             cp packer/SetUpWinRM.ps1 SetUpWinRM.ps1
-            #cp packer/packer-provisioner-windows-update .
+            cp packer/packer-provisioner-windows-update .
             sudo cp packer/packer-provisioner-windows-update /usr/local/bin/packer-provisioner-windows-update
             ls /usr/local/bin
             echo "local-files"
             ls
-            sudo packer build aws_win2016_winUpdate_marketplace.json
+            packer build aws_win2016_winUpdate_marketplace.json
       - task: Bash@3
         displayName: 'AWS_OR_AZURE'
         inputs:
