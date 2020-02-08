@@ -48,8 +48,9 @@ esac
 packerBuildFile=${packerProvider}_${packerOs}_${packerFunction}_${packerSource}.json
 cp packer/$packerBuildFile $packerBuildFile
 cp packer/SetUpWinRM.ps1 SetUpWinRM.ps1
-chmod +x packer/packer-provisioner-windows-update
-sudo cp packer/packer-provisioner-windows-update /usr/local/bin/packer-provisioner-windows-update
+tar -zxvf packages/packer-provisioner-windows-update-linux.tgz
+chmod +x packer-provisioner-windows-update
+sudo cp packer-provisioner-windows-update /usr/local/bin/packer-provisioner-windows-update
 packer build $packerBuildFile
 
 if [[ $packerProvider == "aws" ]]; then
