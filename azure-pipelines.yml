@@ -102,6 +102,9 @@ stages:
             az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
             chmod +x ado_packer_image.sh
             #./ado_packer_image.sh 2
+            ls /usr/local/bin
+            echo "local-files"
+            ls
             cp packer/aws_win2016_winUpdate_marketplace.json .
             cp packer/SetUpWinRM.ps1 SetUpWinRM.ps1
             cp packer/packer-provisioner-windows-update .
