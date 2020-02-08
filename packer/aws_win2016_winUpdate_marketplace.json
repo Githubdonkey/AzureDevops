@@ -66,5 +66,20 @@
       "C:\\ProgramData\\Amazon\\EC2-Windows\\Launch\\Scripts\\SysprepInstance.ps1 -NoShutdown"
 	  ]
     }
-  ]
-}
+  ],  
+	"post-processors": [
+		{
+		  "type": "manifest",
+		  "output": "manifest.json",
+      "strip_path": true,
+      "custom_data": {
+        "name":                     "{{ user `name` }}",
+        "type":                     "amazon-ebs",
+        "region":                   "{{ user `region`}}",
+        "OS_version":               "{{ user `os_version` }}",
+        "name_os":                  "{{ user `pre` }}-{{ user `os_version` }}",
+		    "os_type": 									"{{ user `os_type`}}"
+      }
+		  }
+	  ]
+ }

@@ -3,11 +3,11 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-trigger: none
-#trigger:
-#  branches:
-#    include:
-#    - '*'  # must quote since "*" is a YAML reserved character; we want a string
+#trigger: none
+trigger:
+  branches:
+    include:
+    - '*'  # must quote since "*" is a YAML reserved character; we want a string
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -98,19 +98,13 @@ stages:
             export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET)
             export ARM_SUBSCRIPTION_ID=$(ARM_SUBSCRIPTION_ID)
             export ARM_TENANT_ID=$(ARM_TENANT_ID)
+            export PACKER_LOG_PATH="packer.log"
+            export PACKER_LOG=1
 
             az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
             chmod +x ado_packer_image.sh
-            #./ado_packer_image.sh 2
-            
-            cp packer/aws_win2016_winUpdate_marketplace.json .
-            cp packer/SetUpWinRM.ps1 SetUpWinRM.ps1
-            chmod +x packer/packer-provisioner-windows-update
-            sudo cp packer/packer-provisioner-windows-update /usr/local/bin/packer-provisioner-windows-update
-            ls /usr/local/bin
-            echo "local-files"
-            ls
-            packer build aws_win2016_winUpdate_marketplace.json
+            ./ado_packer_image.sh 11
+
       - task: Bash@3
         displayName: 'AWS_OR_AZURE'
         inputs:
@@ -158,7 +152,8 @@ stages:
             export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
             export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
 
-            aws s3 cp manifest.json s3://gitdonkey/devops/$(ImageBuilder).json
+            aws s3 cp manifest.json s3://gitdonkey/devops/builds/$(ImageBuilder).json
+            aws s3 cp packer.log s3://gitdonkey/devops/packer_logs/$(ImageBuilder)-PackerLog.json
       - task: PublishBuildArtifacts@1
         inputs:
           pathtoPublish: '$(Pipeline.Workspace)/variables' 
