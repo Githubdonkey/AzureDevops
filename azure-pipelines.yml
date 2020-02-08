@@ -109,7 +109,7 @@ stages:
             ls /usr/local/bin
             echo "local-files"
             ls
-            packer build aws_win2016_winUpdate_marketplace.json
+            sudo packer build aws_win2016_winUpdate_marketplace.json
       - task: Bash@3
         displayName: 'AWS_OR_AZURE'
         inputs:
