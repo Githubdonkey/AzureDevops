@@ -3,11 +3,11 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-trigger: none
-#trigger:
-#  branches:
-#    include:
-#    - '*'  # must quote since "*" is a YAML reserved character; we want a string
+#trigger: none
+trigger:
+  branches:
+    include:
+    - '*'  # must quote since "*" is a YAML reserved character; we want a string
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -98,19 +98,13 @@ stages:
             export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET)
             export ARM_SUBSCRIPTION_ID=$(ARM_SUBSCRIPTION_ID)
             export ARM_TENANT_ID=$(ARM_TENANT_ID)
+            export PACKER_LOG_PATH="packer.log"
+            export PACKER_LOG=1
 
             az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
             chmod +x ado_packer_image.sh
-            #./ado_packer_image.sh 2
-            
-            cp packer/aws_win2016_winUpdate_marketplace.json .
-            cp packer/SetUpWinRM.ps1 SetUpWinRM.ps1
-            chmod +x packer/packer-provisioner-windows-update
-            sudo cp packer/packer-provisioner-windows-update /usr/local/bin/packer-provisioner-windows-update
-            ls /usr/local/bin
-            echo "local-files"
-            ls
-            packer build aws_win2016_winUpdate_marketplace.json
+            ./ado_packer_image.sh 11
+
       - task: Bash@3
         displayName: 'AWS_OR_AZURE'
         inputs:
@@ -120,7 +114,7 @@ stages:
             echo "##vso[task.setvariable variable=imageBuilderPipeline]$ImageBuilder"
             mkdir -p $(Pipeline.Workspace)/variables
             echo "$ImageBuilder" > $(Pipeline.Workspace)/variables/ImageBuilder
-          name: DetermineProvider
+
       - task: Bash@3
         displayName: 'AWS_Create_Variables'
         condition: eq(variables['imageBuilderPipeline'], 'amazon-ebs')
@@ -135,6 +129,7 @@ stages:
             echo "$ImagePath" > $(Pipeline.Workspace)/variables/ImagePath
             echo "$ImagePacker" > $(Pipeline.Workspace)/variables/ImagePacker
             echo "##vso[task.setvariable variable=ImagePacker]$ImagePacker"
+
       - task: Bash@3
         displayName: 'Azure_Create_Variables'
         condition: eq(variables['imageBuilderPipeline'], 'azure-arm')
@@ -149,6 +144,7 @@ stages:
             echo "$ImagePath" > $(Pipeline.Workspace)/variables/ImagePath
             echo "$ImagePacker" > $(Pipeline.Workspace)/variables/ImagePacker
             echo "##vso[task.setvariable variable=ImagePacker]$ImagePacker"
+
       - task: Bash@3
         displayName: 'Upload_S3'
         inputs:
@@ -158,7 +154,9 @@ stages:
             export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
             export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
 
-            aws s3 cp manifest.json s3://gitdonkey/devops/$(ImageBuilder).json
+            aws s3 cp manifest.json s3://gitdonkey/devops/builds/$(ImagePacker).json
+            aws s3 cp packer.log s3://gitdonkey/devops/packer_logs/$(ImagePacker)-PackerLog.json
+
       - task: PublishBuildArtifacts@1
         inputs:
           pathtoPublish: '$(Pipeline.Workspace)/variables' 
@@ -172,13 +170,20 @@ stages:
           - download: current
             artifact: variables
           # Read the variable from the file, then expose it in the job
-          - bash: |
-              ImageName=$(cat $(Pipeline.Workspace)/variables/ImageName)
-              echo "##vso[task.setvariable variable=ImageName]$ImageName"
-              ImagePath=$(cat $(Pipeline.Workspace)/variables/ImagePath)
-              echo "##vso[task.setvariable variable=ImagePath]$ImagePath"
-              ImagePacker=$(cat $(Pipeline.Workspace)/variables/ImagePacker)
-              echo "##vso[task.setvariable variable=ImagePacker]$ImagePacker"
+          - task: Bash@3
+            displayName: 'Install_Packer'
+            inputs:
+              targetType: 'inline'
+              script: |
+                ImageName=$(cat $(Pipeline.Workspace)/variables/ImageName)
+                echo "##vso[task.setvariable variable=ImageName]$ImageName"
+                ImagePath=$(cat $(Pipeline.Workspace)/variables/ImagePath)
+                echo "##vso[task.setvariable variable=ImagePath]$ImagePath"
+                ImagePacker=$(cat $(Pipeline.Workspace)/variables/ImagePacker)
+                echo "##vso[task.setvariable variable=ImagePacker]$ImagePacker"
+                echo "$(ImageName)"
+                echo "$(ImagePath)"
+                echo "$(ImagePacker)"
           # Just like in the first example, we can expand the variable within Azure Pipelines itself
           - bash: |
               export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
@@ -195,8 +200,3 @@ stages:
               echo "sleep 4m"
               sleep 1m
               terraform destroy -var="image_id=$(ImagePath)" -auto-approve
-          # Or we can expand it within bash, reading it as environmental variable
-          - bash: |
-              echo "$ImageName"
-              echo "$ImagePath"
-              echo "$ImagePacker"

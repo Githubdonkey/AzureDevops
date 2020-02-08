@@ -40,7 +40,9 @@
       "Name":                   "{{ user `name` }}",
       "Description":            "{{ user `description` }}",
       "OS_Version":             "{{ user `os_version` }}",
-      "Base_AMI_Name":          "{{ .SourceAMIName }}"
+      "Base_AMI_Name":          "{{ .SourceAMIName }}",
+      "Readme":                 "s3://gitdonkey/devops/builds/{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}.json",
+      "Packer_Build":           "s3://gitdonkey/devops/packer_logs/{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}-PackerLog.json"
     },
     "force_deregister":         "true",
     "force_delete_snapshot":    "true"
