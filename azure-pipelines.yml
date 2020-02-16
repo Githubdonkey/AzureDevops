@@ -167,11 +167,7 @@ stages:
         - download: current
           artifact: variables
         
-        - task: Bash@3
-          displayName: 'Install_Packer'
-          inputs:
-            targetType: 'inline'
-            script: |
+        - bash: |
               ImageName=$(cat $(Pipeline.Workspace)/variables/ImageName)
               echo "##vso[task.setvariable variable=ImageName]$ImageName"
               ImagePath=$(cat $(Pipeline.Workspace)/variables/ImagePath)
@@ -183,6 +179,10 @@ stages:
               echo "$(ImagePacker)"
               pwd
               ls
+        - bash: |
+              echo "$(ImageName)"
+        - bash: |
+              echo "$ImagePath"
         # Just like in the first example, we can expand the variable within Azure Pipelines itself
         - bash: |
             export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
