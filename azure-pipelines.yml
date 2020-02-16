@@ -103,7 +103,7 @@ stages:
 
             az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
             chmod +x ado_packer_image.sh
-            ./ado_packer_image.sh 1
+            ./ado_packer_image.sh 11
 
       - task: Bash@3
         displayName: 'AWS_OR_AZURE'
@@ -159,7 +159,7 @@ stages:
 
       - task: PublishBuildArtifacts@1
         inputs:
-          pathtoPublish: '$(Pipeline.Workspace)/variables' 
+          pathtoPublish: '$(Pipeline.Workspace)' 
           artifactName: 'variables'
  
   - stage: terraform_stage3
@@ -180,7 +180,7 @@ stages:
               #buildId: # Required when buildType == Specific && BuildVersionToDownload == Specific
               #tags: # Optional
               #downloadType: 'single' # Choose whether to download a single artifact or all artifacts of a specific build. Options: single, specific
-              artifactName: variables
+              artifactName: 'variables'
               #itemPattern: '**' # Optional
               downloadPath: '$(Pipeline.Workspace)' 
               #parallelizationLimit: '8' # Optional
