@@ -6,12 +6,12 @@ provider "aws" {
 variable "image_id" {}
 
 resource "aws_instance" "secOps" {
-  ami           = "${var.image_id}"
+  ami = var.image_id
   instance_type = "t2.medium"
 
   tags = {
-    Name = "${var.image_id}"
-    Source_image = "${var.image_id}"
+    Name = var.image_id
+    Source_image = var.image_id
   }
 }
 
