@@ -157,7 +157,7 @@ stages:
             aws s3 cp manifest.json s3://gitdonkey/devops/builds/$(ImagePacker).json
             aws s3 cp packer.log s3://gitdonkey/devops/packer_logs/$(ImagePacker)-PackerLog.json
 
-      - publish: $(System.DefaultWorkingDirectory)/variables
+      - publish: $(Pipeline.Workspace)/variables
         artifact: variables
  
   - stage: terraform_stage3
