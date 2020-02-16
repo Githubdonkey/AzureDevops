@@ -154,49 +154,45 @@ stages:
             export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
             export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
 
-            aws s3 cp manifest.json s3://gitdonkey/devops/builds/$(ImagePacker).json
-            aws s3 cp packer.log s3://gitdonkey/devops/packer_logs/$(ImagePacker)-PackerLog.json
+            aws s3 cp manifest.json s3://gitdonkey/devops/builds/$(Build.BuildNumber)/$(ImagePacker).json
+            aws s3 cp packer.log s3://gitdonkey/devops/packer_logs/$(Build.BuildNumber)/$(ImagePacker)-PackerLog.json
 
-      - task: PublishBuildArtifacts@1
-        inputs:
-          pathtoPublish: '$(Pipeline.Workspace)/variables' 
-          artifactName: 'variables'
+      - publish: $(Pipeline.Workspace)/variables
+        artifact: variables
  
   - stage: terraform_stage3
     jobs:
       - job: terraform_stage3
         steps:
-          # Download the artifacts
-          - download: current
-            artifact: variables
-          # Read the variable from the file, then expose it in the job
-          - task: Bash@3
-            displayName: 'Install_Packer'
-            inputs:
-              targetType: 'inline'
-              script: |
-                ImageName=$(cat $(Pipeline.Workspace)/variables/ImageName)
-                echo "##vso[task.setvariable variable=ImageName]$ImageName"
-                ImagePath=$(cat $(Pipeline.Workspace)/variables/ImagePath)
-                echo "##vso[task.setvariable variable=ImagePath]$ImagePath"
-                ImagePacker=$(cat $(Pipeline.Workspace)/variables/ImagePacker)
-                echo "##vso[task.setvariable variable=ImagePacker]$ImagePacker"
-                echo "$(ImageName)"
-                echo "$(ImagePath)"
-                echo "$(ImagePacker)"
-          # Just like in the first example, we can expand the variable within Azure Pipelines itself
-          - bash: |
-              export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
-              export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
-              export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
-              echo "Starting Terraform build"
+        - download: current
+          artifact: variables
+        
+        - bash: |
+              ImageName=$(cat $(Pipeline.Workspace)/variables/ImageName)
+              echo "##vso[task.setvariable variable=ImageName]$ImageName"
+              ImagePath=$(cat $(Pipeline.Workspace)/variables/ImagePath)
+              echo "##vso[task.setvariable variable=ImagePath]$ImagePath"
+              ImagePacker=$(cat $(Pipeline.Workspace)/variables/ImagePacker)
+              echo "##vso[task.setvariable variable=ImagePacker]$ImagePacker"
+        - bash: |
               echo "$(ImageName)"
+        - bash: |
               echo "$(ImagePath)"
-              echo "$(ImagePacker)"
-              cp terraform/aws_main_modules.tf main.tf
-              terraform init
-              terraform plan -var="image_id=$(ImagePath)"
-              terraform apply -var="image_id=$(ImagePath)" -auto-approve
-              echo "sleep 4m"
-              sleep 1m
-              terraform destroy -var="image_id=$(ImagePath)" -auto-approve
+        # Just like in the first example, we can expand the variable within Azure Pipelines itself
+        - bash: |
+            export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
+            export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
+            export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
+            echo "Starting Terraform build"
+            echo "ImageName: $(ImageName)"
+            echo "ImagePath: $(ImagePath)"
+            echo "ImagePacker: $(ImagePacker)"
+            pwd
+            ls
+            cp terraform/aws_main_modules.tf main.tf
+            terraform init
+            terraform plan -var="image_id=$(ImagePath)"
+            terraform apply -var="image_id=$(ImagePath)" -auto-approve
+            echo "sleep 4m"
+            sleep 1m
+            terraform destroy -var="image_id=$(ImagePath)" -auto-approve
