@@ -159,7 +159,7 @@ stages:
 
       - task: PublishBuildArtifacts@1
         inputs:
-          pathtoPublish: '$(Pipeline.Workspace)' 
+          pathtoPublish: '$(Pipeline.Workspace)/variables' 
           artifactName: 'variables'
  
   - stage: terraform_stage3
@@ -182,7 +182,7 @@ stages:
               #downloadType: 'single' # Choose whether to download a single artifact or all artifacts of a specific build. Options: single, specific
               artifactName: 'variables'
               #itemPattern: '**' # Optional
-              downloadPath: '$(Pipeline.Workspace)' 
+              downloadPath: '$(Pipeline.Workspace)/variables' 
               #parallelizationLimit: '8' # Optional
 
                     # Read the variable from the file, then expose it in the job
