@@ -166,10 +166,26 @@ stages:
     jobs:
       - job: terraform_stage3
         steps:
-          # Download the artifacts
-          - download: current
-            artifact: variables
-          # Read the variable from the file, then expose it in the job
+          # Download build artifacts
+          # Download files that were saved as artifacts of a completed build
+          - task: DownloadBuildArtifacts@0
+            inputs:
+              buildType: 'current'
+              #project: # Required when buildType == Specific
+              #pipeline: # Required when buildType == Specific
+              #specificBuildWithTriggering: false # Optional
+              #buildVersionToDownload: 'latest' # Required when buildType == Specific. Options: latest, latestFromBranch, specific
+              #allowPartiallySucceededBuilds: false # Optional
+              #branchName: 'refs/heads/master' # Required when buildType == Specific && BuildVersionToDownload == LatestFromBranch
+              #buildId: # Required when buildType == Specific && BuildVersionToDownload == Specific
+              #tags: # Optional
+              #downloadType: 'single' # Choose whether to download a single artifact or all artifacts of a specific build. Options: single, specific
+              artifactName: variables
+              #itemPattern: '**' # Optional
+              downloadPath: '$(Pipeline.Workspace)' 
+              #parallelizationLimit: '8' # Optional
+
+                    # Read the variable from the file, then expose it in the job
           - task: Bash@3
             displayName: 'Install_Packer'
             inputs:
@@ -184,6 +200,8 @@ stages:
                 echo "$(ImageName)"
                 echo "$(ImagePath)"
                 echo "$(ImagePacker)"
+                pwd
+                ls
           # Just like in the first example, we can expand the variable within Azure Pipelines itself
           - bash: |
               export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
@@ -193,8 +211,10 @@ stages:
               echo "$(ImageName)"
               echo "$(ImagePath)"
               echo "$(ImagePacker)"
+              pwd
+              ls
               cp terraform/aws_main_modules.tf main.tf
-              terraform init
+              terraform inits
               terraform plan -var="image_id=$(ImagePath)"
               terraform apply -var="image_id=$(ImagePath)" -auto-approve
               echo "sleep 4m"
