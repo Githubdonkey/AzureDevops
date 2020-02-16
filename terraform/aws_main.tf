@@ -12,7 +12,7 @@ variable "image_id" {
 }
 
 resource "aws_instance" "web" {
-  ami           = "${var.image_id}"
+  ami           = var.image_id
   instance_type = "t2.micro"
 
   tags = {
