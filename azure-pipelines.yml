@@ -167,14 +167,22 @@ stages:
         - download: current
           artifact: variables
         
-        - bash: |
-              ImageName=$(cat $(Pipeline.Workspace)/variables/ImageName)
-              echo "##vso[task.setvariable variable=ImageName]$ImageName"
-              ImagePath=$(cat $(Pipeline.Workspace)/variables/ImagePath)
-              echo "##vso[task.setvariable variable=ImagePath]$ImagePath"
-              ImagePacker=$(cat $(Pipeline.Workspace)/variables/ImagePacker)
-              echo "##vso[task.setvariable variable=ImagePacker]$ImagePacker"
-        - bash: |
+        - task: Bash@3
+          displayName: 'vars1'
+          inputs:
+            targetType: 'inline'
+            script: |
+                ImageName=$(cat $(Pipeline.Workspace)/variables/ImageName)
+                echo "##vso[task.setvariable variable=ImageName]$ImageName"
+                ImagePath=$(cat $(Pipeline.Workspace)/variables/ImagePath)
+                echo "##vso[task.setvariable variable=ImagePath]$ImagePath"
+                ImagePacker=$(cat $(Pipeline.Workspace)/variables/ImagePacker)
+                echo "##vso[task.setvariable variable=ImagePacker]$ImagePacker"
+        - task: Bash@3
+          displayName: 'vars1'
+          inputs:
+            targetType: 'inline'
+            script: |
               echo "$(ImageName)"
         - bash: |
               echo "$(ImagePath)"
