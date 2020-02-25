@@ -1,0 +1,188 @@
+Server 2016 Base
+Use Public IP?
+Default configuration "winrm enumerate winrm/config/listener" shows 5985 listener
+Failed: winrs -r:ec2-54-162-152-217.compute-1.amazonaws.com -u:administrator -p:"f&uvt4%=vcc2%i&joKYIa6XV=Vud=j;X" winrm enumerate winrm/config/listener
+netsh advfirewall firewall add rule name="5985 - WinRM HTTP" dir=in action=allow protocol=TCP localport=5985
+Success winrs -r:ec2-54-162-152-217.compute-1.amazonaws.com -u:administrator -p:"f&uvt4%=vcc2%i&joKYIa6XV=Vud=j;X" winrm enumerate winrm/config/listener
+
+HTTPS 5986
+Winrs error:
+Ran config script
+Failed: winrs -r:ec2-54-162-152-217.compute-1.amazonaws.com -usessl -u:administrator -p:"f&uvt4%=vcc2%i&joKYIa6XV=Vud=j;X" winrm enumerate winrm/config/listener
+	The server certificate on the destination computer (ec2-54-162-152-217.compute-1.amazonaws.com:5986) has the following errors:    
+	The SSL certificate is signed by an unknown certificate authority.  
+	The SSL certificate contains a common name (CN) that does not match the hostname.
+Updated
+	$Cert = New-SelfSignedCertificate -CertstoreLocation Cert:\LocalMachine\My -DnsName "ec2-54-162-152-217.compute-1.amazonaws.com"
+	cmd.exe /c winrm set "winrm/config/listener?Address=*+Transport=HTTPS" "@{Port=`"5986`";Hostname=`"ec2-54-162-152-217.compute-1.amazonaws.com`";CertificateThumbprint=`"$($Cert.Thumbprint)`"}"
+Failed: winrs -r:ec2-54-162-152-217.compute-1.amazonaws.com -usessl -u:administrator -p:"f&uvt4%=vcc2%i&joKYIa6XV=Vud=j;X" winrm enumerate winrm/config/listener
+	The SSL certificate is signed by an unknown certificate authority.  
+	The SSL certificate contains a common name (CN) that does not match the hostname.
+Failed: winrs -r:54.162.152.217 -usessl -u:administrator -p:"f&uvt4%=vcc2%i&joKYIa6XV=Vud=j;X" winrm enumerate winrm/config/listener
+	The SSL certificate is signed by an unknown certificate authority.  
+	The SSL certificate contains a common name (CN) that does not match the hostname.
+
+	
+	
+	Enter-PSSession -ComputerName 54.162.152.217 -UseSSL -Credential (Get-Credential)
+
+
+	
+	
+winrm get winrm/config
+
+winrm quickconfig
+winrm quickconfig -transport:https
+
+winrm enumerate winrm/config/listener
+
+C:\Users\Administrator>winrm enumerate winrm/config/listener
+Listener
+    Address = *
+    Transport = HTTP
+    Port = 5985
+    Hostname
+    Enabled = true
+    URLPrefix = wsman
+    CertificateThumbprint
+    ListeningOn = 127.0.0.1, 172.31.33.215, ::1, 2001:0:34f1:8072:3cff:3d05:53e0:de28, fe80::5efe:172.31.33.215%6, fe80::3cff:3d05:53e0:de28%7, fe80::950b:6a73:df13:3df4%5
+
+
+winrs -?
+HTTP
+winrs -r:ec2-100-24-16-110.compute-1.amazonaws.com -u:administrator -p:"8v(rpEf*?2J-eV25a*XHnOgL!lKPd47p" winrm enumerate winrm/config/listener
+HTTPS
+winrs -r:54.162.152.217 -usessl -u:administrator -p:"f&uvt4%=vcc2%i&joKYIa6XV=Vud=j;X" winrm enumerate winrm/config/listener
+
+
+
+Scripts used
+***************************************************************************************************************************
+<powershell>
+
+$hostName = $env:COMPUTERNAME
+
+write-output "Running User Data Script"
+write-host "$hostName Running User Data Script"
+
+Set-ExecutionPolicy Unrestricted -Scope LocalMachine -Force -ErrorAction Ignore
+
+# Don't set this before Set-ExecutionPolicy as it throws an error
+$ErrorActionPreference = "stop"
+
+# Remove HTTP listener
+#Get-ChildItem wsman:\localhost\Listener\ | Where-Object -Property Keys -eq 'Transport=HTTP' | Remove-Item -Recurse
+#Get-ChildItem wsman:\localhost\Listener\ | Where-Object -Property Keys -eq 'Transport=HTTPS' | Remove-Item -Recurse
+
+$Cert = New-SelfSignedCertificate -CertstoreLocation Cert:\LocalMachine\My -DnsName "$hostName"
+New-Item -Path WSMan:\LocalHost\Listener -Transport HTTPS -Address * -CertificateThumbPrint $Cert.Thumbprint -Force
+
+# WinRM
+write-output "Setting up WinRM"
+write-host "(host) setting up WinRM"
+
+cmd.exe /c winrm quickconfig -q
+cmd.exe /c winrm set "winrm/config" '@{MaxTimeoutms="1800000"}'
+cmd.exe /c winrm set "winrm/config/winrs" '@{MaxMemoryPerShellMB="1024"}'
+cmd.exe /c winrm set "winrm/config/service" '@{AllowUnencrypted="true"}'
+cmd.exe /c winrm set "winrm/config/client" '@{AllowUnencrypted="true"}'
+cmd.exe /c winrm set "winrm/config/service/auth" '@{Basic="true"}'
+cmd.exe /c winrm set "winrm/config/client/auth" '@{Basic="true"}'
+cmd.exe /c winrm set "winrm/config/service/auth" '@{CredSSP="true"}'
+cmd.exe /c winrm set "winrm/config/listener?Address=*+Transport=HTTPS" "@{Port=`"5986`";Hostname=`"$($hostName)`";CertificateThumbprint=`"$($Cert.Thumbprint)`"}"
+cmd.exe /c netsh advfirewall firewall set rule group="remote administration" new enable=yes
+#netsh advfirewall firewall add rule name="5986 - WinRM HTTP" dir=in action=allow protocol=TCP localport=5986
+cmd.exe /c netsh firewall add portopening TCP 5986 "Port 5986"
+cmd.exe /c net stop winrm
+cmd.exe /c sc config winrm start= auto
+cmd.exe /c net start winrm
+
+</powershell>
+***************************************************************************************************************************
+<powershell>
+
+write-output "Running User Data Script"
+write-host "(host) Running User Data Script"
+
+# Need this to run most powershell scripts
+Set-ExecutionPolicy Unrestricted -Scope LocalMachine -Force -ErrorAction Ignore
+$ErrorActionPreference = "stop"
+
+winrm delete winrm/config/Listener?Address=*+Transport=HTTP  2>$Null
+winrm delete winrm/config/Listener?Address=*+Transport=HTTPS 2>$Null
+
+# Update the HTTPS listener with a self-signed cert
+Remove-Item -Path WSMan:\Localhost\listener\listener* -Recurse
+$Cert = New-SelfSignedCertificate -CertstoreLocation Cert:\LocalMachine\My -DnsName "SERVER"
+New-Item -Path WSMan:\LocalHost\Listener -Transport HTTPS -Address * -CertificateThumbPrint $Cert.Thumbprint -Force
+
+# WinRM
+write-output "Setting up WinRM"
+write-host "(host) setting up WinRM"
+winrm quickconfig -q
+winrm set "winrm/config" '@{MaxTimeoutms="1800000"}'
+winrm set "winrm/config/winrs" '@{MaxMemoryPerShellMB="1024"}'
+winrm set "winrm/config/service/auth" '@{Basic="true"}'
+winrm set "winrm/config/client/auth" '@{Basic="true"}'
+winrm set "winrm/config/service/auth" '@{CredSSP="true"}'
+winrm set "winrm/config/listener?Address=*+Transport=HTTPS" "@{Port=`"5986`";Hostname=`"SERVER`";CertificateThumbprint=`"$($Cert.Thumbprint)`"}"
+netsh advfirewall firewall set rule group="remote administration" new enable=yes
+netsh advfirewall firewall add rule name="5986 - WinRM HTTPS" dir=in action=allow protocol=TCP localport=5986
+net stop winrm
+sc config winrm start= auto
+net start winrm
+
+# update the clock to the correct time which we need later
+TZUTIL /s "Eastern Standard Time"
+
+# Change the computer name here (without rebooting) so that winrm
+# will be able to create a self-signed cert that will stay valid
+# throughout the entire packer provisioning process
+Rename-Computer -NewName "SERVER"
+
+# restart so the name change takes effect
+Restart-Computer
+
+</powershell>
+*************************************************************************************************
+write-output "Running User Data Script"
+write-host "(host) Running User Data Script"
+
+# Need this to run most powershell scripts
+Set-ExecutionPolicy Unrestricted -Scope LocalMachine -Force -ErrorAction Ignore
+$ErrorActionPreference = "stop"
+
+winrm delete winrm/config/Listener?Address=*+Transport=HTTP  2>$Null
+winrm delete winrm/config/Listener?Address=*+Transport=HTTPS 2>$Null
+
+# Update the HTTPS listener with a self-signed cert
+Remove-Item -Path WSMan:\Localhost\listener\listener* -Recurse
+$Cert = New-SelfSignedCertificate -CertstoreLocation Cert:\LocalMachine\My -DnsName "packer"
+New-Item -Path WSMan:\LocalHost\Listener -Transport HTTPS -Address * -CertificateThumbPrint $Cert.Thumbprint -Force
+
+# WinRM
+write-output "Setting up WinRM"
+write-host "(host) setting up WinRM"
+winrm quickconfig -q
+winrm set "winrm/config" '@{MaxTimeoutms="1800000"}'
+winrm set "winrm/config/winrs" '@{MaxMemoryPerShellMB="1024"}'
+winrm set "winrm/config/service/auth" '@{Basic="true"}'
+winrm set "winrm/config/client/auth" '@{Basic="true"}'
+winrm set "winrm/config/service/auth" '@{CredSSP="true"}'
+winrm set "winrm/config/listener?Address=*+Transport=HTTPS" "@{Port=`"5986`";Hostname=`"packer`";CertificateThumbprint=`"$($Cert.Thumbprint)`"}"
+netsh advfirewall firewall set rule group="remote administration" new enable=yes
+netsh advfirewall firewall add rule name="5986 - WinRM HTTPS" dir=in action=allow protocol=TCP localport=5986
+net stop winrm
+cmd.exe /c sc config winrm start= auto
+net start winrm
+
+# update the clock to the correct time which we need later
+#TZUTIL /s "Eastern Standard Time"
+
+# Change the computer name here (without rebooting) so that winrm
+# will be able to create a self-signed cert that will stay valid
+# throughout the entire packer provisioning process
+Rename-Computer -NewName "packer"
+
+# restart so the name change takes effect
+Restart-Computer
