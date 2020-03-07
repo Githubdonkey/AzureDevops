@@ -3,7 +3,7 @@ selection=$1
 
 echo "************** select the operation ************"
 echo "   1) Azure Test"
-echo "   2) AWS Windows Update"
+echo "   2) AWS SSL"
 echo "************** AWS ******************************"
 echo "  11) Packer Build Ubuntu 18 Market Place"
 echo "  12) Packer Build Windows 2012R2 Base Market Place"
@@ -22,7 +22,7 @@ case $selection in
   1) echo "You chose Option 1"
       packerProvider=azure; packerOs=win2012R2; packerFunction=test; packerSource=marketplace;;
   2) echo "You chose Option 2"
-      packerProvider=aws; packerOs=win2016; packerFunction=winUpdate; packerSource=marketplace;;
+      packerProvider=aws; packerOs=win2016; packerFunction=ssl2; packerSource=marketplace;;
   11) echo "You chose Option 11"
       packerProvider=aws; packerOs=ubuntu18; packerFunction=base; packerSource=marketplace;;
   12) echo "You chose Option 12"
@@ -48,6 +48,7 @@ esac
 packerBuildFile=${packerProvider}_${packerOs}_${packerFunction}_${packerSource}.json
 cp packer/$packerBuildFile $packerBuildFile
 cp packer/SetUpWinRM.ps1 SetUpWinRM.ps1
+cp packer/ec2-userdata.ps1 ec2-userdata.ps1
 tar -zxvf packages/packer-provisioner-windows-update-linux.tgz
 chmod +x packer-provisioner-windows-update
 sudo cp packer-provisioner-windows-update /usr/local/bin/packer-provisioner-windows-update
