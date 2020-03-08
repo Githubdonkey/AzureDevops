@@ -77,4 +77,4 @@ if [[ $packerProvider == "aws" ]]; then
         exit 1
 fi
 
-#aws s3 cp manifest.json s3://gitdonkey/devops/${TF_VAR_packer_name}.json
+aws s3 cp manifest.json s3://gitdonkey/devops/${TF_VAR_packer_name}.json

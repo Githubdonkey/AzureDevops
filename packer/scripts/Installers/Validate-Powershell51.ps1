@@ -8,7 +8,7 @@ $varPSversion = Get-Host | Select-Object Version
 
 Write-Host $varPSversion
 
-$varPackages = Get-Package
+$varPackages = Get-WmiObject -Class Win32_Product | Select-Object Name, Version
 
 Write-Host $varPackages
 
@@ -18,3 +18,5 @@ _Version:_ $varPackages<br/>
 "@
 
 Write-Host $Description
+
+#Get-WmiObject -Class Win32_Product | Select-Object Name, Version | ConvertTo-Html | Out-File C:\Users\tom\Desktop\repo\CI\AzureDevops\test.html
