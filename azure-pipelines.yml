@@ -16,7 +16,7 @@ parameters:
   - macOS-latest
   - macOS-10.14
 - name: osMenu
-  displayName: Select Provider
+  displayName: Select OS
   type: string
   default: linux
   values:
@@ -31,15 +31,6 @@ parameters:
   - azure
   - vcenter
   - all
-- name: myStep
-  type: step
-  default:
-    script: echo my step
-- name: mySteplist
-  type: stepList
-  default:
-    - script: echo step one
-    - script: echo step two
 
 trigger: none
 #trigger:
@@ -62,6 +53,7 @@ stages:
           targetType: 'inline'
           script: |
               echo "${{ parameters.imagesMenu }}"
+              echo "${{ parameters.osMenu }}"
               echo "${{ parameters.providerMenu }}"
 
   - stage: Build_Initialize
@@ -153,7 +145,7 @@ stages:
 
             az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
             chmod +x ado_packer_image.sh
-            ./ado_packer_image.sh 11
+            ./ado_packer_image.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "${{ parameters.imagesMenu }}"
 
       - task: Bash@3
         displayName: 'AWS_OR_AZURE'
