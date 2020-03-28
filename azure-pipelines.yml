@@ -3,6 +3,31 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
+parameters:
+- name: imagesMenu
+  displayName: Image Selection
+  type: string
+  default: ubuntu18-base
+  values:
+  - ubuntu18-base
+  - win2012R2-base
+  - win2016_base
+  - ubuntu-16.04
+  - macOS-latest
+  - macOS-10.14
+- name: providerMenu
+  displayName: Select Provider
+  type: string
+  default: aws
+  values:
+  - aws
+  - azure
+  - vcenter
+  - all
+    - aws
+    - azure
+    - vcenter
+
 trigger: none
 #trigger:
 #  branches:
