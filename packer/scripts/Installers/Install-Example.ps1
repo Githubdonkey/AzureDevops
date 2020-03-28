@@ -30,3 +30,8 @@ else {
     Write-Host $process
     exit 1
 }
+
+get-service | foreach-object {  
+    if ($_.status -eq "stopped") { write-host -f red $_.name $_.status }
+    else { write-host -f green $_.name $_.status }
+  }
