@@ -38,6 +38,18 @@ pool:
   vmImage: 'ubuntu-latest'
 
 stages:
+  - stage: Testing
+    displayName: Testing
+    jobs:
+    - job: show_variables
+      steps:
+      - task: Bash@3
+        displayName: Show Variables
+        inputs:
+          targetType: 'inline'
+          script: |
+              echo ${{ parameters.imagesMenu }}
+              echo ${{ parameters.providerMenu }}
 
   - stage: Build_Initialize
     displayName: 'Build_Initialize'
