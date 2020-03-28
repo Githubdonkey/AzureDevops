@@ -4,6 +4,8 @@ selection=$1
 echo "************** select the operation ************"
 echo "   1) Azure Test"
 echo "   2) AWS SSL"
+echo "   3) Azure PS"
+echo "   4) Azure PS"
 echo "************** AWS ******************************"
 echo "  11) Packer Build Ubuntu 18 Market Place"
 echo "  12) Packer Build Windows 2012R2 Base Market Place"
@@ -23,6 +25,10 @@ case $selection in
       packerProvider=azure; packerOs=win2012R2; packerFunction=test; packerSource=marketplace;;
   2) echo "You chose Option 2"
       packerProvider=aws; packerOs=win2016; packerFunction=ssl2; packerSource=marketplace;;
+  3) echo "You chose Option 3"
+      packerProvider=azure; packerOs=win2012R2; packerFunction=ps; packerSource=marketplace;;
+  4) echo "You chose Option 2"
+      packerProvider=aws; packerOs=win2012R2; packerFunction=ps; packerSource=marketplace;;
   11) echo "You chose Option 11"
       packerProvider=aws; packerOs=ubuntu18; packerFunction=base; packerSource=marketplace;;
   12) echo "You chose Option 12"
@@ -71,4 +77,4 @@ if [[ $packerProvider == "aws" ]]; then
         exit 1
 fi
 
-#aws s3 cp manifest.json s3://gitdonkey/devops/${TF_VAR_packer_name}.json
+aws s3 cp manifest.json s3://gitdonkey/devops/${TF_VAR_packer_name}.json
