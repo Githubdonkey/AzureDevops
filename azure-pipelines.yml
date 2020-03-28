@@ -21,6 +21,7 @@ parameters:
   default: aws
   values:
   - linux
+  - windows
 - name: providerMenu
   displayName: Select Provider
   type: string
@@ -30,19 +31,15 @@ parameters:
   - azure
   - vcenter
   - all
-- name: myObject
-  type: object
+- name: myStep
+  type: step
   default:
-    foo: FOO
-    bar: BAR
-    things:
-    - one
-    - two
-    - three
-    nested:
-      one: apple
-      two: pear
-      count: 3
+    script: echo my step
+- name: mySteplist
+  type: stepList
+  default:
+    - script: echo step one
+    - script: echo step two
 
 trigger: none
 #trigger:
@@ -66,6 +63,8 @@ stages:
           script: |
               echo ${{ parameters.imagesMenu }}
               echo ${{ parameters.providerMenu }}
+              echo ${{ parameters.myStep }}
+              echo ${{ parameters.mySteplist }}
 
   - stage: Build_Initialize
     displayName: 'Build_Initialize'
