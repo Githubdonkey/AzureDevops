@@ -90,12 +90,12 @@ stages:
         inputs:
           targetType: 'inline'
           script: |
-            VER=1.5.1
-            echo "Download File"
-            wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
-            echo "Unzip File and move to local bin"
-            sudo unzip packer_${VER}_linux_amd64.zip -d /usr/local/bin
-            echo "Get version"
+            # VER=1.5.1
+            # echo "Download File"
+            # wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
+            # echo "Unzip File and move to local bin"
+            # sudo unzip packer_${VER}_linux_amd64.zip -d /usr/local/bin
+            # echo "Get version"
             packer --version
       - task: Bash@3
         displayName: 'Install_Terraform'
@@ -109,7 +109,7 @@ stages:
             # echo "Unzip File and move to local bin"
             # sudo unzip terraform_${VER}_linux_amd64.zip -d /usr/local/bin
             # echo "Get version"
-            # terraform -v
+            terraform -v
   
   - stage: Run_Packer
     displayName: 'Run_Packer'
