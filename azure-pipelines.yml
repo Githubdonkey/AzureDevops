@@ -61,10 +61,8 @@ stages:
         inputs:
           targetType: 'inline'
           script: |
-              echo ${{ parameters.imagesMenu }}
-              echo ${{ parameters.providerMenu }}
-              echo ${{ parameters.myStep }}
-              echo ${{ parameters.mySteplist }}
+              echo "${{ parameters.imagesMenu }}"
+              echo "${{ parameters.providerMenu }}"
 
   - stage: Build_Initialize
     displayName: 'Build_Initialize'
