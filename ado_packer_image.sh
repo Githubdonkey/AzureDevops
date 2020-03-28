@@ -17,24 +17,24 @@ packer build $packerBuildFile
 
 if [[ $packerProvider == "aws" ]]; then
          echo "AWS provider"
-         export TF_VAR_packer_image=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
-         export TF_VAR_packer_name=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
-         echo "$TF_VAR_packer_image"
-         echo "$TF_VAR_packer_name"
+         export packerImageId=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
+         export packerImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
    elif [[ $packerProvider == "azure" ]]; then
          echo "Azure provider"
-         export TF_VAR_packer_image=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"')
-         export TF_VAR_packer_name=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
-         echo "$TF_VAR_packer_image"
-         echo "$TF_VAR_packer_name"
+         export packerImageId=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"')
+         export packerImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
    else
         echo "manifest.json not found"
         exit 1
 fi
 
-# aws secretsmanager create-secret --name builds/${packerProvider}/${packerImage} --description "The image ${packerProvider} built ${packerOs} I created ${packerImage}"
-aws secretsmanager put-secret-value --secret-id builds/${packerProvider}/${packerImage} --secret-string ${TF_VAR_packer_name}
+aws secretsmanager create-secret --name builds/${packerProvider}/${packerImageName}/name --description "The image ${packerProvider} built ${packerOs} I created ${packerImage}"
+aws secretsmanager create-secret --name builds/${packerProvider}/${packerImageId}/id --description "The image ${packerProvider} built ${packerOs} I created ${packerImage}"
+
+aws secretsmanager put-secret-value --secret-id builds/${packerProvider}/${packerImage}/name --secret-string ${packerImageName}
+aws secretsmanager put-secret-value --secret-id builds/${packerProvider}/${packerImage}/id --secret-string ${packerImageId}
+
 
 # aws secretsmanager update-secret --secret-id builds/${packerProvider}/${packerImage} --secret-string {"imageID":"${TF_VAR_packer_name}"}
 
-aws s3 cp manifest.json s3://gitdonkey/devops/${TF_VAR_packer_name}.json
+aws s3 cp manifest.json s3://gitdonkey/devops/${packerImageName}.json

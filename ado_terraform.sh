@@ -4,7 +4,7 @@ packerProvider=$1
 packerOs=$2
 packerImage=$3
 
-latestImage=$(aws secretsmanager get-secret-value --secret-id builds/${packerProvider}/${packerImage} | jq --raw-output .SecretString)
+latestImage=$(aws secretsmanager get-secret-value --secret-id builds/${packerProvider}/${packerImage}/id | jq --raw-output .SecretString)
 
 # Run Terraform
 
