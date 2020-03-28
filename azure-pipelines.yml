@@ -15,6 +15,12 @@ parameters:
   - ubuntu-16.04
   - macOS-latest
   - macOS-10.14
+- name: osMenu
+  displayName: Select Provider
+  type: string
+  default: aws
+  values:
+  - linux
 - name: providerMenu
   displayName: Select Provider
   type: string
@@ -24,9 +30,10 @@ parameters:
   - azure
   - vcenter
   - all
-    - aws
-    - azure
-    - vcenter
+  nested:
+    one: apple
+    two: pear
+    count: 3
 
 trigger: none
 #trigger:
