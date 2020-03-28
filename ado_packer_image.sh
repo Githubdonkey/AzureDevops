@@ -32,7 +32,7 @@ if [[ $packerProvider == "aws" ]]; then
         exit 1
 fi
 
-aws secretsmanager create-secret --name builds/${packerImage} --description "The image ${packerProvider} built ${packerOs} I created ${packerImage}"
-aws secretsmanager update-secret --secret-id builds/${packerImage} --secret-string '{"imageID":"${TF_VAR_packer_name}"}'
+aws secretsmanager create-secret --name builds/${packerProvider}/${packerImage} --description "The image ${packerProvider} built ${packerOs} I created ${packerImage}"
+aws secretsmanager update-secret --secret-id builds/${packerProvider}/${packerImage} --secret-string {"imageID":"${TF_VAR_packer_name}"}
 
 aws s3 cp manifest.json s3://gitdonkey/devops/${TF_VAR_packer_name}.json
