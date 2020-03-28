@@ -236,15 +236,17 @@ stages:
               export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
               export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
               echo "Starting Terraform build"
-              echo "ImageName: $(ImageName)"
-              echo "ImagePath: $(ImagePath)"
-              echo "ImagePacker: $(ImagePacker)"
-              pwd
-              ls
-              cp terraform/aws_main_modules.tf main.tf
-              terraform init
-              terraform plan -var="image_id=$(ImagePath)"
-              terraform apply -var="image_id=$(ImagePath)" -auto-approve
-              echo "sleep 4m"
-              sleep 1m
-              terraform destroy -var="image_id=$(ImagePath)" -auto-approve
+              echo "Provider: ${{ parameters.providerMenu }}"
+              echo "OS: ${{ parameters.osMenu }}"
+              echo "Image: ${{ parameters.imagesMenu }}"
+              chmod +x ado_terraform.sh
+              ./ado_terraform.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "${{ parameters.imagesMenu }}"
+              # pwd
+              # ls
+              # cp terraform/aws_main_modules.tf main.tf
+              # terraform init
+              # terraform plan -var="image_id=$(ImagePath)"
+              # terraform apply -var="image_id=$(ImagePath)" -auto-approve
+              # echo "sleep 4m"
+              # sleep 1m
+              # terraform destroy -var="image_id=$(ImagePath)" -auto-approve
