@@ -206,26 +206,7 @@ stages:
     jobs:
       - job: terraform_stage3
         steps:
-        - download: current
-          artifact: variables
-        
-        - task: Bash@3
-          displayName: 'convert artifacts to vars'
-          inputs:
-            targetType: 'inline'
-            script: |
-                ImageName=$(cat $(Pipeline.Workspace)/variables/ImageName)
-                echo "##vso[task.setvariable variable=ImageName]$ImageName"
-                ImagePath=$(cat $(Pipeline.Workspace)/variables/ImagePath)
-                echo "##vso[task.setvariable variable=ImagePath]$ImagePath"
-                ImagePacker=$(cat $(Pipeline.Workspace)/variables/ImagePacker)
-                echo "##vso[task.setvariable variable=ImagePacker]$ImagePacker"
-        - task: Bash@3
-          displayName: 'output vars'
-          inputs:
-            targetType: 'inline'
-            script: |
-              echo "$(ImageName)"
+
         # Just like in the first example, we can expand the variable within Azure Pipelines itself
         - task: Bash@3
           displayName: 'Terraform launch destroy'
