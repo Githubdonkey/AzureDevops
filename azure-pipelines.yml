@@ -18,7 +18,7 @@ parameters:
 - name: osMenu
   displayName: Select Provider
   type: string
-  default: aws
+  default: linux
   values:
   - linux
   - windows
