@@ -19,6 +19,24 @@ git push
 # First push "git push --set-upstream origin pipeline_work"
 
 ```
+
+# Secrets Manager
+```
+# Create 
+aws secretsmanager create-secret --name builds/firstImage --description "The secret I created for the first tutorial"
+aws secretsmanager describe-secret --secret-id builds/firstImage
+aws secretsmanager get-secret-value --secret-id builds/firstImage --version-stage AWSCURRENT
+aws secretsmanager update-secret --secret-id builds/firstImage --description 'This is the description I want to attach to the secret.'
+aws secretsmanager get-secret-value --secret-id builds/firstImage
+aws secretsmanager get-secret-value --secret-id builds/firstImage --query SecretString --output text
+
+# Get Secret value only
+aws secretsmanager get-secret-value --secret-id builds/firstImage | jq --raw-output .SecretString | jq -r ."imageID"
+
+# Update Secret value
+aws secretsmanager update-secret --secret-id builds/firstImage --secret-string '{"imageID":"tersttesd"}'
+```
+
 # AzureDevops
 Sign up for an account
 
