@@ -31,10 +31,10 @@ aws secretsmanager get-secret-value --secret-id builds/firstImage
 aws secretsmanager get-secret-value --secret-id builds/firstImage --query SecretString --output text
 
 # Get Secret value only
-aws secretsmanager get-secret-value --secret-id builds/firstImage | jq --raw-output .SecretString | jq -r ."imageID"
+aws secretsmanager get-secret-value --secret-id builds/aws/ubuntu18-base | jq --raw-output .SecretString
 
 # Update Secret value
-aws secretsmanager update-secret --secret-id builds/firstImage --secret-string '{"imageID":"tersttesd"}'
+aws secretsmanager put-secret-value --secret-id builds/aws/ubuntu18-base --secret-string sepersecet
 ```
 
 # AzureDevops
