@@ -15,18 +15,18 @@ cp packer/ec2-userdata.ps1 ec2-userdata.ps1
 # sudo cp packer-provisioner-windows-update /usr/local/bin/packer-provisioner-windows-update
 packer build $packerBuildFile
 
-# if [[ $packerProvider == "aws" ]]; then
-#         echo "AWS provider"
-export packerImageId=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
-export packerImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
-#   elif [[ $packerProvider == "azure" ]]; then
-#         echo "Azure provider"
-#         export packerImageId=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"')
-#         export packerImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
-#   else
-#        echo "manifest.json not found"
-#        exit 1
-#fi
+ if [[ $packerProvider == "aws" ]]; then
+         echo "AWS provider"
+         export packerImageId=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
+         export packerImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
+   elif [[ $packerProvider == "azure" ]]; then
+         echo "Azure provider"
+         export packerImageId=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"')
+         export packerImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
+   else
+        echo "manifest.json not found"
+        exit 1
+fi
 
 aws secretsmanager create-secret --name builds/${packerProvider}/${packerImage}/name --description "The image ${packerProvider} built ${packerOs} I created ${packerImage}"
 aws secretsmanager create-secret --name builds/${packerProvider}/${packerImage}/id --description "The image ${packerProvider} built ${packerOs} I created ${packerImage}"
