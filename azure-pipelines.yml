@@ -3,6 +3,35 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
+parameters:
+- name: imagesMenu
+  displayName: Image Selection
+  type: string
+  default: ubuntu18-base
+  values:
+  - ubuntu18-base
+  - win2012R2-base
+  - win2016_base
+  - ubuntu-16.04
+  - macOS-latest
+  - macOS-10.14
+- name: osMenu
+  displayName: Select OS
+  type: string
+  default: linux
+  values:
+  - linux
+  - windows
+- name: providerMenu
+  displayName: Select Provider
+  type: string
+  default: aws
+  values:
+  - aws
+  - azure
+  - vcenter
+  - all
+
 trigger: none
 #trigger:
 #  branches:
@@ -13,6 +42,19 @@ pool:
   vmImage: 'ubuntu-latest'
 
 stages:
+  - stage: Testing
+    displayName: Testing
+    jobs:
+    - job: show_variables
+      steps:
+      - task: Bash@3
+        displayName: Show Variables
+        inputs:
+          targetType: 'inline'
+          script: |
+              echo "${{ parameters.imagesMenu }}"
+              echo "${{ parameters.osMenu }}"
+              echo "${{ parameters.providerMenu }}"
 
   - stage: Build_Initialize
     displayName: 'Build_Initialize'
@@ -24,36 +66,36 @@ stages:
         inputs:
           targetType: 'inline'
           script: |
-              sudo apt-get update
-              sudo apt-get install curl jq unzip -y
+              # sudo apt-get update
+              # sudo apt-get install curl jq unzip -y
       - task: Bash@3
         displayName: 'Install_AWS_CLI'
         inputs:
           targetType: 'inline'
           script: |
-              sudo apt-get install awscli -y
-              export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
-              export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
-              export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
-              aws --version
-              aws s3 ls
+              # sudo apt-get install awscli -y
+              # export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
+              # export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
+              # export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
+              # aws --version
+              # aws s3 ls
       - task: Bash@3
         displayName: 'Install_AZURE_AZ'
         inputs:
           targetType: 'inline'
           script: |
-            az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
+            # az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
       - task: Bash@3
         displayName: 'Install_Packer'
         inputs:
           targetType: 'inline'
           script: |
-            VER=1.5.1
-            echo "Download File"
-            wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
-            echo "Unzip File and move to local bin"
-            sudo unzip packer_${VER}_linux_amd64.zip -d /usr/local/bin
-            echo "Get version"
+            # VER=1.5.1
+            # echo "Download File"
+            # wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
+            # echo "Unzip File and move to local bin"
+            # sudo unzip packer_${VER}_linux_amd64.zip -d /usr/local/bin
+            # echo "Get version"
             packer --version
       - task: Bash@3
         displayName: 'Install_Terraform'
@@ -67,7 +109,7 @@ stages:
             # echo "Unzip File and move to local bin"
             # sudo unzip terraform_${VER}_linux_amd64.zip -d /usr/local/bin
             # echo "Get version"
-            # terraform -v
+            terraform -v
   
   - stage: Run_Packer
     displayName: 'Run_Packer'
@@ -79,12 +121,12 @@ stages:
         inputs:
           targetType: 'inline'
           script: |
-            VER=1.5.1
-            echo "Download File"
-            wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
-            echo "Unzip File and move to local bin"
-            sudo unzip packer_${VER}_linux_amd64.zip -d /usr/local/bin
-            echo "Get version"
+            # VER=1.5.1
+            # echo "Download File"
+            # wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
+            # echo "Unzip File and move to local bin"
+            # sudo unzip packer_${VER}_linux_amd64.zip -d /usr/local/bin
+            # echo "Get version"
             packer --version
       - task: Bash@3
         displayName: 'Packer_Create_Image'
@@ -103,87 +145,13 @@ stages:
 
             az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
             chmod +x ado_packer_image.sh
-            ./ado_packer_image.sh 11
+            ./ado_packer_image.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "${{ parameters.imagesMenu }}"
 
-      - task: Bash@3
-        displayName: 'AWS_OR_AZURE'
-        inputs:
-          targetType: 'inline'
-          script: |
-            ImageBuilder=$(cat manifest.json | jq '.builds | to_entries[] | .value.name' | tr -d '"')
-            echo "##vso[task.setvariable variable=imageBuilderPipeline]$ImageBuilder"
-            mkdir -p $(Pipeline.Workspace)/variables
-            echo "$ImageBuilder" > $(Pipeline.Workspace)/variables/ImageBuilder
-
-      - task: Bash@3
-        displayName: 'AWS_Create_Variables'
-        condition: eq(variables['imageBuilderPipeline'], 'amazon-ebs')
-        inputs:
-          targetType: 'inline'
-          script: |
-            ImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
-            ImagePath=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
-            ImagePacker=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
-
-            echo "$ImageName" > $(Pipeline.Workspace)/variables/ImageName
-            echo "$ImagePath" > $(Pipeline.Workspace)/variables/ImagePath
-            echo "$ImagePacker" > $(Pipeline.Workspace)/variables/ImagePacker
-            echo "##vso[task.setvariable variable=ImagePacker]$ImagePacker"
-
-      - task: Bash@3
-        displayName: 'Azure_Create_Variables'
-        condition: eq(variables['imageBuilderPipeline'], 'azure-arm')
-        inputs:
-          targetType: 'inline'
-          script: |
-            ImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d'/' -f9)
-            ImagePath=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"')
-            ImagePacker=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
-            
-            echo "$ImageName" > $(Pipeline.Workspace)/variables/ImageName
-            echo "$ImagePath" > $(Pipeline.Workspace)/variables/ImagePath
-            echo "$ImagePacker" > $(Pipeline.Workspace)/variables/ImagePacker
-            echo "##vso[task.setvariable variable=ImagePacker]$ImagePacker"
-
-      - task: Bash@3
-        displayName: 'Upload_S3'
-        inputs:
-          targetType: 'inline'
-          script: |
-            export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
-            export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
-            export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
-
-            aws s3 cp manifest.json s3://gitdonkey/devops/builds/$(Build.BuildNumber)/$(ImagePacker).json
-            aws s3 cp packer.log s3://gitdonkey/devops/packer_logs/$(Build.BuildNumber)/$(ImagePacker)-PackerLog.json
-
-      - publish: $(Pipeline.Workspace)/variables
-        artifact: variables
- 
   - stage: terraform_stage3
     jobs:
       - job: terraform_stage3
         steps:
-        - download: current
-          artifact: variables
-        
-        - task: Bash@3
-          displayName: 'convert artifacts to vars'
-          inputs:
-            targetType: 'inline'
-            script: |
-                ImageName=$(cat $(Pipeline.Workspace)/variables/ImageName)
-                echo "##vso[task.setvariable variable=ImageName]$ImageName"
-                ImagePath=$(cat $(Pipeline.Workspace)/variables/ImagePath)
-                echo "##vso[task.setvariable variable=ImagePath]$ImagePath"
-                ImagePacker=$(cat $(Pipeline.Workspace)/variables/ImagePacker)
-                echo "##vso[task.setvariable variable=ImagePacker]$ImagePacker"
-        - task: Bash@3
-          displayName: 'output vars'
-          inputs:
-            targetType: 'inline'
-            script: |
-              echo "$(ImageName)"
+
         # Just like in the first example, we can expand the variable within Azure Pipelines itself
         - task: Bash@3
           displayName: 'Terraform launch destroy'
@@ -193,16 +161,16 @@ stages:
               export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
               export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
               export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
+              export ARM_CLIENT_ID=$(ARM_CLIENT_ID)
+              export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET)
+              export ARM_SUBSCRIPTION_ID=$(ARM_SUBSCRIPTION_ID)
+              export ARM_TENANT_ID=$(ARM_TENANT_ID)
               echo "Starting Terraform build"
-              echo "ImageName: $(ImageName)"
-              echo "ImagePath: $(ImagePath)"
-              echo "ImagePacker: $(ImagePacker)"
-              pwd
-              ls
-              cp terraform/aws_main_modules.tf main.tf
-              terraform init
-              terraform plan -var="image_id=$(ImagePath)"
-              terraform apply -var="image_id=$(ImagePath)" -auto-approve
-              echo "sleep 4m"
-              sleep 1m
-              terraform destroy -var="image_id=$(ImagePath)" -auto-approve
+              echo "Provider: ${{ parameters.providerMenu }}"
+              echo "OS: ${{ parameters.osMenu }}"
+              echo "Image: ${{ parameters.imagesMenu }}"
+
+              az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
+              
+              chmod +x ado_terraform.sh
+              ./ado_terraform.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "${{ parameters.imagesMenu }}"

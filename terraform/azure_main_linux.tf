@@ -1,14 +1,11 @@
 variable "aws_builder" {
-  type = "string"
   default = ""
 }
-variable "azure_builder" {
-  type = "string"
-  default = ""
-}
+variable "image_id" {}
+
 variable "custom_image_name" {
   type = "string"
-  default = ""
+  default = "testit"
 }
 variable "custom_image_resource_group_name" {
   type = "string"
@@ -25,9 +22,6 @@ variable "custom_subnet" {
 variable "custom_network_interface" {
   type = "string"
   default = "test-nic"
-}
-variable "packer_image" {
-  type = "string"
 }
 
 resource "aws_security_group" "queue" {
@@ -66,13 +60,9 @@ data "azurerm_network_interface" "example" {
   resource_group_name = "${data.azurerm_resource_group.example.name}"
 }
 data "azurerm_image" "search" {
-  name                = "${var.packer_image}"
+  name                = "${var.image_id}"
   resource_group_name = "${var.custom_image_resource_group_name}"
 }
-
-#output "image_id" {
-#  value = "${data.azurerm_image.search.id}"
-#}
 
 resource "azurerm_virtual_machine" "example" {
   name                  = "${var.custom_image_name}-${local.timestamp_sanitized}"
@@ -81,12 +71,7 @@ resource "azurerm_virtual_machine" "example" {
   network_interface_ids = ["${data.azurerm_network_interface.example.id}"]
   vm_size               = "Standard_F2"
 
-  # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
-  # NOTE: This may not be optimal in all cases.
   delete_os_disk_on_termination = true
-
-  # This means the Data Disk Disk will be deleted when Terraform destroys the Virtual Machine
-  # NOTE: This may not be optimal in all cases.
   delete_data_disks_on_termination = true
 
   storage_image_reference {
