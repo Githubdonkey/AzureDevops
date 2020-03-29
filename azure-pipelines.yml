@@ -31,6 +31,18 @@ parameters:
   - azure
   - vcenter
   - all
+- name: myObject
+  type: object
+  default:
+    foo: FOO
+    things:
+    - one
+    - two
+    - three
+    nested:
+      one: apple
+      two: pear
+      count: 3
 
 trigger: none
 #trigger:
@@ -46,6 +58,20 @@ stages:
     displayName: Testing
     jobs:
     - job: show_variables
+      steps:
+      - task: Bash@3
+        displayName: Show Variables
+        inputs:
+          targetType: 'inline'
+          script: |
+              echo "${{ parameters.imagesMenu }}"
+              echo "${{ parameters.osMenu }}"
+              echo "${{ parameters.providerMenu }}"
+
+  - stage: Testing1
+    displayName: Testing1
+    jobs:
+    - job: show_variables1
       steps:
       - task: Bash@3
         displayName: Show Variables
