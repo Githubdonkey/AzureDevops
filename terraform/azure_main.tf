@@ -79,7 +79,7 @@ resource "azurerm_virtual_machine" "example" {
   location              = "${data.azurerm_resource_group.example.location}"
   resource_group_name   = "${data.azurerm_resource_group.example.name}"
   network_interface_ids = ["${data.azurerm_network_interface.example.id}"]
-  vm_size               = "Standard_F2"
+  size                  = "Standard_F2"
 
   # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
   # NOTE: This may not be optimal in all cases.

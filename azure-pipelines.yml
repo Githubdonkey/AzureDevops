@@ -66,25 +66,25 @@ stages:
         inputs:
           targetType: 'inline'
           script: |
-              sudo apt-get update
-              sudo apt-get install curl jq unzip -y
+              # sudo apt-get update
+              # sudo apt-get install curl jq unzip -y
       - task: Bash@3
         displayName: 'Install_AWS_CLI'
         inputs:
           targetType: 'inline'
           script: |
-              sudo apt-get install awscli -y
-              export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
-              export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
-              export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
-              aws --version
-              aws s3 ls
+              # sudo apt-get install awscli -y
+              # export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
+              # export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
+              # export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
+              # aws --version
+              # aws s3 ls
       - task: Bash@3
         displayName: 'Install_AZURE_AZ'
         inputs:
           targetType: 'inline'
           script: |
-            az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
+            # az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
       - task: Bash@3
         displayName: 'Install_Packer'
         inputs:
@@ -147,61 +147,6 @@ stages:
             chmod +x ado_packer_image.sh
             ./ado_packer_image.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "${{ parameters.imagesMenu }}"
 
-      - task: Bash@3
-        displayName: 'AWS_OR_AZURE'
-        inputs:
-          targetType: 'inline'
-          script: |
-            ImageBuilder=$(cat manifest.json | jq '.builds | to_entries[] | .value.name' | tr -d '"')
-            echo "##vso[task.setvariable variable=imageBuilderPipeline]$ImageBuilder"
-            mkdir -p $(Pipeline.Workspace)/variables
-            echo "$ImageBuilder" > $(Pipeline.Workspace)/variables/ImageBuilder
-
-      - task: Bash@3
-        displayName: 'AWS_Create_Variables'
-        condition: eq(variables['imageBuilderPipeline'], 'amazon-ebs')
-        inputs:
-          targetType: 'inline'
-          script: |
-            ImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
-            ImagePath=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d':' -f2)
-            ImagePacker=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
-
-            echo "$ImageName" > $(Pipeline.Workspace)/variables/ImageName
-            echo "$ImagePath" > $(Pipeline.Workspace)/variables/ImagePath
-            echo "$ImagePacker" > $(Pipeline.Workspace)/variables/ImagePacker
-            echo "##vso[task.setvariable variable=ImagePacker]$ImagePacker"
-
-      - task: Bash@3
-        displayName: 'Azure_Create_Variables'
-        condition: eq(variables['imageBuilderPipeline'], 'azure-arm')
-        inputs:
-          targetType: 'inline'
-          script: |
-            ImageName=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"' | cut -d'/' -f9)
-            ImagePath=$(cat manifest.json | jq '.builds | to_entries[] | .value.artifact_id' | tr -d '"')
-            ImagePacker=$(cat manifest.json | jq '.builds | to_entries[] | .value.custom_data.name' | tr -d '"')
-            
-            echo "$ImageName" > $(Pipeline.Workspace)/variables/ImageName
-            echo "$ImagePath" > $(Pipeline.Workspace)/variables/ImagePath
-            echo "$ImagePacker" > $(Pipeline.Workspace)/variables/ImagePacker
-            echo "##vso[task.setvariable variable=ImagePacker]$ImagePacker"
-
-      - task: Bash@3
-        displayName: 'Upload_S3'
-        inputs:
-          targetType: 'inline'
-          script: |
-            export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
-            export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
-            export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
-
-            aws s3 cp manifest.json s3://gitdonkey/devops/builds/$(Build.BuildNumber)/$(ImagePacker).json
-            aws s3 cp packer.log s3://gitdonkey/devops/packer_logs/$(Build.BuildNumber)/$(ImagePacker)-PackerLog.json
-
-      - publish: $(Pipeline.Workspace)/variables
-        artifact: variables
- 
   - stage: terraform_stage3
     jobs:
       - job: terraform_stage3
@@ -222,12 +167,3 @@ stages:
               echo "Image: ${{ parameters.imagesMenu }}"
               chmod +x ado_terraform.sh
               ./ado_terraform.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "${{ parameters.imagesMenu }}"
-              # pwd
-              # ls
-              # cp terraform/aws_main_modules.tf main.tf
-              # terraform init
-              # terraform plan -var="image_id=$(ImagePath)"
-              # terraform apply -var="image_id=$(ImagePath)" -auto-approve
-              # echo "sleep 4m"
-              # sleep 1m
-              # terraform destroy -var="image_id=$(ImagePath)" -auto-approve
