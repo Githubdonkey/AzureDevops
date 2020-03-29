@@ -31,19 +31,18 @@ parameters:
   - azure
   - vcenter
   - all
-  
+
 - name: myObject
   type: string
-  default:
-    foo: FOO
-    things:
-    - one
-    - two
-    - three
-    nested:
-      one: apple
-      two: pear
-      count: 3
+  default: aws
+  values:
+  - aws
+  - name: myObject1
+    type: string
+    default: aws1
+  - azure
+  - vcenter
+  - all
 
 trigger: none
 #trigger:
