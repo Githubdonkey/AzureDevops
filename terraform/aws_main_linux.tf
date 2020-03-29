@@ -9,7 +9,7 @@ variable "image_id" {}
 
 resource "aws_instance" "secOps" {
   ami = var.image_id
-  instance_type = "t2.large"
+  instance_type = "t2.xlarge"
 
   tags = {
     Name = var.image_id

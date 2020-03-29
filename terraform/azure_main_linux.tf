@@ -68,23 +68,14 @@ data "azurerm_image" "search" {
   resource_group_name = "${var.custom_image_resource_group_name}"
 }
 
-#output "image_id" {
-#  value = "${data.azurerm_image.search.id}"
-#}
-
 resource "azurerm_virtual_machine" "example" {
   name                  = "${var.custom_image_name}-${local.timestamp_sanitized}"
-  #location              = "${data.azurerm_resource_group.example.location}"
+  location              = "${data.azurerm_resource_group.example.location}"
   resource_group_name   = "${data.azurerm_resource_group.example.name}"
   network_interface_ids = ["${data.azurerm_network_interface.example.id}"]
-  vm_size                  = "Standard_F2"
+  vm_size               = "Standard_F2"
 
-  # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
-  # NOTE: This may not be optimal in all cases.
   delete_os_disk_on_termination = true
-
-  # This means the Data Disk Disk will be deleted when Terraform destroys the Virtual Machine
-  # NOTE: This may not be optimal in all cases.
   delete_data_disks_on_termination = true
 
   storage_image_reference {
