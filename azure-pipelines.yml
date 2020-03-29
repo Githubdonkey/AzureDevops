@@ -31,8 +31,9 @@ parameters:
   - azure
   - vcenter
   - all
+  
 - name: myObject
-  type: object
+  type: string
   default:
     foo: FOO
     things:
