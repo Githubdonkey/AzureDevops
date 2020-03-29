@@ -38,8 +38,7 @@ parameters:
   values:
   - aws
   - name: myObject1
-    type: string
-    default: aws1
+  - name: myObject2
   - azure
   - vcenter
   - all
