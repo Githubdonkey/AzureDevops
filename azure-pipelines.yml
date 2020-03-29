@@ -161,9 +161,16 @@ stages:
               export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
               export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
               export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
+              export ARM_CLIENT_ID=$(ARM_CLIENT_ID)
+              export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET)
+              export ARM_SUBSCRIPTION_ID=$(ARM_SUBSCRIPTION_ID)
+              export ARM_TENANT_ID=$(ARM_TENANT_ID)
               echo "Starting Terraform build"
               echo "Provider: ${{ parameters.providerMenu }}"
               echo "OS: ${{ parameters.osMenu }}"
               echo "Image: ${{ parameters.imagesMenu }}"
+
+              az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
+              
               chmod +x ado_terraform.sh
               ./ado_terraform.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "${{ parameters.imagesMenu }}"
