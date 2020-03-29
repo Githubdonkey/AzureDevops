@@ -3,10 +3,6 @@ variable "aws_builder" {
 }
 variable "image_id" {}
 
-variable "azure_builder" {
-  type = "string"
-  default = ""
-}
 variable "custom_image_name" {
   type = "string"
   default = "testit"
