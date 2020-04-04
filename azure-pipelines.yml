@@ -32,17 +32,6 @@ parameters:
   - vcenter
   - all
 
-- name: myObject
-  type: string
-  default: aws
-  values:
-  - aws
-  - name: myObject1
-  - name: myObject2
-  - azure
-  - vcenter
-  - all
-
 trigger: none
 #trigger:
 #  branches:

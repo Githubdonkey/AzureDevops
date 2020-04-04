@@ -1,3 +1,5 @@
+provider "aws" {}
+
 variable "aws_builder" {
   default = ""
 }
@@ -32,6 +34,16 @@ resource "aws_security_group" "queue" {
 provider "azurerm" {
   # whilst the `version` attribute is optional, we recommend pinning to a given version of the Provider
   version = "=1.38.0"
+}
+
+variable hostname {
+    type = string
+    default = "ora"
+}
+
+variable udfile{
+    type = string
+    default = "userdata.sh"
 }
 
 #declare local
@@ -95,3 +107,25 @@ resource "azurerm_virtual_machine" "example" {
     disable_password_authentication = false
   }
 } 
+
+resource "azurerm_virtual_machine_extension" "vmext" {
+    resource_group_name     = "${data.azurerm_resource_group.example.name}"
+    location                = "${data.azurerm_resource_group.example.location}"
+    name                    = "vmext-${local.timestamp_sanitized}"
+
+    virtual_machine_name = azurerm_virtual_machine.example.id
+    publisher            = "Microsoft.Azure.Extensions"
+    type                 = "CustomScript"
+    type_handler_version = "2.0"
+
+    protected_settings = <<PROT
+    {
+        "commandToExecute": "hostname && uptime",
+        "commandToExecute": "hostname && uptime",
+        "commandToExecute": "hostname && uptime",
+        "commandToExecute": "hostname && uptime",
+        "commandToExecute": "hostname && uptime",
+        "script": "${base64encode(file(var.udfile))}"
+    }
+    PROT
+}
