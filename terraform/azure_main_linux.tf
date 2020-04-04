@@ -26,11 +26,6 @@ variable "custom_network_interface" {
   default = "test-nic"
 }
 
-resource "aws_security_group" "queue" {
-    name = "queue"
-    description = "Queue role"
-}
-
 provider "azurerm" {
   # whilst the `version` attribute is optional, we recommend pinning to a given version of the Provider
   version = "=1.38.0"
@@ -120,12 +115,7 @@ resource "azurerm_virtual_machine_extension" "vmext" {
 
     protected_settings = <<PROT
     {
-        "commandToExecute": "hostname && uptime",
-        "commandToExecute": "hostname && uptime",
-        "commandToExecute": "hostname && uptime",
-        "commandToExecute": "hostname && uptime",
-        "commandToExecute": "hostname && uptime",
-        "script": "${base64encode(file(var.udfile))}"
+        "commandToExecute": "hostname && uptime"
     }
     PROT
 }
