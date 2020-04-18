@@ -31,6 +31,7 @@ fi
 aws ssm put-parameter --name "/builds/${packerProvider}/${packerOs}/${packerImage}/name" --value "${packerImageName}" --type String --overwrite
 aws ssm put-parameter --name "/builds/${packerProvider}/${packerOs}/${packerImage}/id" --value "${packerImageId}" --type String --overwrite
 
+aws s3 cp aliases.html s3://gitdonkey/devops/${packerImageName}.html
 aws s3 cp manifest.json s3://gitdonkey/devops/${packerImageName}.json
 aws s3 cp packer.log s3://gitdonkey/devops/${packerImageName}_packer_log.json
 

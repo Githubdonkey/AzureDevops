@@ -7,8 +7,9 @@ parameters:
 - name: imagesMenu
   displayName: Image Selection
   type: string
-  default: win2016_base
+  default: win2016_default
   values:
+  - win2016_default
   - win2016_base
   - ubuntu18-base
   - win2012R2-base
