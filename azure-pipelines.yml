@@ -7,21 +7,21 @@ parameters:
 - name: imagesMenu
   displayName: Image Selection
   type: string
-  default: ubuntu18-base
+  default: win2016_base
   values:
+  - win2016_base
   - ubuntu18-base
   - win2012R2-base
-  - win2016_base
   - ubuntu-16.04
   - macOS-latest
   - macOS-10.14
 - name: osMenu
   displayName: Select OS
   type: string
-  default: linux
+  default: windows
   values:
-  - linux
   - windows
+  - linux
 - name: providerMenu
   displayName: Select Provider
   type: string

@@ -67,8 +67,8 @@ create a policy
 ```
 Attach Policy to user
 ```
-aws ssm put-parameter --name "parameter_name" --value "a parameter value" --type String
-aws ssm put-parameter --name "/Test/IAD/helloWorld" --value "My1stParameter" --type String
+aws ssm put-parameter --name "/Test/IAD/helloWorld2" --value "My1stParameter8" --type String --overwrite
+ssm get-parameter --name "/Test/IAD/helloWorld2" --output text --query Parameter.Value
 ```
 # AzureDevops
 Sign up for an account
