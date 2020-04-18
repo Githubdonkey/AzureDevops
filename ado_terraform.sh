@@ -15,6 +15,7 @@ fi
 # Run Terraform
 echo "Starting Terraform build"
 cp terraform/${packerProvider}_main_${packerOs}.tf main.tf
+cp terraform/userdata.sh userdata.sh
 terraform init
 # terraform plan -var="image_id=$packerImageId"
 terraform apply -var="image_id=$packerImageId" -auto-approve

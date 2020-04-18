@@ -1,9 +1,16 @@
 provider "aws" {}
 
+provider "azurerm" {}
+
 variable "aws_builder" {
   default = ""
 }
 variable "image_id" {}
+
+variable location {
+    type = "string"
+    default = "eastus"
+}
 
 variable "custom_image_name" {
   type = "string"
@@ -26,18 +33,13 @@ variable "custom_network_interface" {
   default = "test-nic"
 }
 
-provider "azurerm" {
-  # whilst the `version` attribute is optional, we recommend pinning to a given version of the Provider
-  version = "=1.38.0"
-}
-
 variable hostname {
-    type = string
+    type = "string"
     default = "ora"
 }
 
 variable udfile{
-    type = string
+    type = "string"
     default = "userdata.sh"
 }
 
@@ -72,7 +74,7 @@ data "azurerm_image" "search" {
 }
 
 resource "azurerm_virtual_machine" "example" {
-  name                  = "${var.custom_image_name}-${local.timestamp_sanitized}"
+  name                  = "${data.azurerm_image.search.id}-${local.timestamp_sanitized}"
   location              = "${data.azurerm_resource_group.example.location}"
   resource_group_name   = "${data.azurerm_resource_group.example.name}"
   network_interface_ids = ["${data.azurerm_network_interface.example.id}"]
@@ -86,7 +88,7 @@ resource "azurerm_virtual_machine" "example" {
   }
 
   storage_os_disk {
-    name              = "os_${var.custom_image_name}"
+    name              = "${data.azurerm_image.search.id}-${local.timestamp_sanitized}"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
@@ -103,19 +105,20 @@ resource "azurerm_virtual_machine" "example" {
   }
 } 
 
-resource "azurerm_virtual_machine_extension" "vmext" {
-    resource_group_name     = "${data.azurerm_resource_group.example.name}"
-    location                = "${data.azurerm_resource_group.example.location}"
-    name                    = "vmext-${local.timestamp_sanitized}"
+resource "azurerm_virtual_machine_extension" "stage" {
+    name = "CustomScript"
+    location              = "${var.location}"
+    resource_group_name = "${data.azurerm_resource_group.example.name}"
+    virtual_machine_name = "${azurerm_virtual_machine.example.name}"
+    publisher = "Microsoft.Compute"
+    type = "CustomScriptExtension"
+    type_handler_version = "1.9.5"
+    auto_upgrade_minor_version = true
 
-    virtual_machine_name = azurerm_virtual_machine.example.id
-    publisher            = "Microsoft.Azure.Extensions"
-    type                 = "CustomScript"
-    type_handler_version = "2.0"
-
-    protected_settings = <<PROT
+    settings = <<SETTINGS
     {
-        "commandToExecute": "hostname && uptime"
+        "commandToExecute": "echo 1"
     }
-    PROT
+SETTINGS
+    depends_on = [azurerm_virtual_machine.example]
 }
