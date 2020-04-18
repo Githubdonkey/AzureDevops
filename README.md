@@ -36,6 +36,39 @@ aws secretsmanager get-secret-value --secret-id builds/aws/ubuntu18-base | jq --
 # Update Secret value
 aws secretsmanager put-secret-value --secret-id builds/aws/ubuntu18-base --secret-string sepersecet
 ```
+# Parameter Store
+create a policy
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "ssm:PutParameter",
+                "ssm:DeleteParameter",
+                "ssm:GetParameterHistory",
+                "ssm:GetParametersByPath",
+                "ssm:GetParameters",
+                "ssm:GetParameter",
+                "ssm:DeleteParameters"
+            ],
+            "Resource": "arn:aws:ssm:region:account-id:parameter/*"
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": "ssm:DescribeParameters",
+            "Resource": "*"
+        }
+    ]
+}
+```
+Attach Policy to user
+
+aws ssm put-parameter --name "parameter_name" --value "a parameter value" --type String
+aws ssm put-parameter --name "/Test/IAD/helloWorld" --value "My1stParameter" --type String
 
 # AzureDevops
 Sign up for an account
