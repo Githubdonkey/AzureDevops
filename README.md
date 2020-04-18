@@ -66,10 +66,10 @@ create a policy
 }
 ```
 Attach Policy to user
-
+```
 aws ssm put-parameter --name "parameter_name" --value "a parameter value" --type String
 aws ssm put-parameter --name "/Test/IAD/helloWorld" --value "My1stParameter" --type String
-
+```
 # AzureDevops
 Sign up for an account
 
