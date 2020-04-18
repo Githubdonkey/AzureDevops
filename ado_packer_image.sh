@@ -13,7 +13,7 @@ cp packer/ec2-userdata.ps1 ec2-userdata.ps1
 # tar -zxvf packages/packer-provisioner-windows-update-linux.tgz
 # chmod +x packer-provisioner-windows-update
 # sudo cp packer-provisioner-windows-update /usr/local/bin/packer-provisioner-windows-update
-packer build $packerBuildFile
+#packer build $packerBuildFile
 
  if [[ $packerProvider == "aws" ]]; then
          echo "AWS provider"
@@ -28,10 +28,11 @@ packer build $packerBuildFile
         exit 1
 fi
 
-aws ssm put-parameter --name "builds/${packerProvider}/${packerOs}" --value "${packerImage}" --type String --overwrite
+aws ssm put-parameter --name "/builds/${packerProvider}/${packerOs}/${packerImage}/name" --value "${packerImageName}" --type String --overwrite
+aws ssm put-parameter --name "/builds/${packerProvider}/${packerOs}/${packerImage}/id" --value "${packerImageId}" --type String --overwrite
 
 aws s3 cp manifest.json s3://gitdonkey/devops/${packerImageName}.json
-aws s3 cp manifest.json s3://gitdonkey/devops/${packerImageName}_packer_log.json
+aws s3 cp packer.log s3://gitdonkey/devops/${packerImageName}_packer_log.json
 
 #aws secretsmanager create-secret --name builds/${packerProvider}/${packerOs}/name --description "The image ${packerProvider} built ${packerOs} I created ${packerImage}"
 #aws secretsmanager create-secret --name builds/${packerProvider}/${packerImage}/id --description "The image ${packerProvider} built ${packerOs} I created ${packerImage}"

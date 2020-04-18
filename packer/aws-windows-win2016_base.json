@@ -3,17 +3,17 @@
     "build":                "{{timestamp}}",
     "os_version":           "Windows2016",
     "pre":                  "SICFactory",
-    "image_type": "Base",
+    "image_type":           "Base",
 
     "source_name_filter":   "Windows_Server-2016-English-Full-Base-*",
     "owners":               "amazon",
-    "instance_type":        "t2.xlarge",
+    "instance_type":        "t2.2xlarge",
 
     "aws_access_key":       "{{env `AWS_ACCESS_KEY_ID`}}",
     "aws_secret_key":       "{{env `AWS_SECRET_ACCESS_KEY`}}",
     "region":               "{{env `AWS_DEFAULT_REGION`}}",
-    "name": "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}",
-		"description": "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}} built from latest Market place image"
+    "name":                 "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}",
+		"description":          "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}} built from latest Market place image"
   },
 
   "builders": [
