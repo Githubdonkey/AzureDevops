@@ -26,7 +26,6 @@ $main = @"
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<b>$Env:Computername</b>
 <style>
 TABLE {border-width: 1px; border-style: solid; border-color: black; border-collapse: collapse;}
 TH {border-width: 1px; padding: 3px; border-style: solid; border-color: black; background-color: #6495ED;}
@@ -38,7 +37,9 @@ div {margin:0px auto;BACKGROUND-COLOR:Black;Color:White;font-weight:bold;FONT-SI
 <div style='margin:  0px auto; BACKGROUND-COLOR:Black;Color:White;font-weight:bold;FONT-SIZE:  16pt;TEXT-ALIGN: center;'>
 $Env:Computername  Services Report
 <BR><i>Report generated on $((Get-Date).ToString())</i>
-</div>  
+</div>
+<BR>
+<div>Installed Programs</div>
 "@
 
 $post = "</body></html>"
@@ -70,4 +71,4 @@ $arrayPrograms | Where-Object { $_.DisplayName } | Sort-Object DisplayName | Con
 $arrayUpdates | Sort-Object HotFixID | ConvertTo-Html -PreContent $TitleUpdates -Fragment | Out-File -Append C:\image\aliases.html
 Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP' -Recurse | Get-ItemProperty -Name Version, Release -ErrorAction 0 | Where-Object { $_.PSChildName -match '^(?!S)\p{L}'} | Select-Object PSChildName, Version, Release | ConvertTo-Html -PreContent $TitleDotnet -PostContent $post -Fragment | Out-File -Append C:\image\aliases.html
 
-# Invoke-Item C:\image\aliases.html
+#Invoke-Item C:\image\aliases.html
