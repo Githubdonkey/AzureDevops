@@ -77,6 +77,24 @@
     {
       "type": "powershell",
       "scripts":[
+        "{{ template_dir }}/packer/scripts/Installers/Initialize-2016.ps1"
+      ]
+    },
+    {
+      "type": "powershell",
+      "scripts":[
+        "{{ template_dir }}/packer/scripts/Installers/Install-7zip.ps1"
+      ]
+    },
+    {
+      "type": "powershell",
+      "scripts":[
+        "{{ template_dir }}/packer/scripts/Installers/Install-JQ.ps1"
+      ]
+    },
+    {
+      "type": "powershell",
+      "scripts":[
         "{{ template_dir }}/packer/scripts/Installers/Run-Report.ps1"
       ]
     },

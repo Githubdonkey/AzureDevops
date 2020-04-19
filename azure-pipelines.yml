@@ -23,6 +23,8 @@ parameters:
   values:
   - windows
   - linux
+  - vmware
+  - all
 - name: providerMenu
   displayName: Select Provider
   type: string

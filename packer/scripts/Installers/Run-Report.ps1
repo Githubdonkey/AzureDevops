@@ -4,23 +4,22 @@
 ##  Desc:  Install PowerShell Core
 ################################################################################
 
-# $computers = Import-Csv “C:\Users\tom\Desktop\repo\CI\computerlist.csv”
 # https://devblogs.microsoft.com/scripting/use-powershell-to-quickly-find-installed-software/
 
-$computers = $Env:Computername
+$arrayPrograms = @()
+$arrayUpdates = @()
+$arrayDotnet = @()
 
-$array = @()
-$OutputCollection=  @()
-
-$Title = @"
-<div style='margin:  0px auto; BACKGROUND-COLOR:Black;Color:White;font-weight:bold;FONT-SIZE:  16pt;TEXT-ALIGN: center;'>
-$Env:Computername  Services Report
-</div>
+$TitlePrograms = @"
+<div>Installed Programs</div>
 "@
+
 $TitleUpdates = @"
-<div style='margin:  0px auto; BACKGROUND-COLOR:Black;Color:White;font-weight:bold;FONT-SIZE:  16pt;TEXT-ALIGN: center;'>
-$Env:Computername  Services Report
-</div>
+<div>Updates Installed</div>
+"@
+
+$TitleDotnet = @"
+<div>DotNet Versions installed</div>
 "@
 
 $main = @"
@@ -33,62 +32,42 @@ TABLE {border-width: 1px; border-style: solid; border-color: black; border-colla
 TH {border-width: 1px; padding: 3px; border-style: solid; border-color: black; background-color: #6495ED;}
 TD {border-width: 1px; padding: 3px; border-style: solid; border-color: black;}
 table {border:1px solid black;margin-left:auto;margin-right:auto;}
+div {margin:0px auto;BACKGROUND-COLOR:Black;Color:White;font-weight:bold;FONT-SIZE:16pt;TEXT-ALIGN:center;}
 </style>
 </head><body>
 <div style='margin:  0px auto; BACKGROUND-COLOR:Black;Color:White;font-weight:bold;FONT-SIZE:  16pt;TEXT-ALIGN: center;'>
 $Env:Computername  Services Report
-<BR><i>Report generated on $((Get-Date).ToString()) from $($Env:Computername)</i>
+<BR><i>Report generated on $((Get-Date).ToString())</i>
 </div>  
 "@
 
-foreach($pc in $computers){
+$post = "</body></html>"
 
-    $computername=$pc.computername
-    #Define the variable to hold the location of Currently Installed Programs
-    $UninstallKey=”SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall” 
-    #Create an instance of the Registry Object and open the HKLM base key
-    $reg="[microsoft.win32.registrykey]::OpenRemoteBaseKey(‘LocalMachine’,$computers)"
-    #Drill down into the Uninstall key using the OpenSubKey Method
-    $regkey=$reg.OpenSubKey($UninstallKey) 
-    #Retrieve an array of string that contain all the subkey names
-    $subkeys=$regkey.GetSubKeyNames() 
-    #Open each Subkey and use GetValue Method to return the required values for each
+# Check for Installed Programs
+$installedPrograms = Get-ChildItem "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall"
 
-    foreach($key in $subkeys){
-        $thisKey=$UninstallKey+”\\”+$key 
-        $thisSubKey=$reg.OpenSubKey($thisKey) 
-        $obj = New-Object PSObject
-        $obj | Add-Member -MemberType NoteProperty -Name “ComputerName” -Value $Env:Computername
-        $obj | Add-Member -MemberType NoteProperty -Name “DisplayName” -Value $($thisSubKey.GetValue(“DisplayName”))
-        $obj | Add-Member -MemberType NoteProperty -Name “DisplayVersion” -Value $($thisSubKey.GetValue(“DisplayVersion”))
-        $obj | Add-Member -MemberType NoteProperty -Name “InstallLocation” -Value $($thisSubKey.GetValue(“InstallLocation”))
-        $obj | Add-Member -MemberType NoteProperty -Name “Publisher” -Value $($thisSubKey.GetValue(“Publisher”))
-        $array += $obj
-
-    } 
-
+foreach($program in $installedPrograms){
+    $prg = New-Object PSObject
+    $prg | Add-Member -MemberType NoteProperty 'DisplayName' -Value $program.GetValue('DisplayName')
+    $prg | Add-Member -MemberType NoteProperty 'DisplayVersion' -Value $program.GetValue('DisplayVersion')
+    $prg | Add-Member -MemberType NoteProperty 'Publisher' -Value $program.GetValue('Publisher')
+    $arrayPrograms += $prg
 }
-$wu = new-object -com “Microsoft.Update.Searcher”
-$totalupdates = $wu.GetTotalHistoryCount()
-$all = $wu.QueryHistory(0,$totalupdates)
-# Define a new array to gather output
 
-Foreach ($update in $all)
-    {
-    $string = $update.title
-    $Regex = “KB\d*”
-    $KB = $string | Select-String -Pattern $regex | Select-Object { $_.Matches }
-     $output = New-Object -TypeName PSobject
-     $output | add-member NoteProperty “HotFixID” -value $KB.‘ $_.Matches ‘.Value
-     $output | add-member NoteProperty “Title” -value $string
-     $OutputCollection += $output
-     }
+# Check for Windows Update
+$installedUpdates = Get-HotFix
 
-$post = "<BR><i>Report generated on $((Get-Date).ToString()) from $($Env:Computername)</i>"
+foreach($update in $installedUpdates){
+    $obj = New-Object PSObject
+    $obj | Add-Member -MemberType NoteProperty 'HotFixID' -Value $update.hotfixid
+    $obj | Add-Member -MemberType NoteProperty 'InstalledOn' -Value $update.installedon
+    $obj | Add-Member -MemberType NoteProperty 'Description' -Value $update.description
+    $arrayUpdates += $obj
+}
 
-$array | Where-Object { $_.DisplayName } | Select-Object DisplayName, DisplayVersion, Publisher | ConvertTo-Html -PreContent $main -Fragment | Out-File C:\image\aliases.html
-$OutputCollection | Sort-Object HotFixID | ConvertTo-Html -PreContent $TitleUpdates -Fragment | Out-File -Append C:\image\aliases.html
+#$arrayPrograms | Where-Object { $_.DisplayName } | Sort-Object DisplayName |ConvertTo-Html | Out-File C:\image\aliases.html
+$arrayPrograms | Where-Object { $_.DisplayName } | Sort-Object DisplayName |ConvertTo-Html -PreContent $main -Fragment | Out-File C:\image\aliases.html
+$arrayUpdates | Sort-Object HotFixID | ConvertTo-Html -PreContent $TitleUpdates -Fragment | Out-File -Append C:\image\aliases.html
+Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP' -Recurse | Get-ItemProperty -Name Version, Release -ErrorAction 0 | Where-Object { $_.PSChildName -match '^(?!S)\p{L}'} | Select-Object PSChildName, Version, Release | ConvertTo-Html -PreContent $TitleDotnet -PostContent $post -Fragment | Out-File -Append C:\image\aliases.html
 
-Write-Host “$($OutputCollection.Count) Updates Found”
-
-#Invoke-Item C:\image\aliases.html
+Invoke-Item C:\image\aliases.html
