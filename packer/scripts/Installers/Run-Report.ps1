@@ -66,8 +66,8 @@ foreach($update in $installedUpdates){
 }
 
 #$arrayPrograms | Where-Object { $_.DisplayName } | Sort-Object DisplayName |ConvertTo-Html | Out-File C:\image\aliases.html
-$arrayPrograms | Where-Object { $_.DisplayName } | Sort-Object DisplayName |ConvertTo-Html -PreContent $main -Fragment | Out-File C:\image\aliases.html
+$arrayPrograms | Where-Object { $_.DisplayName } | Sort-Object DisplayName | ConvertTo-Html -PreContent $main -Fragment | Out-File C:\image\aliases.html
 $arrayUpdates | Sort-Object HotFixID | ConvertTo-Html -PreContent $TitleUpdates -Fragment | Out-File -Append C:\image\aliases.html
 Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP' -Recurse | Get-ItemProperty -Name Version, Release -ErrorAction 0 | Where-Object { $_.PSChildName -match '^(?!S)\p{L}'} | Select-Object PSChildName, Version, Release | ConvertTo-Html -PreContent $TitleDotnet -PostContent $post -Fragment | Out-File -Append C:\image\aliases.html
 
-Invoke-Item C:\image\aliases.html
+# Invoke-Item C:\image\aliases.html
