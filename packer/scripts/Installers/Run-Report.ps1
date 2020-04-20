@@ -10,19 +10,7 @@ $arrayPrograms = @()
 $arrayUpdates = @()
 $arrayDotnet = @()
 
-$TitlePrograms = @"
-<div>Installed Programs</div>
-"@
-
-$TitleUpdates = @"
-<div>Updates Installed</div>
-"@
-
-$TitleDotnet = @"
-<div>DotNet Versions installed</div>
-"@
-
-$main = @"
+$ImageDetails= @"
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -35,11 +23,27 @@ div {margin:0px auto;BACKGROUND-COLOR:Black;Color:White;font-weight:bold;FONT-SI
 </style>
 </head><body>
 <div style='margin:  0px auto; BACKGROUND-COLOR:Black;Color:White;font-weight:bold;FONT-SIZE:  16pt;TEXT-ALIGN: center;'>
-$Env:Computername  Services Report
+<i>$Env:name Image Report</i>
+<BR><i>Description $Env:description</i>
 <BR><i>Report generated on $((Get-Date).ToString())</i>
 </div>
 <BR>
+<i><b>Image Name:</b> $Env:name</i><BR>
+<i><b>Image Description:</b> $Env:description</i><BR>
+<i><b>Source_name_filter:</b> $Env:source_name_filter</i><BR>
+<i><b>Build_time:</b> $Env:build_time</i>
+"@
+
+$TitlePrograms = @"
 <div>Installed Programs</div>
+"@
+
+$TitleUpdates = @"
+<div>Updates Installed</div>
+"@
+
+$TitleDotnet = @"
+<div>DotNet Versions installed</div>
 "@
 
 $post = "</body></html>"
@@ -66,8 +70,8 @@ foreach($update in $installedUpdates){
     $arrayUpdates += $obj
 }
 
-#$arrayPrograms | Where-Object { $_.DisplayName } | Sort-Object DisplayName |ConvertTo-Html | Out-File C:\image\aliases.html
-$arrayPrograms | Where-Object { $_.DisplayName } | Sort-Object DisplayName | ConvertTo-Html -PreContent $main -Fragment | Out-File C:\image\aliases.html
+$ImageDetails | Out-File C:\image\aliases.html
+$arrayPrograms | Where-Object { $_.DisplayName } | Sort-Object DisplayName | ConvertTo-Html -PreContent $TitlePrograms -Fragment | Out-File -Append C:\image\aliases.html
 $arrayUpdates | Sort-Object HotFixID | ConvertTo-Html -PreContent $TitleUpdates -Fragment | Out-File -Append C:\image\aliases.html
 Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP' -Recurse | Get-ItemProperty -Name Version, Release -ErrorAction 0 | Where-Object { $_.PSChildName -match '^(?!S)\p{L}'} | Select-Object PSChildName, Version, Release | ConvertTo-Html -PreContent $TitleDotnet -PostContent $post -Fragment | Out-File -Append C:\image\aliases.html
 

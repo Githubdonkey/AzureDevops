@@ -1,4 +1,31 @@
 # Set TLS1.2
+
+$ImageDetails= @"
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<style>
+TABLE {border-width: 1px; border-style: solid; border-color: black; border-collapse: collapse;}
+TH {border-width: 1px; padding: 3px; border-style: solid; border-color: black; background-color: #6495ED;}
+TD {border-width: 1px; padding: 3px; border-style: solid; border-color: black;}
+table {border:1px solid black;margin-left:auto;margin-right:auto;}
+div {margin:0px auto;BACKGROUND-COLOR:Black;Color:White;font-weight:bold;FONT-SIZE:16pt;TEXT-ALIGN:center;}
+</style>
+</head><body>
+<div style='margin:  0px auto; BACKGROUND-COLOR:Black;Color:White;font-weight:bold;FONT-SIZE:  16pt;TEXT-ALIGN: center;'>
+<i>$Env:Computername  Image Report</i>
+<BR><i>Description $Env:Computername</i>
+<BR><i>Report generated on $((Get-Date).ToString())</i>
+</div>
+<BR>
+<i><b>Image Name:</b> $Env:Computername</i><BR>
+<i><b>Image Description:</b> $Env:Computername</i><BR>
+<i><b>Hard Drive size:</b> $Env:Computername</i><BR>
+<i><b>Platform:</b> $Env:Computername</i>
+"@
+
+$ImageDetails | Out-File C:\image\aliases.html
+
 [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor "Tls12"
 
 Write-Host "Setup PowerShellGet"

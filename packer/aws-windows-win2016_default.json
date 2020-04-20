@@ -3,7 +3,7 @@
     "build":                "{{timestamp}}",
     "os_version":           "Windows2016",
     "pre":                  "SICFactory",
-    "image_type": "Default",
+    "image_type":           "Default",
 
     "source_name_filter":   "Windows_Server-2016-English-Full-Base-*",
     "owners":               "amazon",
@@ -12,8 +12,8 @@
     "aws_access_key":       "{{env `AWS_ACCESS_KEY_ID`}}",
     "aws_secret_key":       "{{env `AWS_SECRET_ACCESS_KEY`}}",
     "region":               "{{env `AWS_DEFAULT_REGION`}}",
-    "name": "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}",
-		"description": "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}} built from latest Market place image",
+    "name":                 "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}",
+		"description":          "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}} built from latest Market place image",
 
     "image_folder": 		  	"C:\\image",
     "commit_file": 				  "C:\\image\\commit.txt",
@@ -94,6 +94,12 @@
     },
     {
       "type": "powershell",
+      "environment_vars": [
+        "name={{user `name`}}",
+        "description={{user `description`}}",
+        "source_name_filter={{user `source_name_filter`}}",
+        "build_time={{user `build`}}"
+    ],
       "scripts":[
         "{{ template_dir }}/packer/scripts/Installers/Run-Report.ps1"
       ]

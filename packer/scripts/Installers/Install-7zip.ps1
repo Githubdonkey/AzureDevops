@@ -3,4 +3,4 @@
 ##  Desc:  Install 7zip
 ################################################################################
 
-Choco-Install -PackageName 7zip.install
+choco install 7zip.install -y
