@@ -1,112 +1,68 @@
-variable "aws_builder" {
-  type = "string"
-  default = ""
-}
-variable "azure_builder" {
-  type = "string"
-  default = ""
-}
-variable "custom_image_name" {
-  type = "string"
-  default = ""
-}
-variable "custom_image_resource_group_name" {
-  type = "string"
-  default = "myResourceGroup"
-}
-variable "custom_virtual_network" {
-  type = "string"
-  default = "test-network"
-}
-variable "custom_subnet" {
-  type = "string"
-  default = "internal"
-}
-variable "custom_network_interface" {
-  type = "string"
-  default = "test-nic"
-}
-variable "packer_image" {
-  type = "string"
-}
-
-resource "aws_security_group" "queue" {
-    name = "queue"
-    description = "Queue role"
-}
-
 provider "azurerm" {
-  # whilst the `version` attribute is optional, we recommend pinning to a given version of the Provider
-  version = "=1.38.0"
+  version = "= 2.0.0"
+  features {}
 }
 
-#declare local
-locals {
-  timestamp = "${timestamp()}"
-  timestamp_sanitized = "${replace("${local.timestamp}", "/[- TZ:]/", "")}"
+variable "image_id" {}
+
+resource "azurerm_resource_group" "rg" {
+  name = "my-first-terraform-rg"
+  location = "eastus"
 }
 
-data "azurerm_resource_group" "example" {
-  name     = "${var.custom_image_resource_group_name}"
+resource "azurerm_virtual_network" "myvnet" {
+  name = "my-vnet"
+  address_space = ["10.0.0.0/16"]
+  location = "eastus"
+  resource_group_name = azurerm_resource_group.rg.name
 }
 
-data "azurerm_virtual_network" "example" {
-  name                = "${var.custom_virtual_network}"
-  resource_group_name = "${data.azurerm_resource_group.example.name}"
+resource "azurerm_subnet" "frontendsubnet" {
+  name = "frontendSubnet"
+  resource_group_name =  azurerm_resource_group.rg.name
+  virtual_network_name = azurerm_virtual_network.myvnet.name
+  address_prefix = "10.0.1.0/24"
 }
 
-data "azurerm_subnet" "example" {
-  name                 = "${var.custom_subnet}"
-  resource_group_name  = "${data.azurerm_resource_group.example.name}"
-  virtual_network_name = "${data.azurerm_virtual_network.example.name}"
+resource "azurerm_public_ip" "myvm1publicip" {
+  name = "pip1"
+  location = "eastus"
+  resource_group_name = azurerm_resource_group.rg.name
+  allocation_method = "Dynamic"
+  sku = "Basic"
 }
 
-data "azurerm_network_interface" "example" {
-  name                = "${var.custom_network_interface}"
-  resource_group_name = "${data.azurerm_resource_group.example.name}"
+resource "azurerm_network_interface" "myvm1nic" {
+  name = "myvm1-nic"
+  location = "eastus"
+  resource_group_name = azurerm_resource_group.rg.name
+
+  ip_configuration {
+    name = "ipconfig1"
+    subnet_id = azurerm_subnet.frontendsubnet.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id = azurerm_public_ip.myvm1publicip.id
+  }
 }
-data "azurerm_image" "search" {
-  name                = "${var.packer_image}"
-  resource_group_name = "${var.custom_image_resource_group_name}"
-}
 
-#output "image_id" {
-#  value = "${data.azurerm_image.search.id}"
-#}
+resource "azurerm_windows_virtual_machine" "example" {
+  name                  = "myvm1"  
+  location              = "eastus"
+  resource_group_name   = azurerm_resource_group.rg.name
+  network_interface_ids = [azurerm_network_interface.myvm1nic.id]
+  size                  = "Standard_B1s"
+  admin_username        = "adminuser"
+  admin_password        = "Password123!"
 
-resource "azurerm_virtual_machine" "example" {
-  name                  = "${var.custom_image_name}-${local.timestamp_sanitized}"
-  location              = "${data.azurerm_resource_group.example.location}"
-  resource_group_name   = "${data.azurerm_resource_group.example.name}"
-  network_interface_ids = ["${data.azurerm_network_interface.example.id}"]
-  size                  = "Standard_F2"
-
-  # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
-  # NOTE: This may not be optimal in all cases.
-  delete_os_disk_on_termination = true
-
-  # This means the Data Disk Disk will be deleted when Terraform destroys the Virtual Machine
-  # NOTE: This may not be optimal in all cases.
-  delete_data_disks_on_termination = true
-
-  storage_image_reference {
-    id="${data.azurerm_image.search.id}"
+  source_image_reference {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2019-Datacenter"
+    version   = "latest"
   }
 
-  storage_os_disk {
-    name              = "os_${var.custom_image_name}"
+  os_disk {
     caching           = "ReadWrite"
-    create_option     = "FromImage"
-    managed_disk_type = "Standard_LRS"
+    storage_account_type = "Standard_LRS"
   }
-
-  os_profile {
-    computer_name  = "hostname"
-    admin_username = "testadmin"
-    admin_password = "Password1234!"
-  }
-
-  os_profile_linux_config {
-    disable_password_authentication = false
-  }
-} 
+}

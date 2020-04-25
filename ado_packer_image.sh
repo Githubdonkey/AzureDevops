@@ -10,9 +10,9 @@ packerBuildVarFile=${packerProvider}-${packerOs}-${packerImage}.json
 cp packer/$packerBuildFile $packerBuildFile
 cp packer/SetUpWinRM.ps1 SetUpWinRM.ps1
 cp packer/ec2-userdata.ps1 ec2-userdata.ps1
-# tar -zxvf packages/packer-provisioner-windows-update-linux.tgz
-# chmod +x packer-provisioner-windows-update
-# sudo cp packer-provisioner-windows-update /usr/local/bin/packer-provisioner-windows-update
+#tar -zxvf packages/packer-provisioner-windows-update-linux.tgz
+#chmod +x packer-provisioner-windows-update
+#sudo cp packer-provisioner-windows-update /usr/local/bin/packer-provisioner-windows-update
 packer build $packerBuildFile
 
  if [[ $packerProvider == "aws" ]]; then

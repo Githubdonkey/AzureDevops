@@ -20,9 +20,10 @@ echo $packerImageName
 echo "Starting Terraform build"
 cp terraform/${packerProvider}_main_${packerOs}.tf main.tf
 cp terraform/userdata.sh userdata.sh
+#cp terraform/userdata.ps1 userdata.ps1
 terraform init
 # terraform plan -var="ImageId=${packerImageId}"
-terraform apply -var="ImageId=$packerImageId" -var="ImageName=$packerImageName" -auto-approve
+terraform apply -var="image_id=$packerImageId" -auto-approve
 echo "sleep 3m"
 sleep 3m
-terraform destroy -var="ImageId=$packerImageId" -var="ImageName=$packerImageName" -auto-approve
+terraform destroy -var="image_id=$packerImageId" -auto-approve
