@@ -12,7 +12,7 @@
 
 		"name": "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}",
 		"description": "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}} built from latest Market place image",
-		"vm_size": "Standard_DS3_v2",
+		"vm_size": "Standard_F8s_v2",
 		"ssh_username": "ubuntu",
 		"resource_group_name": "myResourceGroup",
 		"os_type": "Linux",

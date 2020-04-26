@@ -30,8 +30,8 @@ resource "random_string" "random" {
   override_special = "/@£$"
 }
 
-resource "aws_ssm_parameter" "foo" {
-  name  = var.image_id
+resource "aws_ssm_parameter" "test" {
+  name  = "/builds/azure/t${local.timestamp_sanitized}/test"
   type  = "String"
   value = random_string.random.result
   overwrite   = "true"
