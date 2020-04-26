@@ -3,6 +3,7 @@
     "build":                "{{timestamp}}",
     "os_version":           "Windows2016",
     "pre":                  "SICFactory",
+
     "image_type":           "Base",
 
     "source_name_filter":   "Windows_Server-2016-English-Full-Base-*",
@@ -60,6 +61,7 @@
       "C:\\ProgramData\\Amazon\\EC2-Windows\\Launch\\Scripts\\SysprepInstance.ps1 -NoShutdown"
 	  ]
     }
+
   ],  
 	"post-processors": [
 		{

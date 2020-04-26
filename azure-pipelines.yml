@@ -25,6 +25,7 @@ parameters:
   - linux
   - vmware
   - all
+
 - name: providerMenu
   displayName: Select Provider
   type: string
@@ -64,6 +65,7 @@ stages:
     jobs:
     - job: show_variables1
       steps:
+
       - task: Bash@3
         displayName: Show Variables1
         inputs:

@@ -101,6 +101,7 @@ resource "azurerm_virtual_machine" "example" {
   network_interface_ids = [azurerm_network_interface.myvm1nic.id]
   vm_size               = "Standard_F8s_v2"
 
+
   delete_os_disk_on_termination = true
   delete_data_disks_on_termination = true
 
@@ -119,6 +120,7 @@ resource "azurerm_virtual_machine" "example" {
     computer_name  = "t${local.timestamp_sanitized}"
     admin_username = "testadmin"
     admin_password = random_string.random.result
+
   }
 
   os_profile_linux_config {

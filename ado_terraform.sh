@@ -12,6 +12,7 @@ echo $packerImageName
 # Run Terraform
 echo "Starting Terraform build"
 cp terraform/${packerProvider}_main_${packerOs}.tf main.tf
+
 cp terraform/userdata.sh userdata.sh
 
 if [[ $packerProvider == "aws" ]]; then
