@@ -7,15 +7,15 @@ parameters:
 - name: imagesMenu
   displayName: Image Selection
   type: string
-  default: win2016_default
+  default: win2019_default
   values:
+  - win2019_default
+  - win2019_base
   - win2016_default
   - win2016_base
-  - ubuntu18-base
-  - win2012R2-base
-  - ubuntu-16.04
-  - macOS-latest
-  - macOS-10.14
+  - win2012R2_base
+  - win2012R2_default
+  - ubuntu18_base
 - name: osMenu
   displayName: Select OS
   type: string
