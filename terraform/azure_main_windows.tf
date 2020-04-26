@@ -124,6 +124,17 @@ resource "azurerm_virtual_machine" "example" {
   os_profile_windows_config {}
 }
 
+module "run_command" {
+  source               = "innovationnorway/vm-run-command/azurerm"
+  resource_group_name  = azurerm_resource_group.rg.name
+  virtual_machine_name = azurerm_virtual_machine.example.name
+  os_type              = "windows"
+
+  script = <<EOF
+Install-Module -Name PSWindowsUpdate -Force -AllowClobber
+EOF
+}
+
 output "image_id" {
   value = var.image_id
 }
