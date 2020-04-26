@@ -3,18 +3,26 @@
     "build":                "{{timestamp}}",
     "os_version":           "Windows2016",
     "pre":                  "SICFactory",
-
-    "image_type":           "Base",
+    "image_type":           "Default",
 
     "source_name_filter":   "Windows_Server-2016-English-Full-Base-*",
     "owners":               "amazon",
-    "instance_type":        "t2.2xlarge",
+    "instance_type":        "t2.xlarge",
 
     "aws_access_key":       "{{env `AWS_ACCESS_KEY_ID`}}",
     "aws_secret_key":       "{{env `AWS_SECRET_ACCESS_KEY`}}",
     "region":               "{{env `AWS_DEFAULT_REGION`}}",
     "name":                 "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}",
-		"description":          "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}} built from latest Market place image"
+		"description":          "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}} built from latest Market place image",
+
+    "image_folder": 		  	"C:\\image",
+    "commit_file": 				  "C:\\image\\commit.txt",
+    "metadata_file": 			  "C:\\image\\metadata.txt",
+    "helper_script_folder": "C:\\Program Files\\WindowsPowerShell\\Modules\\",
+    "commit_url": 				  "LATEST",
+    "install_user": 			  "installer",
+    "capture_name_prefix": 	"packer",
+    "image_version": 			  "dev"
   },
 
   "builders": [
@@ -40,9 +48,7 @@
       "Name":                   "{{ user `name` }}",
       "Description":            "{{ user `description` }}",
       "OS_Version":             "{{ user `os_version` }}",
-      "Base_AMI_Name":          "{{ .SourceAMIName }}",
-      "Readme":                 "s3://gitdonkey/devops/builds {{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}.json",
-      "Packer_Build":           "s3://gitdonkey/devops/packer_logs {{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}-PackerLog.json"
+      "Base_AMI_Name":          "{{ .SourceAMIName }}"
     },
     "force_deregister":         "true",
     "force_delete_snapshot":    "true",
@@ -53,15 +59,64 @@
     "winrm_use_ssl":            true
    }
   ],
+
 	"provisioners": [
     {
       "type": "powershell",
+      "inline":[
+        "New-Item -Path {{user `image_folder`}} -ItemType Directory -Force",
+        "Write-Output {{user `commit_url`}} > {{user `commit_file` }}",
+        "Write-Host (Get-Content -Path {{user `commit_file`}})"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "{{ template_dir }}/packer/scripts/ImageHelpers",
+      "destination": "{{user `helper_script_folder`}}"
+    },
+    {
+      "type": "powershell",
+      "scripts":[
+        "{{ template_dir }}/packer/scripts/Installers/Initialize-2016.ps1"
+      ]
+    },
+    {
+      "type": "powershell",
+      "scripts":[
+        "{{ template_dir }}/packer/scripts/Installers/Install-7zip.ps1"
+      ]
+    },
+    {
+      "type": "powershell",
+      "scripts":[
+        "{{ template_dir }}/packer/scripts/Installers/Install-JQ.ps1"
+      ]
+    },
+    {
+      "type": "powershell",
+      "environment_vars": [
+        "name={{user `name`}}",
+        "description={{user `description`}}",
+        "source_name_filter={{user `source_name_filter`}}",
+        "build_time={{user `build`}}"
+    ],
+      "scripts":[
+        "{{ template_dir }}/packer/scripts/Installers/Run-Report.ps1"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "C:\\image\\aliases.html",
+      "destination": "{{ template_dir }}/aliases.html",
+      "direction": "download"
+  },
+    {
+      "type": "powershell",
       "inline": [
-      "C:\\ProgramData\\Amazon\\EC2-Windows\\Launch\\Scripts\\InitializeInstance.ps1 -Schedule",
-      "C:\\ProgramData\\Amazon\\EC2-Windows\\Launch\\Scripts\\SysprepInstance.ps1 -NoShutdown"
-	  ]
+        "C:\\ProgramData\\Amazon\\EC2-Windows\\Launch\\Scripts\\InitializeInstance.ps1 -Schedule",
+        "C:\\ProgramData\\Amazon\\EC2-Windows\\Launch\\Scripts\\SysprepInstance.ps1 -NoShutdown"
+      ]
     }
-
   ],  
 	"post-processors": [
 		{

@@ -1,37 +1,21 @@
-variable "aws_builder" {
-  default = ""
-}
-variable "image_id" {}
-
-variable "custom_image_name" {
-  type = "string"
-  default = "testit"
-}
-variable "custom_image_resource_group_name" {
-  type = "string"
-  default = "myResourceGroup"
-}
-variable "custom_virtual_network" {
-  type = "string"
-  default = "test-network"
-}
-variable "custom_subnet" {
-  type = "string"
-  default = "internal"
-}
-variable "custom_network_interface" {
-  type = "string"
-  default = "test-nic"
-}
-
-resource "aws_security_group" "queue" {
-    name = "queue"
-    description = "Queue role"
-}
-
 provider "azurerm" {
-  # whilst the `version` attribute is optional, we recommend pinning to a given version of the Provider
-  version = "=1.38.0"
+  version = "= 2.0.0"
+  features {}
+}
+
+variable "image_id" {
+    description = "Image name"
+    default = ""
+}
+
+variable "location" {
+    description = "location of image"
+    default = "eastus"
+}
+
+variable "custom_image_resource_group_name" {
+  description = "location of image rg"
+  default = "myResourceGroup"
 }
 
 #declare local
@@ -40,58 +24,133 @@ locals {
   timestamp_sanitized = "${replace("${local.timestamp}", "/[- TZ:]/", "")}"
 }
 
-data "azurerm_resource_group" "example" {
-  name     = "${var.custom_image_resource_group_name}"
+resource "random_string" "random" {
+  length = 16
+  special = true
+  override_special = "/@£$"
 }
 
-data "azurerm_virtual_network" "example" {
-  name                = "${var.custom_virtual_network}"
-  resource_group_name = "${data.azurerm_resource_group.example.name}"
+resource "aws_ssm_parameter" "test" {
+  name  = "/builds/azure/t${local.timestamp_sanitized}/test"
+  type  = "String"
+  value = random_string.random.result
+  overwrite   = "true"
 }
 
-data "azurerm_subnet" "example" {
-  name                 = "${var.custom_subnet}"
-  resource_group_name  = "${data.azurerm_resource_group.example.name}"
-  virtual_network_name = "${data.azurerm_virtual_network.example.name}"
+resource "aws_ssm_parameter" "secret" {
+  name        = "/builds/azure/t${local.timestamp_sanitized}/password"
+  description = "The parameter description"
+  type        = "SecureString"
+  value       = random_string.random.result
+  overwrite   = "true"
+
+  tags = {
+    environment = "testing"
+  }
 }
 
-data "azurerm_network_interface" "example" {
-  name                = "${var.custom_network_interface}"
-  resource_group_name = "${data.azurerm_resource_group.example.name}"
-}
 data "azurerm_image" "search" {
-  name                = "${var.image_id}"
-  resource_group_name = "${var.custom_image_resource_group_name}"
+  name                = var.image_id
+  resource_group_name = var.custom_image_resource_group_name
+}
+
+resource "azurerm_resource_group" "rg" {
+  name = "rg-${local.timestamp_sanitized}"
+  location = var.location
+}
+
+resource "azurerm_virtual_network" "myvnet" {
+  name = "vnet-${local.timestamp_sanitized}"
+  address_space = ["10.0.0.0/16"]
+  location = var.location
+  resource_group_name = azurerm_resource_group.rg.name
+}
+
+resource "azurerm_subnet" "frontendsubnet" {
+  name = "frontendSubnet"
+  resource_group_name =  azurerm_resource_group.rg.name
+  virtual_network_name = azurerm_virtual_network.myvnet.name
+  address_prefix = "10.0.1.0/24"
+}
+
+resource "azurerm_public_ip" "myvm1publicip" {
+  name = "pip1"
+  location = var.location
+  resource_group_name = azurerm_resource_group.rg.name
+  allocation_method = "Dynamic"
+  sku = "Basic"
+}
+
+resource "azurerm_network_interface" "myvm1nic" {
+  name = "nic-${local.timestamp_sanitized}"
+  location = var.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  ip_configuration {
+    name = "ipconfig-${local.timestamp_sanitized}"
+    subnet_id = azurerm_subnet.frontendsubnet.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id = azurerm_public_ip.myvm1publicip.id
+  }
 }
 
 resource "azurerm_virtual_machine" "example" {
-  name                  = "${var.custom_image_name}-${local.timestamp_sanitized}"
-  location              = "${data.azurerm_resource_group.example.location}"
-  resource_group_name   = "${data.azurerm_resource_group.example.name}"
-  network_interface_ids = ["${data.azurerm_network_interface.example.id}"]
-  vm_size               = "Standard_F2"
+  name                  = "t${local.timestamp_sanitized}"  
+  location              = var.location
+  resource_group_name   = azurerm_resource_group.rg.name
+  network_interface_ids = [azurerm_network_interface.myvm1nic.id]
+  vm_size               = "Standard_F8s_v2"
+
 
   delete_os_disk_on_termination = true
   delete_data_disks_on_termination = true
 
   storage_image_reference {
-    id="${data.azurerm_image.search.id}"
+    id = data.azurerm_image.search.id
   }
 
   storage_os_disk {
-    name              = "os_${var.custom_image_name}"
+    name              = "t${local.timestamp_sanitized}"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
   }
 
   os_profile {
-    computer_name  = "hostname"
+    computer_name  = "t${local.timestamp_sanitized}"
     admin_username = "testadmin"
-    admin_password = "Password1234!"
+    admin_password = random_string.random.result
+
   }
 
   os_profile_linux_config {
     disable_password_authentication = false
   }
-} 
+}
+
+output "image_id" {
+  value = var.image_id
+}
+
+output "instance_ip_addr1" {
+  value       = azurerm_public_ip.myvm1publicip.ip_address
+  description = "The private IP address of the main server instance."
+}
+
+#resource "azurerm_virtual_machine_extension" "stage" {
+#    name = "CustomScript"
+#    location              = "${var.location}"
+#    resource_group_name = "${data.azurerm_resource_group.example.name}"
+#    virtual_machine_name = "${azurerm_virtual_machine.example.name}"
+#    publisher = "Microsoft.Compute"
+#    type = "CustomScriptExtension"
+#    type_handler_version = "1.9.5"
+#    auto_upgrade_minor_version = true
+#
+#    settings = <<SETTINGS
+#    {
+#        "commandToExecute": "echo 1"
+#    }
+#SETTINGS
+#    depends_on = [azurerm_virtual_machine.example]
+#}
