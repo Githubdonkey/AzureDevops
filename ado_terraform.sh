@@ -8,19 +8,11 @@ packerImageId=$(aws ssm get-parameter --name "/builds/${packerProvider}/${packer
 packerImageName=$(aws ssm get-parameter --name "/builds/${packerProvider}/${packerOs}/${packerImage}/name" --output text --query Parameter.Value)
 echo $packerImageId
 echo $packerImageName
-#if [[ $packerProvider == "aws" ]]; then
-#        packerImageId=$(aws secretsmanager get-secret-value --secret-id builds/${packerProvider}/${packerImage}/id | jq --raw-output .SecretString)
-#   elif [[ $packerProvider == "azure" ]]; then
-#        packerImageId=$(aws secretsmanager get-secret-value --secret-id builds/${packerProvider}/${packerImage}/name | jq --raw-output .SecretString)
-#   else
-#        exit 1
-#fi
 
 # Run Terraform
 echo "Starting Terraform build"
 cp terraform/${packerProvider}_main_${packerOs}.tf main.tf
 cp terraform/userdata.sh userdata.sh
-#cp terraform/userdata.ps1 userdata.ps1
 
 if [[ $packerProvider == "aws" ]]; then
         image_id=$packerImageId
