@@ -13,10 +13,45 @@ variable "location" {
     default = "eastus"
 }
 
+variable "custom_image_resource_group_name" {
+  description = "location of image rg"
+  default = "myResourceGroup"
+}
+
 #declare local
 locals {
   timestamp = "${timestamp()}"
   timestamp_sanitized = "${replace("${local.timestamp}", "/[- TZ:]/", "")}"
+}
+
+resource "random_string" "random" {
+  length = 16
+  special = true
+  override_special = "/@£$"
+}
+
+resource "aws_ssm_parameter" "foo" {
+  name  = var.image_id
+  type  = "String"
+  value = random_string.random.result
+  overwrite   = "true"
+}
+
+resource "aws_ssm_parameter" "secret" {
+  name        = "/builds/azure/t${local.timestamp_sanitized}/password"
+  description = "The parameter description"
+  type        = "SecureString"
+  value       = random_string.random.result
+  overwrite   = "true"
+
+  tags = {
+    environment = "testing"
+  }
+}
+
+data "azurerm_image" "search" {
+  name                = var.image_id
+  resource_group_name = var.custom_image_resource_group_name
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -59,24 +94,41 @@ resource "azurerm_network_interface" "myvm1nic" {
   }
 }
 
-resource "azurerm_windows_virtual_machine" "example" {
+resource "azurerm_virtual_machine" "example" {
   name                  = "t${local.timestamp_sanitized}"  
   location              = var.location
   resource_group_name   = azurerm_resource_group.rg.name
   network_interface_ids = [azurerm_network_interface.myvm1nic.id]
-  size                  = "Standard_F8s_v2"
-  admin_username        = "adminuser"
-  admin_password        = "Password123!"
+  vm_size               = "Standard_F8s_v2"
 
-  source_image_reference {
-    publisher = "MicrosoftWindowsServer"
-    offer     = "WindowsServer"
-    sku       = "2019-Datacenter"
-    version   = "latest"
+  delete_os_disk_on_termination = true
+  delete_data_disks_on_termination = true
+
+  storage_image_reference {
+    id = data.azurerm_image.search.id
   }
 
-  os_disk {
+  storage_os_disk {
+    name              = "t${local.timestamp_sanitized}"
     caching           = "ReadWrite"
-    storage_account_type = "Standard_LRS"
+    create_option     = "FromImage"
+    managed_disk_type = "Standard_LRS"
   }
+
+  os_profile {
+    computer_name  = "t${local.timestamp_sanitized}"
+    admin_username = "testadmin"
+    admin_password = random_string.random.result
+  }
+
+  os_profile_windows_config {}
+}
+
+output "image_id" {
+  value = var.image_id
+}
+
+output "instance_ip_addr1" {
+  value       = azurerm_public_ip.myvm1publicip.ip_address
+  description = "The private IP address of the main server instance."
 }

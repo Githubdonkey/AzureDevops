@@ -21,9 +21,17 @@ echo "Starting Terraform build"
 cp terraform/${packerProvider}_main_${packerOs}.tf main.tf
 cp terraform/userdata.sh userdata.sh
 #cp terraform/userdata.ps1 userdata.ps1
+
+if [[ $packerProvider == "aws" ]]; then
+        image_id=$packerImageId
+   elif [[ $packerProvider == "azure" ]]; then
+        image_id=$packerImageName
+   else
+        exit 1
+fi
+
 terraform init
-# terraform plan -var="ImageId=${packerImageId}"
-terraform apply -var="image_id=$packerImageId" -auto-approve
+terraform apply -var="image_id=$image_id" -auto-approve
 echo "sleep 3m"
 sleep 3m
-terraform destroy -var="image_id=$packerImageId" -auto-approve
+terraform destroy -var="image_id=$image_id" -auto-approve
