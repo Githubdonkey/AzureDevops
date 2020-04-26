@@ -94,45 +94,48 @@ resource "azurerm_network_interface" "myvm1nic" {
   }
 }
 
-resource "azurerm_virtual_machine" "example" {
-  name                  = "t${local.timestamp_sanitized}"  
+resource "azurerm_windows_virtual_machine" "example" {
+  #depends_on=[azurerm_network_interface.web-windows-vm-nic]
+  name = "t${local.timestamp_sanitized}"
   location              = var.location
   resource_group_name   = azurerm_resource_group.rg.name
+  size                  = "Standard_F8s_v2"
   network_interface_ids = [azurerm_network_interface.myvm1nic.id]
-  vm_size               = "Standard_F8s_v2"
+  source_image_id = data.azurerm_image.search.id
+  computer_name = "t${local.timestamp_sanitized}"
+  admin_username = "localadm"
+  admin_password = random_string.random.result
 
-  delete_os_disk_on_termination = true
-  delete_data_disks_on_termination = true
-
-  storage_image_reference {
-    id = data.azurerm_image.search.id
-  }
-
-  storage_os_disk {
+  os_disk {
     name              = "t${local.timestamp_sanitized}"
-    caching           = "ReadWrite"
-    create_option     = "FromImage"
-    managed_disk_type = "Standard_LRS"
+    caching              = "ReadWrite"
+    #create_option     = "FromImage"
+    storage_account_type = "Standard_LRS"
   }
 
-  os_profile {
-    computer_name  = "t${local.timestamp_sanitized}"
-    admin_username = "testadmin"
-    admin_password = random_string.random.result
-  }
+  provision_vm_agent       = true
 
-  os_profile_windows_config {}
+  tags = {
+    environment = "testingEnviroment" 
+  }
 }
 
-module "run_command" {
-  source               = "innovationnorway/vm-run-command/azurerm"
-  resource_group_name  = azurerm_resource_group.rg.name
-  virtual_machine_name = azurerm_virtual_machine.example.name
-  os_type              = "windows"
-
-  script = <<EOF
-Install-Module -Name PSWindowsUpdate -Force -AllowClobber
-EOF
+# Virtual Machine Extension to Install IIS
+resource "azurerm_virtual_machine_extension" "iis-windows-vm-extension" {
+  depends_on=[azurerm_windows_virtual_machine.example]
+  name = "t${local.timestamp_sanitized}-vm-extension"
+  virtual_machine_id = azurerm_windows_virtual_machine.example.id
+  publisher = "Microsoft.Compute"
+  type = "CustomScriptExtension"
+  type_handler_version = "1.9"
+  settings = <<SETTINGS
+    { 
+      "commandToExecute": "powershell Install-WindowsFeature -name Web-Server -IncludeManagementTools;"
+    } 
+  SETTINGS
+  tags = {
+     environment = "testingenviroment"
+  }
 }
 
 output "image_id" {
