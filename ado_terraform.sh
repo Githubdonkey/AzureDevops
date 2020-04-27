@@ -26,5 +26,5 @@ fi
 terraform init
 terraform apply -var="image_id=$image_id" -auto-approve
 echo "sleep 3m"
-sleep 3m
+sleep 10m
 terraform destroy -var="image_id=$image_id" -auto-approve

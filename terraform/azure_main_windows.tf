@@ -8,6 +8,16 @@ variable "image_id" {
     default = ""
 }
 
+variable "AWS_ACCESS_KEY_ID" {
+    description = "AWS Creds"
+    default = ""
+}
+
+variable "AWS_SECRET_ACCESS_KEY" {
+    description = "AWS Creds"
+    default = ""
+}
+
 variable "location" {
     description = "location of image"
     default = "eastus"
@@ -26,8 +36,6 @@ locals {
 
 resource "random_string" "random" {
   length = 16
-  special = true
-  override_special = "/@£$"
 }
 
 resource "aws_ssm_parameter" "test" {
@@ -120,6 +128,22 @@ resource "azurerm_windows_virtual_machine" "example" {
   }
 }
 
+locals {
+  aws_id ="$AWS_ACCESS_KEY_ID = ${var.AWS_ACCESS_KEY_ID}"
+  aws_key ="$AWS_SECRET_ACCESS_KEY = ${var.AWS_SECRET_ACCESS_KEY}"
+  awscli2_from ="$awscli2_from = 'https:\\/\\/awscli.amazonaws.com/AWSCLIV2.msi'"
+  awscli2_to ="$awscli2_to = 'c:/image/AWSCLIV2.msi'"
+  download_command = "Invoke-WebRequest -Uri $awscli2_from -OutFile $awscli2_to"
+  download = "${local.awscli2_from}; ${local.awscli2_to}; ${local.download_command}"
+
+  arg_command =  "$arg_command = '/I c:/image/AWSCLIV2.msi /quiet /norestart'"
+  aws_command = "Start-Process msiexec -Wait -ArgumentList '/I C:/image/AWSCLIV2.msi /quiet /norestart'"
+  sleep = "Start-Sleep -s 15"
+  write_host = "Write-Host ${var.AWS_ACCESS_KEY_ID}"
+  aws_run = "${local.awscli2_from}; ${local.awscli2_to}; ${local.download_command}; ${local.sleep}; ${local.aws_command}; ${local.write_host}"
+}
+
+# https://medium.com/@gmusumeci/how-to-bootstrapping-azure-vms-with-terraform-c8fdaa457836
 # Virtual Machine Extension to Install IIS
 resource "azurerm_virtual_machine_extension" "iis-windows-vm-extension" {
   depends_on=[azurerm_windows_virtual_machine.example]
@@ -130,7 +154,7 @@ resource "azurerm_virtual_machine_extension" "iis-windows-vm-extension" {
   type_handler_version = "1.9"
   settings = <<SETTINGS
     { 
-      "commandToExecute": "powershell Install-WindowsFeature -name Web-Server -IncludeManagementTools;"
+      "commandToExecute":"powershell.exe -Command \"${local.aws_run}\""
     } 
   SETTINGS
   tags = {
@@ -142,7 +166,6 @@ output "image_id" {
   value = var.image_id
 }
 
-output "instance_ip_addr1" {
-  value       = azurerm_public_ip.myvm1publicip.ip_address
-  description = "The private IP address of the main server instance."
+output "AWS_ACCESS_KEY_ID" {
+  value = var.AWS_ACCESS_KEY_ID
 }
