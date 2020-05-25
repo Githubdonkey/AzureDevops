@@ -5,9 +5,11 @@ packerOs=$2
 packerImage=$3
 
 packerBuildFile=${packerProvider}-${packerOs}-${packerImage}.json
-packerBuildVarFile=${packerProvider}-${packerOs}-${packerImage}.json
+packerVarFile=var-${packerProvider}-${packerOs}.json
 
 cp packer/$packerBuildFile $packerBuildFile
+cp packer/$packerVarFile $packerVarFile
+
 cp packer/SetUpWinRM.ps1 SetUpWinRM.ps1
 cp packer/ec2-userdata.ps1 ec2-userdata.ps1
 
@@ -15,7 +17,7 @@ cp packer/ec2-userdata.ps1 ec2-userdata.ps1
 #chmod +x packer-provisioner-windows-update
 #sudo cp packer-provisioner-windows-update /usr/local/bin/packer-provisioner-windows-update
 
-packer build $packerBuildFile
+packer build -var-file=$packerVarFile $packerBuildFile
 
  if [[ $packerProvider == "aws" ]]; then
          echo "AWS provider"
@@ -33,9 +35,12 @@ fi
 aws ssm put-parameter --name "/builds/${packerProvider}/${packerOs}/${packerImage}/name" --value "${packerImageName}" --type String --overwrite
 aws ssm put-parameter --name "/builds/${packerProvider}/${packerOs}/${packerImage}/id" --value "${packerImageId}" --type String --overwrite
 
-aws s3 cp aliases.html s3://gitdonkey/devops/${packerImageName}.html
-aws s3 cp manifest.json s3://gitdonkey/devops/${packerImageName}.json
-aws s3 cp packer.log s3://gitdonkey/devops/${packerImageName}_packer_log.json
+echo "s3://gitdonkey/devops/${packerImageName}.html"
+aws s3 cp aliases.html "s3://gitdonkey/devops/${packerImageName}.html"
+echo "s3://gitdonkey/devops/${packerImageName}.json"
+aws s3 cp manifest.json "s3://gitdonkey/devops/${packerImageName}.json"
+echo "s3://gitdonkey/devops/${packerImageName}_packer_log.json"
+aws s3 cp packer.log "s3://gitdonkey/devops/${packerImageName}_packer_log.json"
 
 #aws secretsmanager create-secret --name builds/${packerProvider}/${packerOs}/name --description "The image ${packerProvider} built ${packerOs} I created ${packerImage}"
 #aws secretsmanager create-secret --name builds/${packerProvider}/${packerImage}/id --description "The image ${packerProvider} built ${packerOs} I created ${packerImage}"

@@ -4,7 +4,6 @@ provider "aws" {
 }
 
 variable "ImageId" {}
-
 variable "ImageName" {}
 
 resource "aws_instance" "secOps" {
