@@ -9,12 +9,13 @@ parameters:
   type: string
   default: win2019_default
   values:
-  - win2019_default
-  - win2019_base
-  - win2016_default
-  - win2016_base
-  - win2012R2_base
-  - win2012R2_default
+  - 2012R2_base
+  - 2012R2_default
+  - 2016_base
+  - 2016_default
+  - 2016_update
+  - 2019_base
+  - 2019_default
   - ubuntu18_base
 - name: osMenu
   displayName: Select OS
