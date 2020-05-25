@@ -3,7 +3,12 @@ provider "azurerm" {
   features {}
 }
 
-variable "image_id" {
+variable "ImageId" {
+    description = "Image ID"
+    default = ""
+}
+
+variable "ImageName" {
     description = "Image name"
     default = ""
 }
@@ -47,11 +52,6 @@ resource "aws_ssm_parameter" "secret" {
   tags = {
     environment = "testing"
   }
-}
-
-data "azurerm_image" "search" {
-  name                = var.image_id
-  resource_group_name = var.custom_image_resource_group_name
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -106,7 +106,7 @@ resource "azurerm_virtual_machine" "example" {
   delete_data_disks_on_termination = true
 
   storage_image_reference {
-    id = data.azurerm_image.search.id
+    id = var.ImageId
   }
 
   storage_os_disk {
@@ -128,29 +128,10 @@ resource "azurerm_virtual_machine" "example" {
   }
 }
 
-output "image_id" {
-  value = var.image_id
+output "ImageId" {
+  value = var.ImageId
 }
 
-output "instance_ip_addr1" {
-  value       = azurerm_public_ip.myvm1publicip.ip_address
-  description = "The private IP address of the main server instance."
+output "ImageName" {
+  value = var.ImageName
 }
-
-#resource "azurerm_virtual_machine_extension" "stage" {
-#    name = "CustomScript"
-#    location              = "${var.location}"
-#    resource_group_name = "${data.azurerm_resource_group.example.name}"
-#    virtual_machine_name = "${azurerm_virtual_machine.example.name}"
-#    publisher = "Microsoft.Compute"
-#    type = "CustomScriptExtension"
-#    type_handler_version = "1.9.5"
-#    auto_upgrade_minor_version = true
-#
-#    settings = <<SETTINGS
-#    {
-#        "commandToExecute": "echo 1"
-#    }
-#SETTINGS
-#    depends_on = [azurerm_virtual_machine.example]
-#}

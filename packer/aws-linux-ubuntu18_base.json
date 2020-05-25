@@ -1,19 +1,17 @@
 {
   "variables": {
-    "build":                "{{timestamp}}",
-    "os_version":           "Ubuntu1804",
     "pre":                  "SICFactory",
-    "image_type": "Base",
+    "os_version":           "Ubuntu1804",
+    "image_type":           "Base",
 
-    "aws_access_key":       "{{env `AWS_ACCESS_KEY_ID`}}",
-    "aws_secret_key":       "{{env `AWS_SECRET_ACCESS_KEY`}}",
-    "region":               "{{env `AWS_DEFAULT_REGION`}}",
-    "name": "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}",
-		"description": "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}} built from latest Market place image",
+    "name":                 "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}",
+		"description":          "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}} built from latest Market place image",
     "owners":               "099720109477",
-    "instance_type":        "t2.xlarge",
     "source_name_filter":   "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*",
-    "ssh_username":         "ubuntu"
+    "ssh_username":         "ubuntu",
+
+    "Readme":                 "s3://gitdonkey/devops/builds/{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}.json",
+    "Packer_Build":           "s3://gitdonkey/devops/packer_logs/{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}-PackerLog.json"
   },
 
   "builders": [
@@ -41,8 +39,8 @@
       "Description":            "{{ user `description` }}",
       "OS_Version":             "{{ user `os_version` }}",
       "Base_AMI_Name":          "{{ .SourceAMIName }}",
-      "Readme":                 "s3://gitdonkey/devops/builds/{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}.json",
-      "Packer_Build":           "s3://gitdonkey/devops/packer_logs/{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}-PackerLog.json"
+      "Readme":                 "{{ user `Readme` }}",
+      "Packer_Build":           "{{ user `Packer_Build` }}"
     },
     "force_deregister":         "true",
     "force_delete_snapshot":    "true"

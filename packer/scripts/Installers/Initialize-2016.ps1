@@ -1,11 +1,11 @@
 # Set TLS1.2
-[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor "Tls12"
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-Write-Host "Setup PowerShellGet"
+#Write-Host "Setup PowerShellGet"
 # Set-PSRepository -InstallationPolicy Trusted -Name PSGallery
-Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+#Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 #Install-Module -Name PowerShellGet -Force
-Set-PSRepository -InstallationPolicy Trusted -Name PSGallery
+#Set-PSRepository -InstallationPolicy Trusted -Name PSGallery
 
 # Disable Windows Update
 $AutoUpdatePath = "HKLM:SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU"

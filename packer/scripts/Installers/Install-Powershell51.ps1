@@ -4,6 +4,8 @@
 ##  Desc:  Install PowerShell Core
 ################################################################################
 
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 $varPSversion = Get-Host | Select-Object Version
 $name = "ps51"
 Write-Host $varPSversion

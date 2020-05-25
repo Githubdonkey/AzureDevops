@@ -9,12 +9,13 @@ parameters:
   type: string
   default: win2019_default
   values:
-  - win2019_default
-  - win2019_base
-  - win2016_default
-  - win2016_base
-  - win2012R2_base
-  - win2012R2_default
+  - 2012R2_base
+  - 2012R2_default
+  - 2016_base
+  - 2016_default
+  - 2016_update
+  - 2019_base
+  - 2019_default
   - ubuntu18_base
 - name: osMenu
   displayName: Select OS
@@ -25,7 +26,15 @@ parameters:
   - linux
   - vmware
   - all
-
+- name: imageVarFile
+  displayName: Select Credentials
+  type: string
+  default: windows
+  values:
+  - default
+  - production
+  - debug
+  - all
 - name: providerMenu
   displayName: Select Provider
   type: string
@@ -58,6 +67,7 @@ stages:
           script: |
               echo "${{ parameters.imagesMenu }}"
               echo "${{ parameters.osMenu }}"
+              echo "${{ parameters.imageVarFile }}"
               echo "${{ parameters.providerMenu }}"
 
   - stage: Testing1
@@ -73,6 +83,7 @@ stages:
           script: |
               echo "${{ parameters.imagesMenu }}"
               echo "${{ parameters.osMenu }}"
+              echo "${{ parameters.imageVarFile }}"
               echo "${{ parameters.providerMenu }}"
 
   - stage: Run_Packer
@@ -109,7 +120,7 @@ stages:
 
             az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
             chmod +x ado_packer_image.sh
-            ./ado_packer_image.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "${{ parameters.imagesMenu }}"
+            ./ado_packer_image.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "${{ parameters.imagesMenu }}" "${{ parameters.imageVarFile }}"
 
   - stage: terraform_stage3
     jobs:
