@@ -1,0 +1,21 @@
+
+  {
+    "build": "{{timestamp}}",
+
+	"client_id": "{{env `ARM_CLIENT_ID`}}",
+	"client_secret": "{{env `ARM_CLIENT_SECRET`}}",
+	"subscription_id": "{{env `ARM_SUBSCRIPTION_ID`}}",
+		
+	"aws_access_key":       "{{env `AWS_ACCESS_KEY_ID`}}",
+	"aws_secret_key":       "{{env `AWS_SECRET_ACCESS_KEY`}}",
+	"region":               "{{env `AWS_DEFAULT_REGION`}}",
+
+	"vm_size": "Standard_DS4_v2",
+	"resource_group_name": "myResourceGroup",
+		
+	"image_folder": "C:\\image",
+	"commit_file": "C:\\image\\commit.txt",
+	"metadata_file": "C:\\image\\metadata.txt",
+	"helper_script_folder": "C:\\Program Files\\WindowsPowerShell\\Modules\\",
+	"commit_url": "LATEST"
+  }

@@ -26,7 +26,15 @@ parameters:
   - linux
   - vmware
   - all
-
+- name: imageVarFile
+  displayName: Select Credentials
+  type: string
+  default: windows
+  values:
+  - default
+  - production
+  - debug
+  - all
 - name: providerMenu
   displayName: Select Provider
   type: string
@@ -59,6 +67,7 @@ stages:
           script: |
               echo "${{ parameters.imagesMenu }}"
               echo "${{ parameters.osMenu }}"
+              echo "${{ parameters.imageVarFile }}"
               echo "${{ parameters.providerMenu }}"
 
   - stage: Testing1
@@ -74,6 +83,7 @@ stages:
           script: |
               echo "${{ parameters.imagesMenu }}"
               echo "${{ parameters.osMenu }}"
+              echo "${{ parameters.imageVarFile }}"
               echo "${{ parameters.providerMenu }}"
 
   - stage: Run_Packer
@@ -110,7 +120,7 @@ stages:
 
             az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
             chmod +x ado_packer_image.sh
-            ./ado_packer_image.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "${{ parameters.imagesMenu }}"
+            ./ado_packer_image.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "${{ parameters.imagesMenu }}" "${{ parameters.imageVarFile }}"
 
   - stage: terraform_stage3
     jobs:

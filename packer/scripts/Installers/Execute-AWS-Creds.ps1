@@ -9,6 +9,6 @@ if (Test-Path "$env:USERPROFILE\.aws\credentials") {Remove-Item "$env:USERPROFIL
 #Add-Content -Path "$env:USERPROFILE\.aws\credentials" -Value "aws_access_key_id = $env:USERNAME"
 #Add-Content -Path "$env:USERPROFILE\.aws\credentials" -Value "aws_secret_access_key = $env:USERNAME"
 
-aws configure set aws_access_key_id $env:USERNAME
-aws configure set aws_secret_access_key $env:USERNAME
-aws configure set default.region $env:USERNAME
+aws configure set aws_access_key_id $env:aws_access_key
+aws configure set aws_secret_access_key $env:aws_secret_key
+aws configure set default.region $env:region

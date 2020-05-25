@@ -3,9 +3,10 @@
 packerProvider=$1
 packerOs=$2
 packerImage=$3
+packerVarFileType=$4
 
 packerBuildFile=${packerProvider}-${packerOs}-${packerImage}.json
-packerVarFile=var-${packerProvider}-${packerOs}.json
+packerVarFile=var-${packerProvider}-${packerVarFileType}.json
 
 cp packer/$packerBuildFile $packerBuildFile
 cp packer/$packerVarFile $packerVarFile
