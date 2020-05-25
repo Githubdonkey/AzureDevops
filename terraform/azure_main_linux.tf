@@ -3,7 +3,12 @@ provider "azurerm" {
   features {}
 }
 
-variable "image_id" {
+variable "ImageId" {
+    description = "Image ID"
+    default = ""
+}
+
+variable "ImageName" {
     description = "Image name"
     default = ""
 }
@@ -50,8 +55,8 @@ resource "aws_ssm_parameter" "secret" {
 }
 
 data "azurerm_image" "search" {
-  name                = var.image_id
-  resource_group_name = var.custom_image_resource_group_name
+  name                = var.ImageId
+  resource_group_name = "myResourceGroup"
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -128,8 +133,12 @@ resource "azurerm_virtual_machine" "example" {
   }
 }
 
-output "image_id" {
-  value = var.image_id
+output "ImageId" {
+  value = var.ImageId
+}
+
+output "ImageName" {
+  value = var.ImageName
 }
 
 output "instance_ip_addr1" {
