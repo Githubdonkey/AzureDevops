@@ -61,19 +61,6 @@ parameters:
 - name: configs
   type: string
   default: 'x86,x64'
-- name: myObject
-  type: object
-  default:
-    foo: FOO
-    bar: BAR
-    things:
-    - one
-    - two
-    - three
-    nested:
-      one: apple
-      two: pear
-      count: 3
 
 trigger: none
 #trigger:
