@@ -46,7 +46,7 @@ parameters:
   - azure
   - vcenter
   - all
-- name: Runtime
+- name: runtime
   displayName: Select Runtime
   type: string
   default: production
@@ -134,7 +134,7 @@ stages:
     - ${{ if eq(parameters.imagesMenu, 'all') }}:
       - job: show_variables2
         steps: 
-        - ${{ each parameter in parameters }}:
+        - ${{ each parameter in parameters.imagesMenu }}:
           - script: echo ${{ parameter.Key }} 
           - script: echo ${{ parameter.Value }}
 
