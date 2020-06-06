@@ -6,6 +6,9 @@ stages:
     - script: |
         echo '${{ parameters.imagesMenu }}'
         echo '${{ parameters.osMenu }}'
+        echo '${{ parameters.providers }}'
+        echo '$(provider)'
+
       displayName: 's1'
 
 - ${{ each provider in parameters.providers }}:
@@ -39,6 +42,7 @@ stages:
         stage: build
         imagesMenu: ${{ parameters.imagesMenu }}
         osMenu: ${{ parameters.osMenu }}
+        runtime: ${{ parameters.runtime }}
     #- job: ImageAvailJob
     #  steps: 
     #  - ${{ each test in parameters.imagesMenu }}:

@@ -1,8 +1,17 @@
 jobs:
-- ${{ if eq(parameters.stage, 'build') }}:
+- ${{ if eq(parameters.runtime, 'production') }}:
   - job: 'imagesbuild'
     steps:
     - script: |
+        echo '${{ arameters.runtime }}'
         echo '${{ parameters.imagesMenu }}'
         echo '${{ parameters.osMenu }}'
-      displayName: 'imagesbuild'
+      displayName: ${{ parameters.runtime }}
+- ${{ if eq(parameters.runtime, 'build') }}:
+  - job: 'imagesbuild'
+    steps:
+    - script: |
+        echo '${{ parameters.runtime }}'
+        echo '${{ parameters.imagesMenu }}'
+        echo '${{ parameters.osMenu }}'
+      displayName: ${{ parameters.runtime }}

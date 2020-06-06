@@ -23,6 +23,18 @@ parameters:
   - windows
   - linux
   - vmware
+- name: runtime
+  displayName: Select Runtime
+  type: string
+  default: production
+  values:
+  - production
+  - build
+  - debug
+  - packerOnly
+  - terraformOnlyNoShutdown
+  - terraformOnly1h
+  - terraformOnly2h
 
 trigger: none
 
@@ -39,3 +51,4 @@ stages:
       - name: azure
     imagesMenu: ${{ parameters.imagesMenu }}
     osMenu: ${{ parameters.osMenu }}
+    runtime: ${{ parameters.runtime }}
