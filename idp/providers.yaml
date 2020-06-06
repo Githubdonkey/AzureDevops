@@ -4,9 +4,9 @@ stages:
   - job: 'show_variables1'
     steps:
     - script: |
-        echo 'one'
+        echo '${{ parameters.imagesMenu }}'
+        echo '${{ parameters.osMenu }}'
       displayName: 's1'
-  
 
 - ${{ each provider in parameters.providers }}:
   - stage: ${{ provider.name }}Init
