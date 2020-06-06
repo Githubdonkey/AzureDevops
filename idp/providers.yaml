@@ -6,10 +6,10 @@ stages:
     - script: |
         echo 'one'
       displayName: 's1'
-  - stage: 'Testing2'
-    jobs:
-    - job: 'show_variables2'
-      steps:
-      - script: |
-          echo 'two'
-        displayName: 's2'
+- stage: 'Testing2'
+  jobs:
+  - job: 'show_variables2'
+    steps:
+    - script: |
+        echo 'two'
+      displayName: 's2'
