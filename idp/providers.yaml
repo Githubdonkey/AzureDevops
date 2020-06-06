@@ -6,6 +6,7 @@ stages:
     - script: |
         echo '${{ parameters.imagesMenu }}'
         echo '${{ parameters.osMenu }}'
+        echo '${{ parameters.runtime }}'
         echo '$(provider)'
       displayName: 's1'
   - job: 'show_variables2'
