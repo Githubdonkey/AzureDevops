@@ -73,8 +73,3 @@ parameters:
       one: apple
       two: pear
       count: 3
-
-steps: 
-- ${{ each parameter in parameters }}:
-  - script: echo ${{ parameter.Key }} 
-  - script: echo ${{ parameter.Value }}
