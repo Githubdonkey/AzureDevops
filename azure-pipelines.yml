@@ -7,7 +7,7 @@ parameters:
 - name: imagesMenu
   displayName: Image Selection
   type: string
-  default: win2019_default
+  default: 2019_default
   values:
   - 2012R2_base
   - 2012R2_default
@@ -29,7 +29,7 @@ parameters:
 - name: imageVarFile
   displayName: Select Credentials
   type: string
-  default: windows
+  default: default
   values:
   - default
   - production
