@@ -28,5 +28,5 @@ stages:
         displayName: ${{ provider.name }}buildjob1
     - job: show_variables2
       steps: 
-      - ${{ each provider in parameters.providers }}:
-        - script: echo ${{ provider.name }}
+      - ${{ each test in parameters.providers }}:
+        - script: echo ${{ test.name }}
