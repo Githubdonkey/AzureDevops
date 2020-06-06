@@ -6,10 +6,13 @@ stages:
     - script: |
         echo '${{ parameters.imagesMenu }}'
         echo '${{ parameters.osMenu }}'
-        echo '[${{ parameters.providers }}]'
         echo '$(provider)'
-
       displayName: 's1'
+  - job: 'show_variables1'
+    steps: 
+    - ${{ each test in parameters.providers }}:
+      - script: echo ${{ test.name }}
+        displayName: ${{ test.name }}
 
 - ${{ each provider in parameters.providers }}:
   - stage: ${{ provider.name }}Init
