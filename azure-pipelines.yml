@@ -119,7 +119,7 @@ stages:
   - stage: Testing1
     displayName: Testing1
     jobs:
-    - ${{ if eq(parameters.imagesMenu, all) }}:
+    - ${{ if eq(parameters.imagesMenu, 'all') }}:
       - job: show_variables1
         steps:
         - task: Bash@3
