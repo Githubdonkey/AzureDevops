@@ -17,6 +17,8 @@ parameters:
   - 2019_base
   - 2019_default
   - ubuntu18_base
+    - test1
+    - test2
 - name: osMenu
   displayName: Select OS
   type: string
