@@ -31,3 +31,27 @@ jobs:
         echo '${{ parameters.imagesMenu }}'
         echo '${{ parameters.osMenu }}'
       displayName: 'packerProdVarImagesYaml'
+    - script: |
+        # VER=1.5.1
+        # echo "Download File"
+        # wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
+        # echo "Unzip File and move to local bin"
+        # sudo unzip packer_${VER}_linux_amd64.zip -d /usr/local/bin
+        # echo "Get version"
+        packer --version
+      displayName: 'packerInstall'
+    - script: |
+        export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
+        export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESSkey)
+        export AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION)
+        export ARM_CLIENT_ID=$(ARM_CLIENT_ID)
+        export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET)
+        export ARM_SUBSCRIPTION_ID=$(ARM_SUBSCRIPTION_ID)
+        export ARM_TENANT_ID=$(ARM_TENANT_ID)
+        export PACKER_LOG_PATH="packer.log"
+        export PACKER_LOG=1
+
+        az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
+        #chmod +x ado_packer_image.sh
+        #./ado_packer_image.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "${{ parameters.imagesMenu }}" "${{ parameters.imageVarFile }}"
+      displayName: 'packer'
