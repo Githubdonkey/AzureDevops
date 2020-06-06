@@ -3,14 +3,83 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
+
+parameters:
+- name: imagesMenu
+  displayName: Image Selection
+  type: string
+  default: all
+  values:
+  - all
+  - rlgroup
+  - 2012R2_base
+  - 2012R2_default
+  - 2016_base
+  - 2016_default
+  - 2016_update
+  - 2019_base
+  - 2019_default
+  - ubuntu18_base
+- name: osMenu
+  displayName: Select OS
+  type: string
+  default: all
+  values:
+  - all
+  - windows
+  - linux
+  - vmware
+- name: imageVarFile
+  displayName: Select Credentials
+  type: string
+  default: default
+  values:
+  - default
+  - production
+  - debug
+  - all
+- name: providerMenu
+  displayName: Select Provider
+  type: string
+  default: aws
+  values:
+  - aws
+  - azure
+  - vcenter
+  - all
+- name: runtime
+  displayName: Select Runtime
+  type: string
+  default: production
+  values:
+  - production
+  - debug
+  - packerOnly
+  - terraformOnlyNoShutdown
+  - terraformOnly1h
+  - terraformOnly2h
+- name: configs
+  type: string
+  default: 'x86,x64'
+- name: myObject
+  type: object
+  default:
+    foo: FOO
+    bar: BAR
+    things:
+    - one
+    - two
+    - three
+    nested:
+      one: apple
+      two: pear
+      count: 3
+
 trigger: none
 #trigger:
 #  branches:
 #    include:
 #    - '*'  # must quote since "*" is a YAML reserved character; we want a string
-
-extends:
-  template: start.yaml
 
 pool:
   vmImage: 'ubuntu-latest'
