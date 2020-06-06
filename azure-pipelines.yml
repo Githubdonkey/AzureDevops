@@ -88,6 +88,7 @@ stages:
                 echo "${{ parameters.imageVarFile }}"
                 echo "${{ parameters.providerMenu }}"
                 echo "$(imagename)"
+                echo "${{ parameters.providerMenu }}"
     - ${{ if contains(parameters.configs, 'x86') }}:
       - job: show_variables2
         steps:
@@ -118,15 +119,15 @@ stages:
   - stage: Testing1
     displayName: Testing1
     jobs:
-    - job: show_variables1
-      steps:
-
-      - task: Bash@3
-        displayName: Show Variables1
-        inputs:
-          targetType: 'inline'
-          script: |
-              echo "${{ parameters.imagesMenu }}"
+    - ${{ if eq(parameters.imagesMenu, all) }}:
+      - job: show_variables1
+        steps:
+        - task: Bash@3
+          displayName: Show Variables1
+          inputs:
+            targetType: 'inline'
+            script: |
+                echo "${{ parameters.imagesMenu }}"
 
   - stage: Run_Packer
     displayName: 'Run_Packer'
