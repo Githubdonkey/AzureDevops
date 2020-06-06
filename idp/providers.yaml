@@ -6,6 +6,12 @@ stages:
     - script: |
         echo 'one'
       displayName: 's1'
+  - job: ImageAvailJob
+    steps: 
+    - ${{ each test in parameters.providers }}:
+      - script: echo ${{ test.name }}
+      displayName: ${{ test.name }}ImagesAvailscript
+
 - ${{ each provider in parameters.providers }}:
   - stage: ${{ provider.name }}Init
     displayName: ${{ provider.name }} - Init
@@ -26,7 +32,3 @@ stages:
       - script: |
           echo ${{ provider.name }}buildjob1
         displayName: ${{ provider.name }}buildjob1
-    - job: show_variables2
-      steps: 
-      - ${{ each test in parameters.providers }}:
-        - script: echo ${{ test.name }}
