@@ -1,0 +1,13 @@
+trigger: none
+
+variables:
+  deploymentLabel: 'idp'
+  imageID: 'placeholder'
+
+stages:
+- template: /idp/providers.yaml
+  parameters:
+    platform: windows
+    providers:
+      - name: aws
+      - name: azure
