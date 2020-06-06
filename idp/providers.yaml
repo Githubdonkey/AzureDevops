@@ -28,6 +28,17 @@ stages:
       - script: |
           echo ${{ provider.name }}buildjob1
         displayName: ${{ provider.name }}buildjob1
+  - stage: ${{ provider.name }}Build2
+    displayName: ${{ provider.name }} - Build2
+    dependsOn: ${{ provider.name }}Build
+    condition: or( eq('${{ parameters.imagesMenu }}', 'all'), eq('${{ parameters.imagesMenu }}', 'test') )
+    jobs:
+    - template: /packer/images.yaml
+      parameters:
+        provider: ${{ provider.name }}
+        stage: build
+        imagesMenu: ${{ parameters.imagesMenu }}
+        osMenu: ${{ parameters.osMenu }}
     #- job: ImageAvailJob
     #  steps: 
     #  - ${{ each test in parameters.imagesMenu }}:

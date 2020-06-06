@@ -1,0 +1,8 @@
+jobs:
+- ${{ if eq(parameters.stage, 'build') }}:
+  - job: 'imagesbuild'
+    steps:
+    - script: |
+        echo '${{ parameters.imagesMenu }}'
+        echo '${{ parameters.osMenu }}'
+      displayName: 'imagesbuild'
