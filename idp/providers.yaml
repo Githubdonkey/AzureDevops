@@ -13,3 +13,13 @@ stages:
     - script: |
         echo 'two'
       displayName: 's2'
+- ${{ each provider in parameters.providers }}:
+  - stage: ${{ each provider in parameters.providers }}Init
+    displayName: ${{ each provider in parameters.providers }}Init
+    dependsOn: Testing2
+    jobs:
+    - job: init
+      steps:
+      - script: |
+          echo 'test3job1'
+        displayName: 'test3job1'
