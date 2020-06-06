@@ -1,3 +1,29 @@
+parameters:
+- name: imagesMenu
+  displayName: Image Selection
+  type: string
+  default: all
+  values:
+  - all
+  - rlgroup
+  - 2012R2_base
+  - 2012R2_default
+  - 2016_base
+  - 2016_default
+  - 2016_update
+  - 2019_base
+  - 2019_default
+  - ubuntu18_base
+- name: osMenu
+  displayName: Select OS
+  type: string
+  default: all
+  values:
+  - all
+  - windows
+  - linux
+  - vmware
+
 trigger: none
 
 variables:

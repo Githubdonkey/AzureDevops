@@ -11,18 +11,18 @@ stages:
     displayName: ${{ provider.name }} - Init
     dependsOn: Testing
     jobs:
-    - job: init
+    - job: initJob1
       steps:
       - script: |
-          echo ${{ provider.name }}Job1
-        displayName: ${{ provider.name }}Job1
+          echo ${{ provider.name }}initJob1
+        displayName: ${{ provider.name }}initJob1
   - stage: ${{ provider.name }}Build
     displayName: ${{ provider.name }} - Build
     dependsOn: ${{ provider.name }}Init
-    condition: eq( variable['provider'], 'all')
+    #condition: eq( variable['provider'], 'all')
     jobs:
-    - job: job1
+    - job: buildjob1
       steps:
       - script: |
-          echo ${{ provider.name }}job1
-        displayName: ${{ provider.name }}job1
+          echo ${{ provider.name }}buildjob1
+        displayName: ${{ provider.name }}buildjob1
