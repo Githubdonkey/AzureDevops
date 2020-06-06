@@ -21,7 +21,7 @@ stages:
   - stage: ${{ provider.name }}Build
     displayName: ${{ provider.name }} - Build
     dependsOn: ${{ provider.name }}Init
-    #condition: eq( variable['provider'], 'all')
+    condition: or( eq('${{ parameters.imagesMenu }}', 'all'), eq('${{ parameters.imagesMenu }}', 'test') )
     jobs:
     - job: buildjob1
       steps:
