@@ -14,8 +14,8 @@ stages:
         echo 'two'
       displayName: 's2'
 - ${{ each provider in parameters.providers }}:
-  - stage: ${{ providers.name }}Init
-    displayName: ${{ providers.name }} - Init
+  - stage: ${{ provider.name }}Init
+    displayName: ${{ provider.name }} - Init
     dependsOn: Testing2
     jobs:
     - job: init
