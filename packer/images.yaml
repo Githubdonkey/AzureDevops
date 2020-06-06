@@ -8,13 +8,21 @@ jobs:
         echo '${{ parameters.osMenu }}'
       displayName: 'productionVarsYaml'
 - ${{ if eq(parameters.runtime, 'production') }}:
-  - job: 'productionImagesYaml'
-    steps:
-    - script: |
-        echo '${{ parameters.runtime }}'
-        echo '${{ parameters.imagesMenu }}'
-        echo '${{ parameters.osMenu }}'
-      displayName: 'productionImagesYaml'
+  - template: /idp/images.yaml
+    parameters:
+      provider: ${{ provider.name }}
+      imagesMenu: ${{ parameters.imagesMenu }}
+      osMenu: ${{ parameters.osMenu }}
+      runtime: ${{ parameters.runtime }}
+      images:
+      - name: 2012R2_base
+        providers:
+        - azure
+        description: Server 2012R2 Base
+      - name: 2012R2_default
+        providers:
+        - aws
+        description: Server 2012R2 Default
 - ${{ if eq(parameters.runtime, 'build') }}:
   - job: 'buildVarsYaml'
     steps:
