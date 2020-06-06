@@ -69,6 +69,7 @@ stages:
               echo "${{ parameters.osMenu }}"
               echo "${{ parameters.imageVarFile }}"
               echo "${{ parameters.providerMenu }}"
+              echo "$(imagename)"
 
   - stage: Testing1
     displayName: Testing1
@@ -82,9 +83,6 @@ stages:
           targetType: 'inline'
           script: |
               echo "${{ parameters.imagesMenu }}"
-              echo "${{ parameters.osMenu }}"
-              echo "${{ parameters.imageVarFile }}"
-              echo "${{ parameters.providerMenu }}"
 
   - stage: Run_Packer
     displayName: 'Run_Packer'
