@@ -25,28 +25,9 @@ jobs:
         echo '${{ parameters.runtime }}'
         echo '${{ parameters.imagesMenu }}'
         echo '${{ parameters.osMenu }}'
-      displayName: 'createPool'
-  - ${{ if eq(parameters.runtime, 'production') }}:
-    - job: 'packerProdVarImagesYaml'
-      steps:
-      - script: |
-          echo '${{ parameters.runtime }}'
-          echo '${{ parameters.imagesMenu }}'
-          echo '${{ parameters.osMenu }}'
-        displayName: 'packerProdVarImagesYaml'
-  - ${{ if eq(parameters.runtime, 'build') }}:
-    - job: 'packerProdImagesYaml'
-      steps:
-      - script: |
-          echo '${{ parameters.runtime }}'
-          echo '${{ parameters.imagesMenu }}'
-          echo '${{ parameters.osMenu }}'
-        displayName: 'packerProdImagesYaml'
-  - ${{ if eq(parameters.runtime, 'build') }}:
-    - job: 'packerBuildVarimagesYaml'
-      steps:
-      - script: |
-          echo '${{ parameters.runtime }}'
-          echo '${{ parameters.imagesMenu }}'
-          echo '${{ parameters.osMenu }}'
-        displayName: 'packerBuildVarimagesYaml'
+      displayName: 'outputVars'
+    - script: |
+        echo '${{ parameters.runtime }}'
+        echo '${{ parameters.imagesMenu }}'
+        echo '${{ parameters.osMenu }}'
+      displayName: 'packerProdVarImagesYaml'
