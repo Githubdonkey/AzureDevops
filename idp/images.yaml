@@ -2,9 +2,9 @@ jobs:
   - job: 'createPool'
     pool:
       ${{ if eq(parameters.runtime, 'production') }}:
-        name: 'ubuntu-latest'
+        name: 'Azure Pipelines'
       ${{ if eq(parameters.runtime, 'build') }}:
-        name: 'ubuntu-latest'
+        name: 'Azure Pipelines'
     strategy:
       matrix:
         ${{ each image in parameters.images }}:
