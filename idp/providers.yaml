@@ -19,7 +19,7 @@ stages:
   - stage: ${{ provider.name }}Build
     displayName: ${{ provider.name }} - Build
     dependsOn: ${{ provider.name }}Init
-    condition: eq( variables['provider'], 'all' }} )
+    condition: eq( variable['provider'], 'all')
     jobs:
     - job: job1
       steps:
