@@ -7,8 +7,10 @@ parameters:
 - name: imagesMenu
   displayName: Image Selection
   type: string
-  default: 2019_default
+  default: all
   values:
+  - all
+  - rlgroup
   - 2012R2_base
   - 2012R2_default
   - 2016_base
@@ -17,17 +19,15 @@ parameters:
   - 2019_base
   - 2019_default
   - ubuntu18_base
-    - test1
-    - test2
 - name: osMenu
   displayName: Select OS
   type: string
-  default: windows
+  default: all
   values:
+  - all
   - windows
   - linux
   - vmware
-  - all
 - name: imageVarFile
   displayName: Select Credentials
   type: string
@@ -46,6 +46,21 @@ parameters:
   - azure
   - vcenter
   - all
+- name: Runtime
+  displayName: Select Runtime
+  type: string
+  default: production
+  values:
+  - production
+  - debug
+  - packerOnly
+  - terraformOnlyNoShutdown
+  - terraformOnly1h
+  - terraformOnly2h
+- name: configs
+  type: string
+  default: 'x86,x64'
+
 
 trigger: none
 #trigger:
@@ -60,18 +75,45 @@ stages:
   - stage: Testing
     displayName: Testing
     jobs:
-    - job: show_variables
-      steps:
-      - task: Bash@3
-        displayName: Show Variables
-        inputs:
-          targetType: 'inline'
-          script: |
-              echo "${{ parameters.imagesMenu }}"
-              echo "${{ parameters.osMenu }}"
-              echo "${{ parameters.imageVarFile }}"
-              echo "${{ parameters.providerMenu }}"
-              echo "$(imagename)"
+    - ${{ if contains(parameters.configs, 'x86') }}:
+      - job: show_variables1
+        steps:
+        - task: Bash@3
+          displayName: Show Variables1
+          inputs:
+            targetType: 'inline'
+            script: |
+                echo "${{ parameters.imagesMenu }}"
+                echo "${{ parameters.osMenu }}"
+                echo "${{ parameters.imageVarFile }}"
+                echo "${{ parameters.providerMenu }}"
+                echo "$(imagename)"
+    - ${{ if contains(parameters.configs, 'x86') }}:
+      - job: show_variables2
+        steps:
+        - task: Bash@3
+          displayName: Show Variables2
+          inputs:
+            targetType: 'inline'
+            script: |
+                echo "${{ parameters.imagesMenu }}"
+                echo "${{ parameters.osMenu }}"
+                echo "${{ parameters.imageVarFile }}"
+                echo "${{ parameters.providerMenu }}"
+                echo "$(imagename)"
+    - ${{ if contains(parameters.configs, 'x86') }}:
+      - job: show_variables3
+        steps:
+        - task: Bash@3
+          displayName: Show Variables3
+          inputs:
+            targetType: 'inline'
+            script: |
+                echo "${{ parameters.imagesMenu }}"
+                echo "${{ parameters.osMenu }}"
+                echo "${{ parameters.imageVarFile }}"
+                echo "${{ parameters.providerMenu }}"
+                echo "$(imagename)"
 
   - stage: Testing1
     displayName: Testing1
