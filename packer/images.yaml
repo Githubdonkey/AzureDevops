@@ -3,7 +3,7 @@ jobs:
   - job: 'imagesbuild'
     steps:
     - script: |
-        echo '${{ arameters.runtime }}'
+        echo '${{ parameters.runtime }}'
         echo '${{ parameters.imagesMenu }}'
         echo '${{ parameters.osMenu }}'
       displayName: ${{ parameters.runtime }}
