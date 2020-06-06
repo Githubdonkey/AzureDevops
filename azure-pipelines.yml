@@ -60,6 +60,19 @@ parameters:
 - name: configs
   type: string
   default: 'x86,x64'
+- name: myObject
+  type: object
+  default:
+    foo: FOO
+    bar: BAR
+    things:
+    - one
+    - two
+    - three
+    nested:
+      one: apple
+      two: pear
+      count: 3
 
 
 trigger: none
@@ -134,7 +147,7 @@ stages:
     - ${{ if eq(parameters.imagesMenu, 'all') }}:
       - job: show_variables2
         steps: 
-        - ${{ each parameter in parameters.imagesMenu }}:
+        - ${{ each parameter in parameters }}:
           - script: echo ${{ parameter.Key }} 
           - script: echo ${{ parameter.Value }}
 
