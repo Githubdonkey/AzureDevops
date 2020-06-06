@@ -128,6 +128,15 @@ stages:
             targetType: 'inline'
             script: |
                 echo "${{ parameters.imagesMenu }}"
+  - stage: Testing2
+    displayName: Testing2
+    jobs:
+    - ${{ if eq(parameters.imagesMenu, 'all') }}:
+      - job: show_variables2
+        steps: 
+        - ${{ each parameter in parameters }}:
+          - script: echo ${{ parameter.Key }} 
+          - script: echo ${{ parameter.Value }}
 
   - stage: Run_Packer
     displayName: 'Run_Packer'
