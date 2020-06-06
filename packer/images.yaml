@@ -1,17 +1,33 @@
 jobs:
 - ${{ if eq(parameters.runtime, 'production') }}:
-  - job: 'imagesbuild'
+  - job: 'productionVarsYaml'
     steps:
     - script: |
         echo '${{ parameters.runtime }}'
         echo '${{ parameters.imagesMenu }}'
         echo '${{ parameters.osMenu }}'
-      displayName: ${{ parameters.runtime }}
+      displayName: 'productionVarsYaml'
+- ${{ if eq(parameters.runtime, 'production') }}:
+  - job: 'productionImagesYaml'
+    steps:
+    - script: |
+        echo '${{ parameters.runtime }}'
+        echo '${{ parameters.imagesMenu }}'
+        echo '${{ parameters.osMenu }}'
+      displayName: 'productionImagesYaml'
 - ${{ if eq(parameters.runtime, 'build') }}:
-  - job: 'imagesbuild'
+  - job: 'buildVarsYaml'
     steps:
     - script: |
         echo '${{ parameters.runtime }}'
         echo '${{ parameters.imagesMenu }}'
         echo '${{ parameters.osMenu }}'
-      displayName: ${{ parameters.runtime }}
+      displayName: 'buildVarsYaml'
+- ${{ if eq(parameters.runtime, 'build') }}:
+  - job: 'buildImagesYaml'
+    steps:
+    - script: |
+        echo '${{ parameters.runtime }}'
+        echo '${{ parameters.imagesMenu }}'
+        echo '${{ parameters.osMenu }}'
+      displayName: 'buildImagesYaml'
