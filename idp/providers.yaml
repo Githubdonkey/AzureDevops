@@ -8,7 +8,7 @@ stages:
       displayName: 's1'
   - job: ImageAvailJob
     steps: 
-    - ${{ each test in parameters.providers }}:
+    - ${{ each test in parameters.imagesMenu }}:
       - script: echo ${{ test.name }}
       displayName: ${{ test.name }}ImagesAvailscript
 
