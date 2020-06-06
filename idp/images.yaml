@@ -1,10 +1,7 @@
 jobs:
   - job: 'createPool'
     pool:
-      ${{ if eq(parameters.runtime, 'production') }}:
-        vmImage: 'ubuntu-latest'
-      ${{ if eq(parameters.runtime, 'build') }}:
-        vmImage: 'ubuntu-latest'
+      vmImage: 'ubuntu-latest'
     strategy:
       matrix:
         ${{ each image in parameters.images }}:
