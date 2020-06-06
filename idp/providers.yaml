@@ -8,7 +8,7 @@ stages:
         echo '${{ parameters.osMenu }}'
         echo '$(provider)'
       displayName: 's1'
-  - job: 'show_variables1'
+  - job: 'show_variables2'
     steps: 
     - ${{ each test in parameters.providers }}:
       - script: echo ${{ test.name }}
