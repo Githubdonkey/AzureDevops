@@ -26,7 +26,7 @@ stages:
     - job: initJob1
       steps:
       - script: |
-          echo ${{ provider.name }}initJob1
+          echo '${{ provider.name }}initJob1'
           echo '${{ parameters.platform }}'
           echo '${{ parameters.imagesMenu }}'
           echo '${{ parameters.osMenu }}'
