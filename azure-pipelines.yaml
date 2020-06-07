@@ -17,8 +17,9 @@ parameters:
 - name: osMenu
   displayName: Select OS
   type: string
-  default: all
+  default: default
   values:
+  - default
   - all
   - windows
   - linux
@@ -35,8 +36,9 @@ parameters:
 - name: providerMenu
   displayName: Select Provider
   type: string
-  default: aws
+  default: default
   values:
+  - default
   - aws
   - azure
   - vcenter
