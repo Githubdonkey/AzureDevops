@@ -20,7 +20,7 @@ stages:
 - ${{ each provider in parameters.providers }}:
   - stage: ${{ provider.name }}Init
     displayName: ${{ provider.name }} - Init
-    dependsOn: Testing
+    dependsOn: OutputAllVars
     jobs:
     - job: initJob1
       steps:
