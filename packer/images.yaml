@@ -54,5 +54,5 @@ jobs:
       images:
       - name: ${{ parameters.imagesMenu }}
         providers:
-        - ${{ parameters.provider }}
-        description: ${{ parameters.provider }}-${{ parameters.imagesMenu }}
+        - ${{ parameters.providerMenu }}
+        description: testingSingle
