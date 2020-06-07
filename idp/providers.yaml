@@ -35,8 +35,8 @@ stages:
           echo '${{ parameters.runtime }}'
         displayName: ${{ provider.name }}initJob1
 
-  - stage: ${{ provider.name }}CallImageYaml
-    displayName: ${{ provider.name }} - CallImageYaml
+  - stage: ${{ provider.name }}
+    displayName: ${{ provider.name }}
     dependsOn: ${{ provider.name }}Init
     jobs:
     - template: /packer/images.yaml
