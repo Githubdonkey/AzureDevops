@@ -7,7 +7,7 @@ jobs:
         echo '${{ parameters.imagesMenu }}'
         echo '${{ parameters.osMenu }}'
       displayName: 'productionVarsYaml'
-- ${{ if eq(parameters.runtime, 'production') }}:
+- ${{ if eq(parameters.imagesMenu, 'all') }}:
   - template: /idp/images.yaml
     parameters:
       provider: ${{ parameters.provider }}
@@ -18,24 +18,29 @@ jobs:
       - name: 2012R2_base
         providers:
         - azure
+        - aws
         description: Server 2012R2 Base
       - name: 2012R2_default
         providers:
         - aws
         description: Server 2012R2 Default
-- ${{ if eq(parameters.runtime, 'build') }}:
-  - job: 'buildVarsYaml'
-    steps:
-    - script: |
-        echo '${{ parameters.runtime }}'
-        echo '${{ parameters.imagesMenu }}'
-        echo '${{ parameters.osMenu }}'
-      displayName: 'buildVarsYaml'
-- ${{ if eq(parameters.runtime, 'build') }}:
-  - job: 'buildImagesYaml'
-    steps:
-    - script: |
-        echo '${{ parameters.runtime }}'
-        echo '${{ parameters.imagesMenu }}'
-        echo '${{ parameters.osMenu }}'
-      displayName: 'buildImagesYaml'
+- ${{ if eq(parameters.imagesMenu, 'rlgroup') }}:
+  - template: /idp/images.yaml
+    parameters:
+      provider: ${{ parameters.provider }}
+      imagesMenu: ${{ parameters.imagesMenu }}
+      osMenu: ${{ parameters.osMenu }}
+      runtime: ${{ parameters.runtime }}
+      images:
+      - name: rl_test1
+        providers:
+        - azure
+        description: rl_test1
+      - name: rl_test2
+        providers:
+        - azure
+        description: rl_test2
+      - name: rl_test3
+        providers:
+        - azure
+        description: rl_test3
