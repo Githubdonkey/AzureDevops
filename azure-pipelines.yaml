@@ -23,6 +23,24 @@ parameters:
   - windows
   - linux
   - vmware
+- name: imageVarFile
+  displayName: Select Credentials
+  type: string
+  default: default
+  values:
+  - default
+  - production
+  - debug
+  - all
+- name: providerMenu
+  displayName: Select Provider
+  type: string
+  default: aws
+  values:
+  - aws
+  - azure
+  - vcenter
+  - all
 - name: runtime
   displayName: Select Runtime
   type: string
@@ -35,6 +53,9 @@ parameters:
   - terraformOnlyNoShutdown
   - terraformOnly1h
   - terraformOnly2h
+- name: configs
+  type: string
+  default: 'x86,x64'
 
 trigger: none
 

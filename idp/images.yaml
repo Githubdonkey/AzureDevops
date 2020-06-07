@@ -27,6 +27,8 @@ jobs:
         echo '${{ parameters.runtime }}'
         echo '${{ parameters.imagesMenu }}'
         echo '${{ parameters.osMenu }}'
+        pwd
+        ls
       displayName: 'PackerDebug'
     - script: |
         echo '${{ parameters.runtime }}'
