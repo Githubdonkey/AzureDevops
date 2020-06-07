@@ -11,6 +11,9 @@ jobs:
   - template: /idp/images.yaml
     #condition: and( eq('${{ parameters.imagesMenu }}', 'all'), ne('${{ parameters.imagesMenu }}', 'rlgroup') )
     parameters:
+      stage: build
+      imageVarFile: ${{ parameters.imageVarFile }}
+      providerMenu: ${{ parameters.providerMenu }}
       provider: ${{ parameters.provider }}
       imagesMenu: ${{ parameters.imagesMenu }}
       osMenu: ${{ parameters.osMenu }}
@@ -28,6 +31,9 @@ jobs:
   - template: /idp/images.yaml
     #condition: and( ne('${{ parameters.imagesMenu }}', 'all'), eq('${{ parameters.imagesMenu }}', 'rlgroup') )
     parameters:
+      stage: build
+      imageVarFile: ${{ parameters.imageVarFile }}
+      providerMenu: ${{ parameters.providerMenu }}
       provider: ${{ parameters.provider }}
       imagesMenu: ${{ parameters.imagesMenu }}
       osMenu: ${{ parameters.osMenu }}
@@ -49,6 +55,9 @@ jobs:
 #- ${{ if and( ne('${{ parameters.imagesMenu }}', 'all'), ne('${{ parameters.imagesMenu }}', 'rlgroup') ) }}:
   - template: /idp/images.yaml
     parameters:
+      stage: build
+      imageVarFile: ${{ parameters.imageVarFile }}
+      providerMenu: ${{ parameters.providerMenu }}
       provider: ${{ parameters.provider }}
       imagesMenu: ${{ parameters.imagesMenu }}
       osMenu: ${{ parameters.osMenu }}
