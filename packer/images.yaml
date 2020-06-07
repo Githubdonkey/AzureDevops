@@ -7,8 +7,9 @@ jobs:
         echo '${{ parameters.imagesMenu }}'
         echo '${{ parameters.osMenu }}'
       displayName: 'productionVarsYaml'
-- ${{ if eq(parameters.imagesMenu, 'all') }}:
+#- ${{ if eq(parameters.imagesMenu, 'all') }}:
   - template: /idp/images.yaml
+    condition: and( eq('${{ parameters.imagesMenu }}', 'all'), ne('${{ parameters.imagesMenu }}', 'rlgroup') )
     parameters:
       provider: ${{ parameters.provider }}
       imagesMenu: ${{ parameters.imagesMenu }}
@@ -23,8 +24,9 @@ jobs:
         providers:
         - aws
         description: Server 2012R2 Default
-- ${{ if eq(parameters.imagesMenu, 'rlgroup') }}:
+#- ${{ if eq(parameters.imagesMenu, 'rlgroup') }}:
   - template: /idp/images.yaml
+    condition: and( ne('${{ parameters.imagesMenu }}', 'all'), eq('${{ parameters.imagesMenu }}', 'rlgroup') )
     parameters:
       provider: ${{ parameters.provider }}
       imagesMenu: ${{ parameters.imagesMenu }}
