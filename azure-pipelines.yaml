@@ -72,4 +72,6 @@ stages:
       - name: azure
     imagesMenu: ${{ parameters.imagesMenu }}
     osMenu: ${{ parameters.osMenu }}
+    imageVarFile: ${{ imageVarFile }}
+    providerMenu: ${{ providerMenu }}
     runtime: ${{ parameters.runtime }}

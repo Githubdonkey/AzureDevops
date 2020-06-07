@@ -31,11 +31,6 @@ jobs:
         ls
       displayName: 'PackerDebug'
     - script: |
-        echo '${{ parameters.runtime }}'
-        echo '${{ parameters.imagesMenu }}'
-        echo '${{ parameters.osMenu }}'
-      displayName: 'packerProdVarImagesYaml'
-    - script: |
         # VER=1.5.1
         # echo "Download File"
         # wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip

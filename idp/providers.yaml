@@ -1,14 +1,16 @@
 stages:
-- stage: 'Testing'
+- stage: 'OutputAllVars'
   jobs:
   - job: 'show_variables1'
     steps:
     - script: |
+        echo '${{ parameters.platform }}'
         echo '${{ parameters.imagesMenu }}'
         echo '${{ parameters.osMenu }}'
+        echo '${{ parameters.imageVarFile }}'
+        echo '${{ parameters.providerMenu }}'
         echo '${{ parameters.runtime }}'
-        echo '$(provider)'
-      displayName: 's1'
+      displayName: 'Show variables used in menu'
   - job: 'show_variables2'
     steps: 
     - ${{ each test in parameters.providers }}:
@@ -46,6 +48,8 @@ stages:
         stage: build
         imagesMenu: ${{ parameters.imagesMenu }}
         osMenu: ${{ parameters.osMenu }}
+        imageVarFile: ${{ parameters.imageVarFile }}
+        providerMenu: ${{ parameters.providerMenu }}
         runtime: ${{ parameters.runtime }}
     #- job: ImageAvailJob
     #  steps: 
