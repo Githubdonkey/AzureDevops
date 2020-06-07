@@ -12,13 +12,13 @@ jobs:
           ${{ if eq(image.providers[0], '') }}:
             ${{ image.name }}:
               ImageName: ${{ image.name }}
-              ImageDescription: 'Description-${{ image.name }}'
+              ImageDescription: 'Description1-${{ image.name }}'
           ${{ if ne(image.providers[0], '') }}:
             ${{ each provider in image.providers }}:
               ${{ if eq( provider, parameters.provider) }}:
                 ${{ image.name }}:
                   ImageName: ${{ image.name }}
-                  ImageDescription: 'Description-${{ image.name }}'
+                  ImageDescription: 'Description2-${{ image.name }}'
     steps:
     - script: |
         echo 'ImageName variable: $(ImageName)'
@@ -61,8 +61,9 @@ jobs:
 
         echo 'Setting Azure Creds to $(ARM_CLIENT_ID)'
         az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
-        #chmod +x ado_packer_image.sh
+        chmod +x ado_packer_image.sh
         #./ado_packer_image.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "${{ parameters.imagesMenu }}" "${{ parameters.imageVarFile }}"
+        ./ado_packer_image.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "$(ImageName)" "${{ parameters.imageVarFile }}"
       displayName: 'packer'
     - script: |
         echo '********Setting Variables*********'
