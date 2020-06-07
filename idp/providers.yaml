@@ -62,3 +62,17 @@ stages:
         imageVarFile: ${{ parameters.imageVarFile }}
         providerMenu: ${{ parameters.providerMenu }}
         runtime: ${{ parameters.runtime }}
+  - stage: ${{ provider.name }}Build
+    displayName: ${{ provider.name }} - Build
+    dependsOn: ${{ provider.name }}Test
+    condition: and( ne('${{ parameters.imagesMenu }}', 'all'), ne('${{ parameters.imagesMenu }}', 'rlgroup') )
+    jobs:
+    - template: /packer/images.yaml
+      parameters:
+        provider: ${{ provider.name }}
+        stage: build
+        imagesMenu: ${{ parameters.imagesMenu }}
+        osMenu: ${{ parameters.osMenu }}
+        imageVarFile: ${{ parameters.imageVarFile }}
+        providerMenu: ${{ parameters.providerMenu }}
+        runtime: ${{ parameters.runtime }}
