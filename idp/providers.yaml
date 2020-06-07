@@ -12,6 +12,7 @@ stages:
         echo '${{ parameters.runtime }}'
       displayName: 'Show variables used in menu'
   - job: 'show_variables2'
+    dependsOn: show_variables1
     steps: 
     - ${{ each test in parameters.providers }}:
       - script: echo ${{ test.name }}
@@ -26,20 +27,30 @@ stages:
       steps:
       - script: |
           echo ${{ provider.name }}initJob1
+          echo '${{ parameters.platform }}'
+          echo '${{ parameters.imagesMenu }}'
+          echo '${{ parameters.osMenu }}'
+          echo '${{ parameters.imageVarFile }}'
+          echo '${{ parameters.providerMenu }}'
+          echo '${{ parameters.runtime }}'
         displayName: ${{ provider.name }}initJob1
-  - stage: ${{ provider.name }}Build
-    displayName: ${{ provider.name }} - Build
+  - stage: ${{ provider.name }}Test
+    displayName: ${{ provider.name }} - Test
     dependsOn: ${{ provider.name }}Init
     condition: and( eq('${{ parameters.imagesMenu }}', 'all'), ne('${{ parameters.imagesMenu }}', 'rlgroup') )
     jobs:
-    - job: buildjob1
-      steps:
-      - script: |
-          echo ${{ provider.name }}buildjob1
-        displayName: ${{ provider.name }}buildjob1
-  - stage: ${{ provider.name }}Build2
-    displayName: ${{ provider.name }} - Build2
-    dependsOn: ${{ provider.name }}Build
+    - template: /packer/images.yaml
+      parameters:
+        provider: ${{ provider.name }}
+        stage: build
+        imagesMenu: ${{ parameters.imagesMenu }}
+        osMenu: ${{ parameters.osMenu }}
+        imageVarFile: ${{ parameters.imageVarFile }}
+        providerMenu: ${{ parameters.providerMenu }}
+        runtime: ${{ parameters.runtime }}
+  - stage: ${{ provider.name }}Build
+    displayName: ${{ provider.name }} - Build
+    dependsOn: ${{ provider.name }}Test
     condition: and( ne('${{ parameters.imagesMenu }}', 'all'), eq('${{ parameters.imagesMenu }}', 'rlgroup') )
     jobs:
     - template: /packer/images.yaml
@@ -51,8 +62,3 @@ stages:
         imageVarFile: ${{ parameters.imageVarFile }}
         providerMenu: ${{ parameters.providerMenu }}
         runtime: ${{ parameters.runtime }}
-    #- job: ImageAvailJob
-    #  steps: 
-    #  - ${{ each test in parameters.imagesMenu }}:
-    #    - script: echo ${{ test.name }}
-    #      displayName: ${{ test.name }}ImagesAvailscript
