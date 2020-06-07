@@ -3,7 +3,7 @@ parameters:
   images: []
 
 jobs:
-  - job: 'PackerBuild'
+  - job: '${{ parameters.provider }}PackerBuild'
     pool:
       vmImage: 'ubuntu-latest'
     strategy:
