@@ -4,7 +4,7 @@ parameters:
   images: []
 
 jobs:
-  - job: 'createPool'
+  - job: 'PackerBuild'
     pool:
       vmImage: 'ubuntu-latest'
     strategy:
@@ -22,10 +22,12 @@ jobs:
                   ImageDescription: 'Description-${{ image.name }}'
     steps:
     - script: |
+        echo 'ImageName variable: $(ImageName)'
+        echo '$(ImageDescription)'
         echo '${{ parameters.runtime }}'
         echo '${{ parameters.imagesMenu }}'
         echo '${{ parameters.osMenu }}'
-      displayName: 'outputVars'
+      displayName: 'PackerDebug'
     - script: |
         echo '${{ parameters.runtime }}'
         echo '${{ parameters.imagesMenu }}'
@@ -39,6 +41,15 @@ jobs:
         # sudo unzip packer_${VER}_linux_amd64.zip -d /usr/local/bin
         # echo "Get version"
         packer --version
+      displayName: 'packerInstall'
+    - script: |
+        # VER=1.5.1
+        # echo "Download File"
+        # wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
+        # echo "Unzip File and move to local bin"
+        # sudo unzip packer_${VER}_linux_amd64.zip -d /usr/local/bin
+        # echo "Get version"
+        terraform -v
       displayName: 'packerInstall'
     - script: |
         export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
