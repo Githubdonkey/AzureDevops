@@ -44,15 +44,15 @@ jobs:
         - azure
         description: rl_test3
 #- ${{ if eq(parameters.imagesMenu, '2012R2_base') }}:
-- ${{ if and( ne('${{ parameters.imagesMenu }}', 'all'), ne('${{ parameters.imagesMenu }}', 'rlgroup') ) }}:
-  - template: /idp/images.yaml
-    parameters:
-      provider: ${{ parameters.provider }}
-      imagesMenu: ${{ parameters.imagesMenu }}
-      osMenu: ${{ parameters.osMenu }}
-      runtime: ${{ parameters.runtime }}
-      images:
-      - name: ${{ parameters.imagesMenu }}
-        providers:
-        - ${{ parameters.providerMenu }}
-        description: testingSingle
+#- ${{ if and( ne('${{ parameters.imagesMenu }}', 'all'), ne('${{ parameters.imagesMenu }}', 'rlgroup') ) }}:
+#  - template: /idp/images.yaml
+#    parameters:
+#      provider: ${{ parameters.provider }}
+#      imagesMenu: ${{ parameters.imagesMenu }}
+#      osMenu: ${{ parameters.osMenu }}
+#      runtime: ${{ parameters.runtime }}
+#      images:
+#      - name: ${{ parameters.imagesMenu }}
+#        providers:
+#        - ${{ parameters.providerMenu }}
+#        description: testingSingle
