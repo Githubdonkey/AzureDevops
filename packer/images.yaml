@@ -7,9 +7,9 @@ jobs:
         echo '${{ parameters.imagesMenu }}'
         echo '${{ parameters.osMenu }}'
       displayName: 'productionVarsYaml'
-#- ${{ if eq(parameters.imagesMenu, 'all') }}:
+- ${{ if eq(parameters.imagesMenu, 'all') }}:
   - template: /idp/images.yaml
-    condition: and( eq('${{ parameters.imagesMenu }}', 'all'), ne('${{ parameters.imagesMenu }}', 'rlgroup') )
+    #condition: and( eq('${{ parameters.imagesMenu }}', 'all'), ne('${{ parameters.imagesMenu }}', 'rlgroup') )
     parameters:
       provider: ${{ parameters.provider }}
       imagesMenu: ${{ parameters.imagesMenu }}
@@ -24,9 +24,9 @@ jobs:
         providers:
         - aws
         description: Server 2012R2 Default
-#- ${{ if eq(parameters.imagesMenu, 'rlgroup') }}:
+- ${{ if eq(parameters.imagesMenu, 'rlgroup') }}:
   - template: /idp/images.yaml
-    condition: and( ne('${{ parameters.imagesMenu }}', 'all'), eq('${{ parameters.imagesMenu }}', 'rlgroup') )
+    #condition: and( ne('${{ parameters.imagesMenu }}', 'all'), eq('${{ parameters.imagesMenu }}', 'rlgroup') )
     parameters:
       provider: ${{ parameters.provider }}
       imagesMenu: ${{ parameters.imagesMenu }}
@@ -45,16 +45,16 @@ jobs:
         providers:
         - azure
         description: rl_test3
-#- ${{ if eq(parameters.imagesMenu, '2012R2_base') }}:
+- ${{ if contains(parameters.imagesMenu, '_') }}:
 #- ${{ if and( ne('${{ parameters.imagesMenu }}', 'all'), ne('${{ parameters.imagesMenu }}', 'rlgroup') ) }}:
-#  - template: /idp/images.yaml
-#    parameters:
-#      provider: ${{ parameters.provider }}
-#      imagesMenu: ${{ parameters.imagesMenu }}
-#      osMenu: ${{ parameters.osMenu }}
-#      runtime: ${{ parameters.runtime }}
-#      images:
-#      - name: ${{ parameters.imagesMenu }}
-#        providers:
-#        - ${{ parameters.providerMenu }}
-#        description: testingSingle
+  - template: /idp/images.yaml
+    parameters:
+      provider: ${{ parameters.provider }}
+      imagesMenu: ${{ parameters.imagesMenu }}
+      osMenu: ${{ parameters.osMenu }}
+      runtime: ${{ parameters.runtime }}
+      images:
+      - name: ${{ parameters.imagesMenu }}
+        providers:
+        - ${{ parameters.providerMenu }}
+        description: testingSingle
