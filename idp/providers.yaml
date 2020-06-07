@@ -34,8 +34,9 @@ stages:
           echo '${{ parameters.providerMenu }}'
           echo '${{ parameters.runtime }}'
         displayName: ${{ provider.name }}initJob1
-  - stage: ${{ provider.name }}Test
-    displayName: ${{ provider.name }} - Test
+        
+  - stage: ${{ provider.name }}Buildrlgroup
+    displayName: ${{ provider.name }} - Buildrlgroup
     dependsOn: ${{ provider.name }}Init
     condition: and( eq('${{ parameters.imagesMenu }}', 'all'), ne('${{ parameters.imagesMenu }}', 'rlgroup') )
     jobs:
@@ -48,9 +49,10 @@ stages:
         imageVarFile: ${{ parameters.imageVarFile }}
         providerMenu: ${{ parameters.providerMenu }}
         runtime: ${{ parameters.runtime }}
-  - stage: ${{ provider.name }}Build
-    displayName: ${{ provider.name }} - Build
-    dependsOn: ${{ provider.name }}Test
+
+  - stage: ${{ provider.name }}Buildall
+    displayName: ${{ provider.name }} - Buildall
+    dependsOn: ${{ provider.name }}Init
     condition: and( ne('${{ parameters.imagesMenu }}', 'all'), eq('${{ parameters.imagesMenu }}', 'rlgroup') )
     jobs:
     - template: /packer/images.yaml
@@ -62,9 +64,10 @@ stages:
         imageVarFile: ${{ parameters.imageVarFile }}
         providerMenu: ${{ parameters.providerMenu }}
         runtime: ${{ parameters.runtime }}
-  - stage: ${{ provider.name }}Build
-    displayName: ${{ provider.name }} - Build
-    dependsOn: ${{ provider.name }}Test
+
+  - stage: ${{ provider.name }}Buildsingle
+    displayName: ${{ provider.name }} - Buildsingle
+    dependsOn: ${{ provider.name }}Init
     condition: and( ne('${{ parameters.imagesMenu }}', 'all'), ne('${{ parameters.imagesMenu }}', 'rlgroup') )
     jobs:
     - template: /packer/images.yaml
