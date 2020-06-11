@@ -13,6 +13,7 @@ parameters:
   - 2016_update
   - 2019_base
   - 2019_default
+  - 2019_md
   - ubuntu18_base
 - name: osMenu
   displayName: Select OS

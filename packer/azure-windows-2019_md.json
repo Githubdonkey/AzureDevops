@@ -1,0 +1,127 @@
+{
+	"variables": {
+		"os_version": "Windows2019",
+    	"pre": "SICFactory",
+    	"image_type": "Default",
+
+		"name": "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}",
+		"description": "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}} built from latest Market place image",
+
+		"os_type": "Windows",
+	  	"image_publisher": "MicrosoftWindowsServer",
+	  	"image_offer": "WindowsServer",
+		"image_sku": "2019-Datacenter"
+  },
+	"builders": [{
+		"type": "azure-arm",
+
+    	"client_id": "{{user `client_id`}}",
+	  	"client_secret": "{{user `client_secret`}}",
+		"subscription_id": "{{user `subscription_id`}}",
+		  
+		"managed_image_resource_group_name": "{{user `resource_group_name`}}",
+		"managed_image_name": "{{user `name`}}",
+
+		"os_type": "{{user `os_type`}}",
+		"image_publisher": "{{user `image_publisher`}}",
+		"image_offer": "{{user `image_offer`}}",
+		"image_sku": "{{user `image_sku`}}",
+		"os_disk_size_gb": 32,
+		"disk_additional_size": [32],
+    
+		"communicator": "winrm",
+		"winrm_use_ssl": "true",
+		"winrm_insecure": "true",
+		"winrm_timeout": "5m",
+		"winrm_username": "packer",
+	
+		"location": "East US",
+		"vm_size": "{{ user `vm_size` }}",
+		"async_resourcegroup_delete": "true"
+	}],
+	"provisioners": [
+	{
+		"type": "powershell",
+		"inline":[
+		"New-Item -Path {{user `image_folder`}} -ItemType Directory -Force",
+		"Write-Output {{user `commit_url`}} > {{user `commit_file` }}",
+		"Write-Host (Get-Content -Path {{user `commit_file`}})"
+		]
+	},
+	{
+		"type": "file",
+		"source": "{{ template_dir }}/packer/scripts/ImageHelpers",
+		"destination": "{{user `helper_script_folder`}}"
+	},
+	{
+		"type": "powershell",
+		"scripts":[
+		"{{ template_dir }}/packer/scripts/Installers/Initialize-2016.ps1"
+		]
+	},
+	{
+		"type": "powershell",
+		"scripts":[
+		"{{ template_dir }}/packer/scripts/Installers/Install-AWSCLI.ps1"
+		]
+	},
+	{
+		"type": "powershell",
+		"environment_vars": [
+		"aws_access_key={{user `aws_access_key`}}",
+		"aws_secret_key={{user `aws_secret_key`}}",
+		"region={{user `region`}}"
+	],
+		"scripts":[
+		"{{ template_dir }}/packer/scripts/Installers/Execute-AWS-Creds.ps1"
+		]
+	},
+	{
+		"type": "powershell",
+		"scripts":[
+		"{{ template_dir }}/packer/scripts/Installers/Install-JQ.ps1"
+		]
+	},
+	{
+		"type": "powershell",
+		"environment_vars": [
+		"name={{user `name`}}",
+		"description={{user `description`}}",
+		"source_name_filter={{user `source_name_filter`}}",
+		"build_time={{user `build`}}"
+	],
+		"scripts":[
+		"{{ template_dir }}/packer/scripts/Installers/Run-Report.ps1"
+		]
+	},
+	{
+		"type": "file",
+		"source": "C:\\image\\aliases.html",
+		"destination": "{{ template_dir }}/aliases.html",
+		"direction": "download"
+	},
+		{
+		"type": "powershell",
+		  "inline": [
+			"if( Test-Path $Env:SystemRoot\\windows\\system32\\Sysprep\\unattend.xml ){ rm $Env:SystemRoot\\windows\\system32\\Sysprep\\unattend.xml -Force}",
+			"& $env:SystemRoot\\System32\\Sysprep\\Sysprep.exe /oobe /generalize /quiet /quit /mode:vm",
+			"while($true) { $imageState = Get-ItemProperty HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Setup\\State | Select ImageState; Write-Output $imageState.ImageState; if($imageState.ImageState -ne 'IMAGE_STATE_GENERALIZE_RESEAL_TO_OOBE') { Start-Sleep -s 10 } else { break } }"
+			]
+		 }
+	],
+	"post-processors": [
+		{
+		"type": "manifest",
+		"output": "manifest.json",
+		"strip_path": true,
+		"custom_data": {
+			"name": "{{ user `name` }}",
+			"type": "azure-arm",
+			"region": "{{ user `region`}}",
+			"OS_version": "{{ user `os_version` }}",
+			"name_os": "{{ user `pre` }}-{{ user `os_version` }}",
+			"os_type": "{{ user `os_type`}}"
+		}
+		  }
+	  ]
+ }
