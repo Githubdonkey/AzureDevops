@@ -26,7 +26,7 @@
 		"image_publisher": "{{user `image_publisher`}}",
 		"image_offer": "{{user `image_offer`}}",
 		"image_sku": "{{user `image_sku`}}",
-		"disk_additional_size": [ 10 ],
+		"disk_additional_size": ["10"],
     
 		"communicator": "winrm",
 		"winrm_use_ssl": "true",
