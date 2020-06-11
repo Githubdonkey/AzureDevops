@@ -26,7 +26,6 @@
 		"image_publisher": "{{user `image_publisher`}}",
 		"image_offer": "{{user `image_offer`}}",
 		"image_sku": "{{user `image_sku`}}",
-		"os_disk_size_gb": 64,
 		"disk_additional_size": [ 10 ],
     
 		"communicator": "winrm",
