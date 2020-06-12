@@ -4,7 +4,7 @@
     	"pre": "SICFactory",
     	"image_type": "Default",
 
-		"name": "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}",
+		"name": "{{user `image_type`}}-{{user `build`}}",
 		"description": "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}} built from latest Market place image",
 
 		"os_type": "Windows",
