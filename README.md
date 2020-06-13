@@ -188,4 +188,7 @@ az login --service-principal --username $ARM_CLIENT_ID --password $ARM_CLIENT_SE
 az vm list-sizes --location eastus
 ```
 
+Create Image gallery
+
+add image definition
 
