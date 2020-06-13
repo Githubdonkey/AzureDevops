@@ -2,11 +2,12 @@
 	"variables": {
 		"os_version": "Windows2019",
     	"pre": "SICFactory",
-    	"image_type": "Default",
+    	"image_type": "md",
 
-		"name": "{{user `image_type`}}-{{user `build`}}",
+		"name": "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}",
 		"description": "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}} built from latest Market place image",
 
+		"temp_compute_name": "{{user `image_type`}}{{user `build`}}",
 		"os_type": "Windows",
 	  	"image_publisher": "MicrosoftWindowsServer",
 	  	"image_offer": "WindowsServer",
@@ -18,9 +19,11 @@
     	"client_id": "{{user `client_id`}}",
 	  	"client_secret": "{{user `client_secret`}}",
 		"subscription_id": "{{user `subscription_id`}}",
-		  
+
 		"managed_image_resource_group_name": "{{user `resource_group_name`}}",
 		"managed_image_name": "{{user `name`}}",
+
+		"temp_compute_name": "{{user `temp_compute_name`}}",
 
 		"os_type": "{{user `os_type`}}",
 		"image_publisher": "{{user `image_publisher`}}",
@@ -77,12 +80,6 @@
 	},
 	{
 		"type": "powershell",
-		"scripts":[
-		"{{ template_dir }}/packer/scripts/Installers/Install-JQ.ps1"
-		]
-	},
-	{
-		"type": "powershell",
 		"environment_vars": [
 		"name={{user `name`}}",
 		"description={{user `description`}}",
@@ -92,6 +89,16 @@
 		"scripts":[
 		"{{ template_dir }}/packer/scripts/Installers/Run-Report.ps1"
 		]
+	},
+	{
+		"type": "shell-local",
+		"inline":[  
+			"echo test1",
+			"echo test2",
+			"az disk list -g myResourceGroup",
+			"echo {{user `build`}}",
+			"echo {{user `temp_compute_name`}}"
+         ]
 	},
 	{
 		"type": "file",

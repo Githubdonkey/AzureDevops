@@ -33,15 +33,17 @@ $Snapshot = New-AzureRmSnapshot -Snapshot $snapshotConfig -SnapshotName $snapsho
 az disk list
 
 datadisk=$()
-
+$datadiskvar = "test111_DataDisk_0"
 
 az snapshot create -g MyResourceGroup -n MySnapshot2 --source "/subscriptions/603917ef-28ce-417f-8107-d905c3fc11b2/resourceGroups/MYRESOURCEGROUP/providers/Microsoft.Compute/disks/test111_disk1_0da24e62e4d04590b2aee2dc7931c369"
 
 $osDiskId=$(az vm show -g myResourceGroup -n test111 --query "storageProfile.osDisk.managedDisk.id" -o tsv)
 $dataDiskId=$(az disk list -g myResourceGroup --query "[?contains(name,'DataDisk_0')].[id]" -o tsv)
 
-az vm show -g myResourceGroup -n test111 --query "storageProfile.osDisk.managedDisk.id" -o tsv
-az disk list -g myResourceGroup --query "[?contains(name,'DataDisk_0')].[id]" -o tsv
+az vm show -g myResourceGroup -n test111 --query storageProfile.osDisk.managedDisk.id -o tsv
+az vm show -g myResourceGroup -n test111 --query "[?contains(name,'DataDisk_0')].[id]" -o tsv
+az disk list -g myResourceGroup --query "[?contains(name,'test111_DataDisk_0')].[id]" -o tsv
+az disk list -g myResourceGroup --query "[?contains(name,'$datadiskvar')].[id]" -o tsv
 
 az snapshot create -g MyResourceGroup -n MySnapshot5 --source $osDiskId
 az snapshot create -g MyResourceGroup -n MySnapshot7 --source $dataDiskId
