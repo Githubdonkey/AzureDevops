@@ -10,7 +10,7 @@
 	"aws_secret_key":       "{{env `AWS_SECRET_ACCESS_KEY`}}",
 	"region":               "{{env `AWS_DEFAULT_REGION`}}",
 
-	"vm_size": "Standard_DS4_v2",
+	"vm_size": "Standard_DS3_v2",
 	"resource_group_name": "myResourceGroup",
 		
 	"image_folder": "C:\\image",

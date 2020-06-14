@@ -11,7 +11,8 @@
 		"os_type": "Windows",
 	  	"image_publisher": "MicrosoftWindowsServer",
 	  	"image_offer": "WindowsServer",
-		"image_sku": "2019-Datacenter"
+		"image_sku": "2019-Datacenter",
+		"temp_resource_group_name": "packer{{user `image_type`}}{{user `build`}}"
   },
 	"builders": [{
 		"type": "azure-arm",
@@ -24,6 +25,7 @@
 		"managed_image_name": "{{user `name`}}",
 
 		"temp_compute_name": "{{user `temp_compute_name`}}",
+		"temp_resource_group_name": "{{user `temp_resource_group_name`}}",
 
 		"os_type": "{{user `os_type`}}",
 		"image_publisher": "{{user `image_publisher`}}",
@@ -94,11 +96,13 @@
 		"type": "shell-local",
 		"inline":[  
 			"echo test1",
-			"echo test2",
-			"az disk list -g myResourceGroup",
-			"echo {{user `build`}}",
-			"echo {{user `temp_compute_name`}}"
-         ]
+			"#az disk list -g {{user `temp_resource_group_name`}}",
+			"echo **************Data Disk 1****************",
+			"az disk list -g {{user `temp_resource_group_name`}} --query \"[?contains(name,'datadisk-1')].[id]\" -o tsv",
+			"export datadiskvar=$(az disk list -g {{user `temp_resource_group_name`}} --query \"[?contains(name,'datadisk-1')].[id]\" -o tsv)",
+			"echo $datadiskvar",
+			"az snapshot create -g myResourceGroup -n {{user `temp_compute_name`}} --source $datadiskvar"
+		 ]
 	},
 	{
 		"type": "file",
