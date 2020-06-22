@@ -39,7 +39,7 @@ jobs:
         packer --version
       displayName: 'packerInstall'
     - script: |
-        # VER=1.5.1
+        # VER=1.5.6
         # echo "Download File"
         # wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
         # echo "Unzip File and move to local bin"
