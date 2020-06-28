@@ -197,8 +197,9 @@ export PATH=~/.local/bin:$PATH
 source ~/.profile
 
 ###### setup DataSync
-aws ssm get-parameter --name /aws/service/datasync/ami --region us-east-1
 ```
+aws ssm get-parameter --name /aws/service/datasync/ami --region us-east-1
+
 {
     "Parameter": {
         "Name": "/aws/service/datasync/ami",
@@ -209,26 +210,24 @@ aws ssm get-parameter --name /aws/service/datasync/ami --region us-east-1
         "ARN": "arn:aws:ssm:us-east-1::parameter/aws/service/datasync/ami"
     }
 }
-```
+
 Create VM > Search AMI > Community AMIs > your setup
-log in with admin
+log in with admin password
 check network connection
 Amazon S3/gitdonkey/datasync
 IAM role
-
+```
 
 EFS
+```
 Create file system
 Step 1: Configure network access
 Step 2: Configure file system settings - TestEFS
 Step 3: Configure client access
 Step 4: REview and create
+```
 
-Using the Amazon EC2 console, associate your EC2 instance with a VPC security group that enables access to your mount target. For example, if you assigned the "default" security group to your mount target, you should assign the "default" security group to your EC2 instance. Learn more
-Open an SSH client and connect to your EC2 instance. (Find out how to connect.)
-If you're using an Amazon Linux EC2 instance, install the EFS mount helper with the following command:
 sudo yum install -y amazon-efs-utils
-
 Mounting your file system
 
 Open an SSH client and connect to your EC2 instance. (Find out how to connect).
@@ -240,8 +239,8 @@ sudo mount -t efs fs-5d4636de:/ /efs
 Using the EFS mount helper and the TLS mount option:
 sudo mount -t efs -o tls fs-5d4636de:/ efs
 Using the NFS client:
-sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport fs-5d4636de.efs.us-east-1.amazonaws.com:/ efs
-
+sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport fs-b2750631.efs.us-east-1.amazonaws.com:/ /efs
+```
 EFS tutorial
 https://www.youtube.com/watch?v=5HaztXVaJQ8&t=28s
 https://www.youtube.com/watch?v=4jy2FILK5R8
@@ -274,8 +273,71 @@ create vm
     sudo mount -t efs $efsFileSystemId:/ /efs
 Using the EFS mount helper and the TLS mount option:
 sudo mount -t efs -o tls fs-b2750631:/ /efs
-
+```
 Network Requirements for DataSync
+
+Create NFS server ubuntu18.04(10.0.1.78)
+```
+#https://help.ubuntu.com/community/SettingUpNFSHowTo
+dpkg -l | grep nfs-kernel-server
+sudo apt-get update
+sudo apt-get install nfs-kernel-server -y
+sudo mkdir -p /export/testdata
+sudo mount --bind /home/ubuntu /export/testdata
+sudo vi /etc/exports > /export/testdata 10.0.1.129(rw,no_root_squash)
+sudo systemctl restart nfs-server.service
+sudo systemctl status nfs-server.service
+
+AWS Setup
+Subnet Public
+Public IP
+SG: EC2-SSH DATASYNC-SG
+```
+Create NFS Windows 2019 Server (54.208.236.233)
+```
+Server Manager
+Manage > Add Roles and fetures
+
+Next on Wizard
+Next
+Select your server > Next
+expand “File and Storage Services” > “File and iSCSI Services” then check the box against “Server for NFS“
+A pop-up window will come forth > Add Features” then hit “Next“.
+In this “Select features” page, simply click on “Next“. >  Next
+Install
+
+Configure NFS Share Folder
+“Server Manager“. Click “File and Storage Services” and select Shares from the expanded menu. After that, click on the “TASKS” drop-down menu and select “New Share…“. A “New Share Wizard” will open.
+On the first page of the wizard, select “NFS Share-Quick” and Click “Next” as shown below.
+On this page, choose “Type a custom path“, browse for your directory and click “Next“
+Type in a name for your share and hit “Next“
+Click on “Add” on the window below and you now have many options to choose the hosts to access the share. You can place only one host, a Netgroup, Client group or all servers that can reach it. Make your choice and click on “Next“
+You can tweak the permissions to befit your scenario here. Once done, click “Next“.
+
+EC2AMAZ-MQHDIPI:/datasync
+
+```
+Create NFS client(10.0.1.129)
+```
+sudo apt update
+sudo apt install nfs-common
+sudo mkdir /mnt/nfs
+sudo mount -t nfs 10.0.1.78:/export/testdata /mnt/nfs
+sudo mkdir /mnt/winnfs
+sudo mount -t nfs 10.0.1.182:/datasync /mnt/winnfs
+
+AWS setup
+Subnet Public
+Public IP
+SG: EC2-SSH
+```
+Working Environment
+SG EFS-SG allow nfs tcp 2049 Source EC2-SSH
+SG EFS-SG allow nfs tcp 2049 Source EC2-SG
+SG EC2-SSH allow ssh tcp 22 Source myIP
+SG EC2-SG allow http tcp 80 Source 0.0.0.0/0
+SG EC2-SG allow http tcp 80 Source ::/0
+SG EC2-SG allow ssh tcp 22 Source 0.0.0.0/0
 
 
 EFS automation
