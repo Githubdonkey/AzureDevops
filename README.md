@@ -283,7 +283,8 @@ dpkg -l | grep nfs-kernel-server
 sudo apt-get update
 sudo apt-get install nfs-kernel-server -y
 sudo mkdir -p /export/testdata
-sudo mount --bind /home/ubuntu /export/testdata
+sudo mkdir -p /home/ubuntu/testdata
+sudo mount --bind /home/ubuntu/testdata /export/testdata
 sudo vi /etc/exports > /export/testdata 10.0.1.129(rw,no_root_squash)
 sudo systemctl restart nfs-server.service
 sudo systemctl status nfs-server.service
