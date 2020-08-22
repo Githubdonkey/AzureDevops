@@ -189,3 +189,56 @@ az vm list-sizes --location eastus
 ```
 
 
+ubuntu 20 server
+
+http server
+sudo python3 -m http.server 80
+
+boot command
+Boot Options: initrd=/casper/initrd autoinstall ds=nocloud-net;seedfrom=htpp://192.168.238.000:00/ ---
+
+```
+#cloud-config
+autoinstall:
+  version: 1
+  early-commands:
+    - systemctl stop ssh # otherwise packer tries to connect and exceed max attempts
+  network:
+    network:
+      version: 2
+      ethernets:
+        eth0:
+          dhcp4: yes
+          dhcp-identifier: mac
+  apt:
+    preserve_sources_list: false
+    primary:
+      - arches: [amd64]
+        uri: "http://archive.ubuntu.com/ubuntu/"
+  ssh:
+    install-server: yes
+    allow-pw: yes
+  identity:
+    hostname: ubuntu-00
+    password: "$6$FhcddHFVZ7ABA4Gi$9l4yURWASWe8xEa1jzI0bacVLvhe3Yn4/G3AnU11K3X0yu/mICVRxfo6tZTB2noKljlIRzjkVZPocdf63MtzC0" # root
+    username: ubuntu # root doesn't work
+  packages:
+    - open-vm-tools
+  user-data:
+    disable_root: false 
+  late-commands:
+    - echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' > /target/etc/sudoers.d/ubuntu
+    - sed -ie 's/GRUB_CMDLINE_LINUX=.*/GRUB_CMDLINE_LINUX="net.ifnames=0 ipv6.disable=1 biosdevname=0"/' /target/etc/default/grub
+    - curtin in-target --target /target update-grub2
+
+```
+
+Install desktop
+```
+sudo apt update
+sudo apt install tasksel
+sudo tasksel install ubuntu-desktop
+sudo tasksel install ubuntu-desktop-minimal
+reboot
+if graphics dont start: sudo systemctl set-default graphical.target
+```
