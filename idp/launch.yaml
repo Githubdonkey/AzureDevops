@@ -3,7 +3,7 @@ parameters:
   images: []
 
 jobs:
-  - job: '${{ parameters.provider }}PackerBuild'
+  - job: '${{ parameters.provider }}TerraformBuild'
     pool:
       vmImage: 'ubuntu-latest'
     strategy:
@@ -62,7 +62,7 @@ jobs:
         echo 'Setting Azure Creds to $(ARM_CLIENT_ID)'
         az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
         
-        chmod +x ado_packer_image.sh
+        chmod +x ado_terraform.sh
         #./ado_packer_image.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "${{ parameters.imagesMenu }}" "${{ parameters.imageVarFile }}"
         ./ado_terraform.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "${{ parameters.imagesMenu }}" "${{ parameters.imageVarFile }}"
       displayName: 'terraform'

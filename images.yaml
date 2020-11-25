@@ -7,6 +7,14 @@ jobs:
         echo '${{ parameters.imagesMenu }}'
         echo '${{ parameters.osMenu }}'
       displayName: 'productionVarsYaml'
+- ${{ if and( ne('${{ parameters.imagesMenu }}', 'all'), eq('${{ parameters.imagesMenu }}', 'rlgroup') ) }}:
+  - job: 'productionTest'
+    steps:
+    - script: |
+        echo '${{ parameters.runtime }}'
+        echo '${{ parameters.imagesMenu }}'
+        echo '${{ parameters.osMenu }}'
+      displayName: 'productionVarsYaml'
 - ${{ if eq(parameters.imagesMenu, 'all') }}:
   - template: /idp/build.yaml
     #condition: and( eq('${{ parameters.imagesMenu }}', 'all'), ne('${{ parameters.imagesMenu }}', 'rlgroup') )
