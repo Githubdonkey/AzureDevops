@@ -15,6 +15,7 @@ parameters:
   - 2019_default
   - 2019_md
   - ubuntu18_base
+  - ubuntu18_ansible
 - name: osMenu
   displayName: Select OS
   type: string

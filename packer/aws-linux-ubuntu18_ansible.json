@@ -1,0 +1,77 @@
+{
+  "variables": {
+    "pre":                  "SICFactory",
+    "os_version":           "Ubuntu1804",
+    "image_type":           "Base",
+
+    "name":                 "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}",
+		"description":          "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}} built from latest Market place image",
+    "owners":               "099720109477",
+    "source_name_filter":   "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*",
+    "ssh_username":         "ubuntu",
+
+    "Readme":                 "s3://gitdonkey/devops/builds/{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}.json",
+    "Packer_Build":           "s3://gitdonkey/devops/packer_logs/{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}-PackerLog.json"
+  },
+
+  "builders": [
+   {
+    "type":                     "amazon-ebs",
+    "access_key":               "{{user `aws_access_key`}}",
+    "secret_key":               "{{user `aws_secret_key`}}",
+    "region":                   "{{user `region`}}",
+    "source_ami_filter": {
+      "filters": {
+        "virtualization-type":  "hvm",
+        "name":                 "{{user `source_name_filter`}}",
+        "root-device-type":     "ebs"
+      },
+      "owners": [
+                                "{{user `owners`}}"
+      ],
+      "most_recent":            true
+    },
+    "instance_type":            "{{user `instance_type`}}",
+    "ssh_username":             "{{user `ssh_username`}}",
+    "ami_name":                 "{{user `name`}}",
+    "tags": {
+      "Name":                   "{{ user `name` }}",
+      "Description":            "{{ user `description` }}",
+      "OS_Version":             "{{ user `os_version` }}",
+      "Base_AMI_Name":          "{{ .SourceAMIName }}",
+      "Readme":                 "{{ user `Readme` }}",
+      "Packer_Build":           "{{ user `Packer_Build` }}"
+    },
+    "force_deregister":         "true",
+    "force_delete_snapshot":    "true"
+   }
+  ],
+
+	"provisioners": [{
+		"execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E sh '{{ .Path }}'",
+		"inline": [
+      "apt-get update",
+      "sudo apt-get install ansible -y",
+      "sudo apt-get install python-pip -y",
+      "pip install pywinrm"
+		],
+		"inline_shebang": "/bin/sh -x",
+		"type": "shell"
+  }],
+  
+	"post-processors": [
+		{
+		  "type": "manifest",
+		  "output": "manifest.json",
+      "strip_path": true,
+      "custom_data": {
+        "name":                     "{{ user `name` }}",
+        "type":                     "amazon-ebs",
+        "region":                   "{{ user `region`}}",
+        "OS_version":               "{{ user `os_version` }}",
+        "name_os":                  "{{ user `pre` }}-{{ user `os_version` }}",
+		    "os_type": 									"{{ user `os_type`}}"
+      }
+		  }
+	  ]
+ }
