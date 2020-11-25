@@ -7,7 +7,8 @@ jobs:
         echo '${{ parameters.imagesMenu }}'
         echo '${{ parameters.osMenu }}'
       displayName: 'productionVarsYaml'
-- ${{ if and( ne('${{ parameters.imagesMenu }}', 'all'), eq('${{ parameters.imagesMenu }}', 'rlgroup') ) }}:
+- ${{ if eq(parameters.runtime, 'production') }}:
+#- ${{ if and( ne('${{ parameters.imagesMenu }}', 'all'), eq('${{ parameters.imagesMenu }}', 'rlgroup') ) }}:
   - job: 'productionTest'
     steps:
     - script: |
