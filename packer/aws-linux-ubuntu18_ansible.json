@@ -2,7 +2,7 @@
   "variables": {
     "pre":                  "SICFactory",
     "os_version":           "Ubuntu1804",
-    "image_type":           "Base",
+    "image_type":           "Ansible",
 
     "name":                 "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}}",
 		"description":          "{{user `pre`}}-{{user `os_version`}}-{{user `image_type`}}-{{user `build`}} built from latest Market place image",
