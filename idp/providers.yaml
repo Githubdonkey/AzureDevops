@@ -35,14 +35,28 @@ stages:
           echo '${{ parameters.runtime }}'
         displayName: ${{ provider.name }}initJob1
 
-  - stage: ${{ provider.name }}
-    displayName: ${{ provider.name }}
+  - stage: ${{ provider.name }}Build
+    displayName: ${{ provider.name }}Build
     dependsOn: ${{ provider.name }}Init
     jobs:
-    - template: /packer/images.yaml
+    - template: /images.yaml
       parameters:
         provider: ${{ provider.name }}
         stage: build
+        imagesMenu: ${{ parameters.imagesMenu }}
+        osMenu: ${{ parameters.osMenu }}
+        imageVarFile: ${{ parameters.imageVarFile }}
+        providerMenu: ${{ parameters.providerMenu }}
+        runtime: ${{ parameters.runtime }}
+
+  - stage: ${{ provider.name }}Launch
+    displayName: ${{ provider.name }}Launch
+    dependsOn: ${{ provider.name }}Build
+    jobs:
+    - template: /images.yaml
+      parameters:
+        provider: ${{ provider.name }}
+        stage: launch
         imagesMenu: ${{ parameters.imagesMenu }}
         osMenu: ${{ parameters.osMenu }}
         imageVarFile: ${{ parameters.imageVarFile }}
