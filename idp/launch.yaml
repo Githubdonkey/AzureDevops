@@ -64,8 +64,9 @@ jobs:
         
         chmod +x ado_packer_image.sh
         #./ado_packer_image.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "${{ parameters.imagesMenu }}" "${{ parameters.imageVarFile }}"
-        ./ado_packer_image.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "$(ImageName)" "${{ parameters.imageVarFile }}"
-      displayName: 'packer'
+        ./ado_terraform.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "${{ parameters.imagesMenu }}" "${{ parameters.imageVarFile }}"
+      displayName: 'terraform'
+      condition: and( eq('${{ parameters.runtime }}', 'terraformOnlyNoShutdown'), eq('${{ parameters.providerMenu }}', 'azure') )
     - script: |
         echo '********Setting Variables*********'
       displayName: 'Logs Variables'

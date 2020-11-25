@@ -25,6 +25,6 @@ cp terraform/userdata.sh.tpl userdata.sh.tpl
 
 terraform init
 terraform apply -var="ImageId=$packerImageId" -var="ImageName=$packerImageName" -auto-approve
-echo "sleep 20m"
-sleep 20m
+echo "sleep 5m"
+sleep 5m
 terraform destroy -var="ImageId=$packerImageId" -var="ImageName=$packerImageName" -auto-approve

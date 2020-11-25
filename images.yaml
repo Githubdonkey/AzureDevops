@@ -67,3 +67,20 @@ jobs:
         providers:
         - ${{ parameters.providerMenu }}
         description: testingSingle
+
+#- ${{ if contains(parameters.imagesMenu, '_') }}:
+- ${{ if and( eq('${{ parameters.runtime }}', 'terraformOnlyNoShutdown'), eq('${{ parameters.providerMenu }}', 'azure') ) }}:
+  - template: /idp/launch.yaml
+    parameters:
+      stage: launch
+      imageVarFile: ${{ parameters.imageVarFile }}
+      providerMenu: ${{ parameters.providerMenu }}
+      provider: ${{ parameters.provider }}
+      imagesMenu: ${{ parameters.imagesMenu }}
+      osMenu: ${{ parameters.osMenu }}
+      runtime: ${{ parameters.runtime }}
+      images:
+      - name: ${{ parameters.imagesMenu }}
+        providers:
+        - ${{ parameters.providerMenu }}
+        description: testingSingle
