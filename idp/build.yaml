@@ -61,7 +61,6 @@ jobs:
 
         echo 'Setting Azure Creds to $(ARM_CLIENT_ID)'
         az login --service-principal --username $(ARM_CLIENT_ID) --password $(ARM_CLIENT_SECRET) --tenant $(ARM_TENANT_ID)
-        cd ../
         chmod +x ado_packer_image.sh
         #./ado_packer_image.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "${{ parameters.imagesMenu }}" "${{ parameters.imageVarFile }}"
         ./ado_packer_image.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "$(ImageName)" "${{ parameters.imageVarFile }}"
