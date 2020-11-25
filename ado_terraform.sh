@@ -3,10 +3,17 @@
 packerProvider=$1
 packerOs=$2
 packerImage=$3
+packerVarFileType=$4
+
+packerProvider=$1
+packerOs=$2
+packerImage=$3
+packerVarFileType=$4
 
 echo $packerProvider
 echo $packerOs
 echo $packerImage
+echo $packerVarFileType
 
 packerImageId=$(aws ssm get-parameter --name "/builds/${packerProvider}/${packerOs}/${packerImage}/id" --output text --query Parameter.Value)
 packerImageName=$(aws ssm get-parameter --name "/builds/${packerProvider}/${packerOs}/${packerImage}/name" --output text --query Parameter.Value)
