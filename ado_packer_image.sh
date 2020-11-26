@@ -5,6 +5,14 @@ packerOs=$2
 packerImage=$3
 packerVarFileType=$4
 
+if test -z "$packerImage" 
+then
+      echo "\$packerImage is empty"
+      exit 0
+else
+      echo "\$packerImage is NOT empty"
+fi
+
 packerBuildFile=${packerProvider}-${packerOs}-${packerImage}.json
 packerVarFile=var-${packerProvider}-${packerVarFileType}.json
 
