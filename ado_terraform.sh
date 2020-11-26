@@ -5,10 +5,13 @@ packerOs=$2
 packerImage=$3
 packerVarFileType=$4
 
-packerProvider=$1
-packerOs=$2
-packerImage=$3
-packerVarFileType=$4
+if test -z "$packerImage" 
+then
+      echo "\$packerImage is empty"
+      exit 0
+else
+      echo "\$packerImage is NOT empty"
+fi
 
 echo $packerProvider
 echo $packerOs
@@ -32,6 +35,6 @@ cp terraform/userdata.sh.tpl userdata.sh.tpl
 
 terraform init
 terraform apply -var="ImageId=$packerImageId" -var="ImageName=$packerImageName" -auto-approve
-echo "sleep 5m"
-sleep 5m
+echo "sleep 2m"
+sleep 2m
 terraform destroy -var="ImageId=$packerImageId" -var="ImageName=$packerImageName" -auto-approve

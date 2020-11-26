@@ -31,15 +31,6 @@ jobs:
         ls
       displayName: 'PackerDebug'
     - script: |
-        # VER=1.5.1
-        # echo "Download File"
-        # wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
-        # echo "Unzip File and move to local bin"
-        # sudo unzip packer_${VER}_linux_amd64.zip -d /usr/local/bin
-        # echo "Get version"
-        packer --version
-      displayName: 'packerInstall'
-    - script: |
         # VER=1.5.6
         # echo "Download File"
         # wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
@@ -48,6 +39,7 @@ jobs:
         # echo "Get version"
         terraform -v
       displayName: 'terraformInstall'
+      condition: contains('${{ parameters.runtime }}', 'terraform')
     - script: |
         echo '********Setting Variables*********'
         export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
@@ -65,9 +57,9 @@ jobs:
         
         chmod +x ado_terraform.sh
         #./ado_packer_image.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "${{ parameters.imagesMenu }}" "${{ parameters.imageVarFile }}"
-        ./ado_terraform.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "${{ parameters.imagesMenu }}" "${{ parameters.imageVarFile }}"
+        ./ado_terraform.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "$(ImageName)" "${{ parameters.imageVarFile }}"
       displayName: 'terraform'
-      condition: and( eq('${{ parameters.runtime }}', 'terraformOnlyNoShutdown'), eq('${{ parameters.providerMenu }}', 'azure') )
+      #condition: and( eq('${{ parameters.runtime }}', 'terraformOnlyNoShutdown'), eq('${{ parameters.providerMenu }}', 'azure') )
     - script: |
         echo '********Setting Variables*********'
       displayName: 'Logs Variables'
