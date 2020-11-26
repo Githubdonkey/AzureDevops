@@ -27,6 +27,8 @@ jobs:
         echo '${{ parameters.runtime }}'
         echo '${{ parameters.imagesMenu }}'
         echo '${{ parameters.osMenu }}'
+        echo '${{ parameters.provider }}'
+        echo '${{ image.name }}'
         pwd
         ls
       displayName: 'Debug'

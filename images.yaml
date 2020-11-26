@@ -1,65 +1,22 @@
 jobs:
-- ${{ if eq(parameters.runtime, 'production') }}:
-  - job: 'productionVarsYaml'
+- ${{ if contains(parameters.stage, 'build') }}:
+  - job: 'buildVars'
     steps:
     - script: |
         echo '${{ parameters.runtime }}'
         echo '${{ parameters.imagesMenu }}'
         echo '${{ parameters.osMenu }}'
-      displayName: 'productionVarsYaml'
-- ${{ if eq(parameters.runtime, 'production') }}:
+      displayName: 'buildVars'
+- ${{ if contains(parameters.stage, 'launch') }}:
 #- ${{ if and( ne('${{ parameters.imagesMenu }}', 'all'), eq('${{ parameters.imagesMenu }}', 'rlgroup') ) }}:
-  - job: 'productionTest'
+  - job: 'launchVars'
     steps:
     - script: |
         echo '${{ parameters.runtime }}'
         echo '${{ parameters.imagesMenu }}'
         echo '${{ parameters.osMenu }}'
-      displayName: 'productionVarsYaml'
-- ${{ if eq(parameters.imagesMenu, 'all') }}:
-  - template: /idp/build.yaml
-    #condition: and( eq('${{ parameters.imagesMenu }}', 'all'), ne('${{ parameters.imagesMenu }}', 'rlgroup') )
-    parameters:
-      stage: build
-      imageVarFile: ${{ parameters.imageVarFile }}
-      providerMenu: ${{ parameters.providerMenu }}
-      provider: ${{ parameters.provider }}
-      imagesMenu: ${{ parameters.imagesMenu }}
-      osMenu: ${{ parameters.osMenu }}
-      runtime: ${{ parameters.runtime }}
-      images:
-      - name: 2012R2_base
-        providers:
-        - azure
-        description: Server 2012R2 Base
-      - name: 2012R2_default
-        providers:
-        - aws
-        description: Server 2012R2 Default
-- ${{ if eq(parameters.imagesMenu, 'rlgroup') }}:
-  - template: /idp/build.yaml
-    #condition: and( ne('${{ parameters.imagesMenu }}', 'all'), eq('${{ parameters.imagesMenu }}', 'rlgroup') )
-    parameters:
-      stage: build
-      imageVarFile: ${{ parameters.imageVarFile }}
-      providerMenu: ${{ parameters.providerMenu }}
-      provider: ${{ parameters.provider }}
-      imagesMenu: ${{ parameters.imagesMenu }}
-      osMenu: ${{ parameters.osMenu }}
-      runtime: ${{ parameters.runtime }}
-      images:
-      - name: rl_test1
-        providers:
-        - azure
-        description: rl_test1
-      - name: rl_test2
-        providers:
-        - azure
-        description: rl_test2
-      - name: rl_test3
-        providers:
-        - azure
-        description: rl_test3
+      displayName: 'launchVars'
+
 - ${{ if contains(parameters.stage, 'build') }}:
 #- ${{ if and( contains('${{ parameters.imagesMenu }}', '_'), eq('${{ parameters.runtime }}', 'packerOnly') ) }}:
   - template: /idp/build.yaml
@@ -75,7 +32,7 @@ jobs:
       - name: ${{ parameters.imagesMenu }}
         providers:
         - ${{ parameters.providerMenu }}
-        description: testingSingle
+        description: buildSingle
 
 - ${{ if contains(parameters.stage, 'launch') }}:
 #- ${{ if and( eq('${{ parameters.runtime }}', 'terraformOnlyNoShutdown'), eq('${{ parameters.providerMenu }}', 'azure') ) }}:
@@ -92,4 +49,4 @@ jobs:
       - name: ${{ parameters.imagesMenu }}
         providers:
         - ${{ parameters.providerMenu }}
-        description: testingSingle
+        description: launchSingle
