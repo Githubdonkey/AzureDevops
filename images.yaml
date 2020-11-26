@@ -60,8 +60,8 @@ jobs:
         providers:
         - azure
         description: rl_test3
-- ${{ if contains(parameters.imagesMenu, '_') }}:
-#- ${{ if and( ne('${{ parameters.imagesMenu }}', 'all'), ne('${{ parameters.imagesMenu }}', 'rlgroup') ) }}:
+#- ${{ if contains(parameters.imagesMenu, '_') }}:
+- ${{ if and( contains('${{ parameters.imagesMenu }}', '_'), eq('${{ parameters.runtime }}', 'packerOnly') ) }}:
   - template: /idp/build.yaml
     parameters:
       stage: build
