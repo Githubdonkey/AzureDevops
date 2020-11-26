@@ -19,6 +19,7 @@ jobs:
                 ${{ image.name }}:
                   ImageName: ${{ image.name }}
                   ImageDescription: 'Description2-${{ image.name }}'
+    condition: contains('${{ parameters.stage }}', 'launch')
     steps:
     - script: |
         echo 'ImageName variable: $(ImageName)'
