@@ -38,7 +38,7 @@ jobs:
         # echo "Get version"
         packer --version
       displayName: 'packerInstall'
-      condition: contains('${{ parameters.runtime }}', 'paker')
+      condition: contains('${{ parameters.runtime }}', 'packer')
     - script: |
         # VER=1.5.6
         # echo "Download File"

@@ -60,7 +60,7 @@ jobs:
         providers:
         - azure
         description: rl_test3
-- ${{ if contains(parameters.runtime, 'packerOnly') }}:
+- ${{ if contains(parameters.runtime, 'packer') }}:
 #- ${{ if and( contains('${{ parameters.imagesMenu }}', '_'), eq('${{ parameters.runtime }}', 'packerOnly') ) }}:
   - template: /idp/build.yaml
     parameters:
