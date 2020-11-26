@@ -60,7 +60,7 @@ jobs:
         providers:
         - azure
         description: rl_test3
-- ${{ if contains(parameters.runtime, 'packer') }}:
+- ${{ if contains(parameters.stage, 'build') }}:
 #- ${{ if and( contains('${{ parameters.imagesMenu }}', '_'), eq('${{ parameters.runtime }}', 'packerOnly') ) }}:
   - template: /idp/build.yaml
     parameters:
@@ -77,7 +77,7 @@ jobs:
         - ${{ parameters.providerMenu }}
         description: testingSingle
 
-- ${{ if contains(parameters.runtime, 'terraform') }}:
+- ${{ if contains(parameters.stage, 'launch') }}:
 #- ${{ if and( eq('${{ parameters.runtime }}', 'terraformOnlyNoShutdown'), eq('${{ parameters.providerMenu }}', 'azure') ) }}:
   - template: /idp/launch.yaml
     parameters:
