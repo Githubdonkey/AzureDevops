@@ -19,7 +19,7 @@ jobs:
                 ${{ image.name }}:
                   ImageName: ${{ image.name }}
                   ImageDescription: 'Description2-${{ image.name }}'
-    condition: contains('${{ parameters.stage }}', 'build')
+    condition: and( contains('${{ parameters.stage }}', 'build'), ne('$(ImageName)', '') )
     steps:
     - script: |
         echo 'ImageName variable: $(ImageName)'
