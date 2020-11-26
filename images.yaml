@@ -77,7 +77,7 @@ jobs:
         - ${{ parameters.providerMenu }}
         description: testingSingle
 
-- ${{ if contains(parameters.runtime, 'terraformOnlyNoShutdown') }}:
+- ${{ if contains(parameters.runtime, 'terraform') }}:
 #- ${{ if and( eq('${{ parameters.runtime }}', 'terraformOnlyNoShutdown'), eq('${{ parameters.providerMenu }}', 'azure') ) }}:
   - template: /idp/launch.yaml
     parameters:

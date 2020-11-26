@@ -28,7 +28,7 @@ jobs:
         echo '${{ parameters.osMenu }}'
         pwd
         ls
-      displayName: 'PackerDebug'
+      displayName: 'Debug'
     - script: |
         # VER=1.5.1
         # echo "Download File"
@@ -38,6 +38,7 @@ jobs:
         # echo "Get version"
         packer --version
       displayName: 'packerInstall'
+      condition: contains('${{ parameters.runtime }}', 'paker')
     - script: |
         # VER=1.5.6
         # echo "Download File"
@@ -47,6 +48,21 @@ jobs:
         # echo "Get version"
         terraform -v
       displayName: 'terraformInstall'
+      condition: contains('${{ parameters.runtime }}', 'terraform')
+    - script: |
+        # VER=1.5.6
+        # echo "Download File"
+        # wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
+        # echo "Unzip File and move to local bin"
+        # sudo unzip packer_${VER}_linux_amd64.zip -d /usr/local/bin
+        # echo "Get version"
+        sudo apt-get update
+        sudo apt-get install ansible -y
+        sudo apt-get install python-pip -y
+        pip install pywinrm
+        ansible --version
+      displayName: 'ansibleInstall'
+      condition: contains('${{ parameters.runtime }}', 'ansible')
     - script: |
         echo '********Setting Variables*********'
         export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
@@ -65,7 +81,7 @@ jobs:
         #./ado_packer_image.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "${{ parameters.imagesMenu }}" "${{ parameters.imageVarFile }}"
         ./ado_packer_image.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "$(ImageName)" "${{ parameters.imageVarFile }}"
       displayName: 'packer'
-      condition: and( eq('${{ parameters.runtime }}', 'terraformOnlyNoShutdown'), eq('${{ parameters.providerMenu }}', 'azure') )
+      condition: and( contains('${{ parameters.runtime }}', 'packer'), eq('${{ parameters.providerMenu }}', 'azure') )
     - script: |
         echo '********Setting Variables*********'
       displayName: 'Logs Variables'
