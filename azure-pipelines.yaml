@@ -2,7 +2,7 @@ parameters:
 - name: imagesMenu
   displayName: Image Selection
   type: string
-  default: all
+  default: ubuntu18_base
   values:
   - all
   - rlgroup
@@ -19,7 +19,7 @@ parameters:
 - name: osMenu
   displayName: Select OS
   type: string
-  default: default
+  default: linux
   values:
   - default
   - all
@@ -38,7 +38,7 @@ parameters:
 - name: providerMenu
   displayName: Select Provider
   type: string
-  default: default
+  default: azure
   values:
   - default
   - aws
@@ -48,7 +48,7 @@ parameters:
 - name: runtime
   displayName: Select Runtime
   type: string
-  default: production
+  default: packerOnly
   values:
   - production
   - build
