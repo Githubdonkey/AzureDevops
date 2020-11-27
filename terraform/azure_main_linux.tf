@@ -49,9 +49,7 @@ resource "aws_ssm_parameter" "secret" {
   value       = random_string.random.result
   overwrite   = "true"
 
-  tags = {
-    environment = "testing"
-  }
+  
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -100,6 +98,9 @@ resource "azurerm_virtual_machine" "example" {
   resource_group_name   = azurerm_resource_group.rg.name
   network_interface_ids = [azurerm_network_interface.myvm1nic.id]
   vm_size               = "Standard_F8s_v2"
+  tags = {
+    tfState = "s3://gitdonkey/devops/${var.ImageName}-${local.timestamp_sanitized}.tfstate"
+  }
 
 
   delete_os_disk_on_termination = true
@@ -120,7 +121,6 @@ resource "azurerm_virtual_machine" "example" {
     computer_name  = "t${local.timestamp_sanitized}"
     admin_username = "testadmin"
     admin_password = random_string.random.result
-
   }
 
   os_profile_linux_config {

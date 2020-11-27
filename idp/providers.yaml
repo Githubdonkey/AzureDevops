@@ -11,8 +11,10 @@ stages:
         echo '${{ parameters.providerMenu }}'
         echo '${{ parameters.runtime }}'
       displayName: 'Show variables used in menu'
+      condition: and( ne('${{ parameters.imagesMenu }}', 'all'), eq('${{ parameters.imagesMenu }}', 'ubuntu18_base') )
   - job: 'show_variables2'
     dependsOn: show_variables1
+    condition: and( ne('${{ parameters.imagesMenu }}', 'all'), ne('${{ parameters.imagesMenu }}', 'ubuntu18_base') )
     steps: 
     - ${{ each test in parameters.providers }}:
       - script: echo ${{ test.name }}
@@ -62,6 +64,39 @@ stages:
         imageVarFile: ${{ parameters.imageVarFile }}
         providerMenu: ${{ parameters.providerMenu }}
         runtime: ${{ parameters.runtime }}
+
+- stage: 'Ansible'
+  jobs:
+  - job: 'show_variables_ansible'
+    steps:
+    - script: |
+        echo '${{ parameters.platform }}'
+        echo '${{ parameters.imagesMenu }}'
+        echo '${{ parameters.osMenu }}'
+        echo '${{ parameters.imageVarFile }}'
+        echo '${{ parameters.providerMenu }}'
+        echo '${{ parameters.runtime }}'
+      displayName: 'Ansible Vars'
+      condition: and( ne('${{ parameters.imagesMenu }}', 'all'), eq('${{ parameters.imagesMenu }}', 'ubuntu18_base') )
+  - job: 'show_variables2'
+    dependsOn: show_variables1
+    condition: and( ne('${{ parameters.imagesMenu }}', 'all'), ne('${{ parameters.imagesMenu }}', 'ubuntu18_base') )
+    steps: 
+    - ${{ each test in parameters.providers }}:
+      - script: echo ${{ test.name }}
+        displayName: ${{ test.name }}
+
+
+
+
+
+
+
+
+
+
+
+
 
 #  - stage: ${{ provider.name }}Buildall
 #    displayName: ${{ provider.name }} - Buildall
