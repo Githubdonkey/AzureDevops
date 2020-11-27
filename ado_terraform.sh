@@ -37,6 +37,7 @@ terraform init
 terraform apply -var="ImageId=$packerImageId" -var="ImageName=$packerImageName" -auto-approve
 pwd
 ls
+aws s3 cp terraform.tfstate "s3://gitdonkey/devops/${packerImageName}_tf.tfstate"
 echo "sleep 2m"
 sleep 2m
-terraform destroy -var="ImageId=$packerImageId" -var="ImageName=$packerImageName" -auto-approve
+terraform destroy -auto-approve
