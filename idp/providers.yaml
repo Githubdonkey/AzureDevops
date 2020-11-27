@@ -78,13 +78,19 @@ stages:
         echo '${{ parameters.runtime }}'
       displayName: 'Ansible Vars'
       condition: and( ne('${{ parameters.imagesMenu }}', 'all'), eq('${{ parameters.imagesMenu }}', 'ubuntu18_base') )
-  - job: 'show_variables2'
-    dependsOn: show_variables1
+  - job: 'show_variables_ansible2'
+    dependsOn: show_variables_ansible
     condition: and( ne('${{ parameters.imagesMenu }}', 'all'), ne('${{ parameters.imagesMenu }}', 'ubuntu18_base') )
     steps: 
     - ${{ each test in parameters.providers }}:
-      - script: echo ${{ test.name }}
-        displayName: ${{ test.name }}
+      - script: |
+          echo '${{ parameters.platform }}'
+          echo '${{ parameters.imagesMenu }}'
+          echo '${{ parameters.osMenu }}'
+          echo '${{ parameters.imageVarFile }}'
+          echo '${{ parameters.providerMenu }}'
+          echo '${{ parameters.runtime }}'
+        displayName: 'Ansible Vars'
 
 
 
