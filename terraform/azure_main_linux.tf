@@ -29,6 +29,10 @@ locals {
   timestamp_sanitized = "${replace("${local.timestamp}", "/[- TZ:]/", "")}"
 }
 
+data "aws_ssm_parameter" "tf" {
+  name = "/builds/terraform/default_password"
+}
+
 resource "random_string" "random" {
   length = 16
   special = true
@@ -48,8 +52,6 @@ resource "aws_ssm_parameter" "secret" {
   type        = "SecureString"
   value       = random_string.random.result
   overwrite   = "true"
-
-  
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -120,7 +122,7 @@ resource "azurerm_virtual_machine" "example" {
   os_profile {
     computer_name  = "t${local.timestamp_sanitized}"
     admin_username = "testadmin"
-    admin_password = random_string.random.result
+    admin_password = data.aws_ssm_parameter.ami.value
   }
 
   os_profile_linux_config {

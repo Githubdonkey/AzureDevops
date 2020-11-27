@@ -44,9 +44,8 @@ if [ -f terraform.tfstate ]; then
    echo "terraform.tfstate is removed"
 fi
 ls
-aws s3 cp "s3://gitdonkey/devops/tf_${packerImageName}.tfstate" terraform.tfstate
-ls
 echo "sleep 2m"
-
-sleep 2m
+sleep 5m
+ls
+aws s3 cp "s3://gitdonkey/devops/tf_${packerImageName}.tfstate" terraform.tfstate
 terraform destroy -auto-approve
