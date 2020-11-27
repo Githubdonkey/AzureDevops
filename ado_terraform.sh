@@ -35,9 +35,18 @@ cp terraform/userdata.sh.tpl userdata.sh.tpl
 
 terraform init
 terraform apply -var="ImageId=$packerImageId" -var="ImageName=$packerImageName" -auto-approve
+terraform output
 pwd
 ls
 aws s3 cp terraform.tfstate "s3://gitdonkey/devops/tf_${packerImageName}.tfstate"
+if [ -f terraform.tfstate ]; then
+   rm terraform.tfstate
+   echo "terraform.tfstate is removed"
+fi
+ls
+aws s3 cp "s3://gitdonkey/devops/tf_${packerImageName}.tfstate" terraform.tfstate
+ls
 echo "sleep 2m"
+
 sleep 2m
 terraform destroy -auto-approve

@@ -76,21 +76,27 @@ stages:
         echo '${{ parameters.imageVarFile }}'
         echo '${{ parameters.providerMenu }}'
         echo '${{ parameters.runtime }}'
+        echo '${{ parameters.ansible }}'
       displayName: 'Ansible Vars'
       condition: and( ne('${{ parameters.imagesMenu }}', 'all'), eq('${{ parameters.imagesMenu }}', 'ubuntu18_base') )
   - job: 'show_variables_ansible2'
     dependsOn: show_variables_ansible
-    condition: and( ne('${{ parameters.imagesMenu }}', 'all'), ne('${{ parameters.imagesMenu }}', 'ubuntu18_base') )
+    condition: and( ne('${{ parameters.imagesMenu }}', 'all'), ne('${{ parameters.imagesMenu }}', 'all') )
     steps: 
-    - ${{ each test in parameters.providers }}:
-      - script: |
-          echo '${{ parameters.platform }}'
-          echo '${{ parameters.imagesMenu }}'
-          echo '${{ parameters.osMenu }}'
-          echo '${{ parameters.imageVarFile }}'
-          echo '${{ parameters.providerMenu }}'
-          echo '${{ parameters.runtime }}'
-        displayName: 'Ansible Vars'
+    - script: |
+        # VER=1.5.6
+        # echo "Download File"
+        # wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
+        # echo "Unzip File and move to local bin"
+        # sudo unzip packer_${VER}_linux_amd64.zip -d /usr/local/bin
+        # echo "Get version"
+        sudo apt-get update
+        sudo apt-get install ansible -y
+        sudo apt-get install python-pip -y
+        pip install pywinrm
+        ansible --version
+      displayName: 'ansibleInstall'
+      condition: contains('${{ parameters.ansible }}', 'default')
 
 
 
