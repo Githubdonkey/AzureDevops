@@ -25,7 +25,7 @@ variable "custom_image_resource_group_name" {
 
 #declare local
 locals {
-  timestamp = "${timestamp()}"
+  timestamp = timestamp()
   timestamp_sanitized = "${replace("${local.timestamp}", "/[- TZ:]/", "")}"
 }
 
@@ -35,11 +35,6 @@ data "aws_ssm_parameter" "tf" {
 
 data "azurerm_resource_group" "build" {
   name = "AnsibleVM"
-}
-
-resource "azurerm_resource_group" "rg" {
-  name = "rg-${local.timestamp_sanitized}"
-  location = var.location
 }
 
 resource "azurerm_virtual_network" "myvnet" {
@@ -87,7 +82,6 @@ resource "azurerm_virtual_machine" "example" {
     tfState = "s3://gitdonkey/devops/${var.ImageName}-${local.timestamp_sanitized}.tfstate"
   }
 
-
   delete_os_disk_on_termination = true
   delete_data_disks_on_termination = true
 
@@ -116,11 +110,12 @@ resource "azurerm_virtual_machine" "example" {
 output "ImageId" {
   value = var.ImageId
 }
-
 output "ImageName" {
   value = var.ImageName
 }
-
 output "resourceGroupId" {
   value = data.azurerm_resource_group.build.id
+}
+output "publicIP" {
+  value = azurerm_public_ip.myvm1publicip.id
 }
