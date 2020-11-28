@@ -19,7 +19,7 @@ jobs:
                 ${{ image.name }}:
                   ImageName: ${{ image.name }}
                   ImageDescription: 'Description2-${{ image.name }}'
-    condition: contains('${{ parameters.stage }}', 'launch')
+    condition: contains('${{ parameters.runtime }}', 'terraform')
     steps:
     - script: |
         echo 'ImageName variable: $(ImageName)'
@@ -59,7 +59,7 @@ jobs:
         #./ado_packer_image.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "${{ parameters.imagesMenu }}" "${{ parameters.imageVarFile }}"
         ./ado_terraform.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "$(ImageName)" "${{ parameters.imageVarFile }}"
       displayName: 'terraform'
-      #condition: and( eq('${{ parameters.runtime }}', 'terraformOnlyNoShutdown'), eq('${{ parameters.providerMenu }}', 'azure') )
+      condition: contains('${{ parameters.runtime }}', 'terraform')
     - script: |
         echo '********Setting Variables*********'
       displayName: 'Logs Variables'
