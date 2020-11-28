@@ -46,12 +46,12 @@ resource "azurerm_virtual_network" "myvnet" {
   name = "vnet-${local.timestamp_sanitized}"
   address_space = ["10.0.0.0/16"]
   location = var.location
-  resource_group_name = azurerm_resource_group.build.name
+  resource_group_name = data.azurerm_resource_group.build.name
 }
 
 resource "azurerm_subnet" "frontendsubnet" {
   name = "frontendSubnet"
-  resource_group_name =  azurerm_resource_group.build.name
+  resource_group_name =  data.azurerm_resource_group.build.name
   virtual_network_name = azurerm_virtual_network.myvnet.name
   address_prefix = "10.0.1.0/24"
 }
@@ -59,7 +59,7 @@ resource "azurerm_subnet" "frontendsubnet" {
 resource "azurerm_public_ip" "myvm1publicip" {
   name = "pip1"
   location = var.location
-  resource_group_name = azurerm_resource_group.build.name
+  resource_group_name = data.azurerm_resource_group.build.name
   allocation_method = "Dynamic"
   sku = "Basic"
 }
@@ -67,7 +67,7 @@ resource "azurerm_public_ip" "myvm1publicip" {
 resource "azurerm_network_interface" "myvm1nic" {
   name = "nic-${local.timestamp_sanitized}"
   location = var.location
-  resource_group_name = azurerm_resource_group.build.name
+  resource_group_name = data.azurerm_resource_group.build.name
 
   ip_configuration {
     name = "ipconfig-${local.timestamp_sanitized}"
@@ -80,7 +80,7 @@ resource "azurerm_network_interface" "myvm1nic" {
 resource "azurerm_virtual_machine" "example" {
   name                  = "t${local.timestamp_sanitized}"  
   location              = var.location
-  resource_group_name   = azurerm_resource_group.build.name
+  resource_group_name   = data.azurerm_resource_group.build.name
   network_interface_ids = [azurerm_network_interface.myvm1nic.id]
   vm_size               = "Standard_F8s_v2"
   tags = {
