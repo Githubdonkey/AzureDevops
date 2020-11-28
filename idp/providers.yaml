@@ -67,7 +67,8 @@ stages:
         providerMenu: ${{ parameters.providerMenu }}
         runtime: ${{ parameters.runtime }}
 
-  - stage: 'Ansible'
+  - stage: ${{ provider.name }}Ansible
+    displayName: ${{ provider.name }}Ansible
     jobs:
     - job: 'show_variables_ansible'
       steps:
