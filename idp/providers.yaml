@@ -120,7 +120,9 @@ stages:
           sudo ./ansible/ansible_setup.sh
           #./ado_packer_image.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "${{ parameters.imagesMenu }}" "${{ parameters.imageVarFile }}"
           #./ado_packer_image.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "$(ImageName)" "${{ parameters.imageVarFile }}"
-        displayName: 'ansibleConfigure'
+
+          ansible -m win_ping windows
+        displayName: 'ansibleRun'
 
 
 
