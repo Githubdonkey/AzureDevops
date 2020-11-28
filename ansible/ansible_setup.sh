@@ -1,9 +1,11 @@
 #!/bin/bash
 
-#packerProvider=$1
+packerProvider=$1
 #packerOs=$2
 #packerImage=$3
 #packerVarFileType=$4
+
+echo $packerProvider
 
 #if test -z "$packerImage" 
 #then
@@ -14,7 +16,7 @@
 #fi
 
 ansibleHosts="/etc/ansible/hosts"
-[ -f $file ] && rm $file
+[ -f $ansibleHosts ] && rm $ansibleHosts
 touch $ansibleHosts
 
 cat <<EOF > /etc/ansible/hosts
@@ -28,7 +30,7 @@ EOF
 ansibleWindows="/etc/ansible/group_vars/windows.yaml"
 [ ! -e "/etc/ansible/group_vars" ] && mkdir "/etc/ansible/group_vars"
 ansibleWindows="/etc/ansible/group_vars/windows.yaml"
-[ -f $file ] && rm $file
+[ -f $ansibleWindows ] && rm $ansibleWindows
 touch $ansibleWindows
 
 cat <<EOF > /etc/ansible/group_vars/windows.yaml
