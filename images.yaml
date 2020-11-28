@@ -21,7 +21,7 @@ jobs:
 #- ${{ if and( contains('${{ parameters.imagesMenu }}', '_'), eq('${{ parameters.runtime }}', 'packerOnly') ) }}:
   - template: /idp/build.yaml
     parameters:
-      stage: build
+      stage: ${{ parameters.stage }}
       imageVarFile: ${{ parameters.imageVarFile }}
       providerMenu: ${{ parameters.providerMenu }}
       provider: ${{ parameters.provider }}
@@ -38,7 +38,7 @@ jobs:
 #- ${{ if and( eq('${{ parameters.runtime }}', 'terraformOnlyNoShutdown'), eq('${{ parameters.providerMenu }}', 'azure') ) }}:
   - template: /idp/launch.yaml
     parameters:
-      stage: launch
+      stage: ${{ parameters.stage }}
       imageVarFile: ${{ parameters.imageVarFile }}
       providerMenu: ${{ parameters.providerMenu }}
       provider: ${{ parameters.provider }}
