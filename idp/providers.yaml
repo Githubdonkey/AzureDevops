@@ -40,6 +40,7 @@ stages:
   - stage: ${{ provider.name }}Build
     displayName: ${{ provider.name }}Build
     dependsOn: ${{ provider.name }}Init
+    condition: contains('${{ parameters.runtime }}', 'packer')
     jobs:
     - template: /images.yaml
       parameters:
@@ -54,6 +55,7 @@ stages:
   - stage: ${{ provider.name }}Launch
     displayName: ${{ provider.name }}Launch
     dependsOn: ${{ provider.name }}Build
+    condition: contains('${{ parameters.runtime }}', 'terraform')
     jobs:
     - template: /images.yaml
       parameters:
@@ -95,7 +97,7 @@ stages:
         pip install pywinrm
         ansible --version
       displayName: 'ansibleInstall'
-      condition: contains('${{ parameters.ansible }}', 'default')
+      condition: contains('${{ parameters.runtime }}', 'ansible')
 
 
 

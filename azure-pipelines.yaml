@@ -48,15 +48,12 @@ parameters:
 - name: runtime
   displayName: Select Runtime
   type: string
-  default: packerOnly
+  default: terraform
   values:
-  - production
-  - build
-  - debug
-  - packerOnly
-  - terraformOnlyNoShutdown
-  - terraformOnly1h
-  - terraformOnly2h
+  - packer
+  - terraform
+  - ansible
+  - packer-terraform-ansible
 - name: ansible
   displayName: Select Ansible Build
   type: string
