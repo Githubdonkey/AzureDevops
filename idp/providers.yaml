@@ -78,10 +78,9 @@ stages:
         echo '${{ parameters.runtime }}'
         echo '${{ parameters.ansible }}'
       displayName: 'Ansible Vars'
-      condition: and( ne('${{ parameters.imagesMenu }}', 'all'), eq('${{ parameters.imagesMenu }}', 'ubuntu18_base') )
+      condition: and( ne('${{ parameters.imagesMenu }}', 'all'), contains('${{ parameters.imagesMenu }}', 'ubuntu18') )
   - job: 'show_variables_ansible2'
     dependsOn: show_variables_ansible
-    condition: and( ne('${{ parameters.imagesMenu }}', 'all'), ne('${{ parameters.imagesMenu }}', 'all') )
     steps: 
     - script: |
         # VER=1.5.6
