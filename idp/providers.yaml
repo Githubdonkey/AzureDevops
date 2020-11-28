@@ -67,37 +67,37 @@ stages:
         providerMenu: ${{ parameters.providerMenu }}
         runtime: ${{ parameters.runtime }}
 
-- stage: 'Ansible'
-  jobs:
-  - job: 'show_variables_ansible'
-    steps:
-    - script: |
-        echo '${{ parameters.platform }}'
-        echo '${{ parameters.imagesMenu }}'
-        echo '${{ parameters.osMenu }}'
-        echo '${{ parameters.imageVarFile }}'
-        echo '${{ parameters.providerMenu }}'
-        echo '${{ parameters.runtime }}'
-        echo '${{ parameters.ansible }}'
-      displayName: 'Ansible Vars'
-      condition: contains('${{ parameters.runtime }}', 'ansible')
-  - job: 'show_variables_ansible2'
-    dependsOn: show_variables_ansible
-    steps: 
-    - script: |
-        # VER=1.5.6
-        # echo "Download File"
-        # wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
-        # echo "Unzip File and move to local bin"
-        # sudo unzip packer_${VER}_linux_amd64.zip -d /usr/local/bin
-        # echo "Get version"
-        sudo apt-get update
-        sudo apt-get install ansible -y
-        sudo apt-get install python-pip -y
-        pip install pywinrm
-        ansible --version
-      displayName: 'ansibleInstall'
-      condition: contains('${{ parameters.runtime }}', 'ansible')
+  - stage: 'Ansible'
+    jobs:
+    - job: 'show_variables_ansible'
+      steps:
+      - script: |
+          echo '${{ parameters.platform }}'
+          echo '${{ parameters.imagesMenu }}'
+          echo '${{ parameters.osMenu }}'
+          echo '${{ parameters.imageVarFile }}'
+          echo '${{ parameters.providerMenu }}'
+          echo '${{ parameters.runtime }}'
+          echo '${{ parameters.ansible }}'
+        displayName: 'Ansible Vars'
+        condition: contains('${{ parameters.runtime }}', 'ansible')
+    - job: 'show_variables_ansible2'
+      dependsOn: show_variables_ansible
+      steps: 
+      - script: |
+          # VER=1.5.6
+          # echo "Download File"
+          # wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
+          # echo "Unzip File and move to local bin"
+          # sudo unzip packer_${VER}_linux_amd64.zip -d /usr/local/bin
+          # echo "Get version"
+          sudo apt-get update
+          sudo apt-get install ansible -y
+          sudo apt-get install python-pip -y
+          pip install pywinrm
+          ansible --version
+        displayName: 'ansibleInstall'
+        condition: contains('${{ parameters.runtime }}', 'ansible')
 
 
 
