@@ -111,7 +111,7 @@ stages:
           #pywinrm
           ansible --version
         displayName: 'ansibleConfigure'
-    - job: 'ansibleConfigure1'
+    - job: 'ansibleRun'
       dependsOn: ansibleConfigure
       steps: 
       - script: |
@@ -120,7 +120,7 @@ stages:
           sudo ./ansible/ansible_setup.sh
           #./ado_packer_image.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "${{ parameters.imagesMenu }}" "${{ parameters.imageVarFile }}"
           #./ado_packer_image.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "$(ImageName)" "${{ parameters.imageVarFile }}"
-
+          
           ansible -m win_ping windows
         displayName: 'ansibleRun'
 
