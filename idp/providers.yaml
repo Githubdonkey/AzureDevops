@@ -108,21 +108,16 @@ stages:
           # echo "Unzip File and move to local bin"
           # sudo unzip packer_${VER}_linux_amd64.zip -d /usr/local/bin
           # echo "Get version"
-          pywinrm --version
+          pywinrm
           ansible --version
         displayName: 'ansibleConfigure'
     - job: 'ansibleConfigure1'
       dependsOn: ansibleConfigure
       steps: 
       - script: |
-          # VER=1.5.6
-          # echo "Download File"
-          # wget https://releases.hashicorp.com/packer/${VER}/packer_${VER}_linux_amd64.zip
-          # echo "Unzip File and move to local bin"
-          # sudo unzip packer_${VER}_linux_amd64.zip -d /usr/local/bin
-          # echo "Get version"
+
           chmod +x ansible/ansible_setup.sh
-          ./ansible/ansible_setup.sh
+          sudo ./ansible/ansible_setup.sh
           #./ado_packer_image.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "${{ parameters.imagesMenu }}" "${{ parameters.imageVarFile }}"
           #./ado_packer_image.sh "${{ parameters.providerMenu }}" "${{ parameters.osMenu }}" "$(ImageName)" "${{ parameters.imageVarFile }}"
         displayName: 'ansibleConfigure'
