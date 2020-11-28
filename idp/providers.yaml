@@ -69,6 +69,7 @@ stages:
 
   - stage: ${{ provider.name }}Ansible
     displayName: ${{ provider.name }}Ansible
+    condition: and( ne('${{ parameters.imagesMenu }}', 'all'), eq('${{ parameters.imagesMenu }}', 'ubuntu18_base') )
     jobs:
     - job: 'show_variables_ansible'
       steps:
@@ -81,7 +82,6 @@ stages:
           echo '${{ parameters.runtime }}'
           echo '${{ parameters.ansible }}'
         displayName: 'Ansible Vars'
-        condition: contains('${{ parameters.runtime }}', 'ansible')
     - job: 'show_variables_ansible2'
       dependsOn: show_variables_ansible
       steps: 
@@ -98,7 +98,6 @@ stages:
           pip install pywinrm
           ansible --version
         displayName: 'ansibleInstall'
-        condition: contains('${{ parameters.runtime }}', 'ansible')
 
 
 
