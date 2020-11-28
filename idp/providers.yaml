@@ -108,7 +108,7 @@ stages:
           # echo "Unzip File and move to local bin"
           # sudo unzip packer_${VER}_linux_amd64.zip -d /usr/local/bin
           # echo "Get version"
-          pywinrm
+          #pywinrm
           ansible --version
         displayName: 'ansibleConfigure'
     - job: 'ansibleConfigure1'
