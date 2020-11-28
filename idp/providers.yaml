@@ -80,7 +80,7 @@ stages:
         echo '${{ parameters.runtime }}'
         echo '${{ parameters.ansible }}'
       displayName: 'Ansible Vars'
-      condition: and( ne('${{ parameters.imagesMenu }}', 'all'), contains('${{ parameters.imagesMenu }}', 'ubuntu18') )
+      condition: contains('${{ parameters.runtime }}', 'ansible')
   - job: 'show_variables_ansible2'
     dependsOn: show_variables_ansible
     steps: 
