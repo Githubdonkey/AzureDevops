@@ -107,15 +107,7 @@ resource "azurerm_virtual_machine" "example" {
   }
 }
 
-output "ImageId" {
-  value = var.ImageId
-}
-output "ImageName" {
-  value = var.ImageName
-}
-output "resourceGroupId" {
-  value = data.azurerm_resource_group.build.id
-}
-output "publicIP" {
-  value = azurerm_public_ip.myvm1publicip.id
-}
+output "ImageId" {value = var.ImageId}
+output "ImageName" {value = var.ImageName}
+output "resourceGroupId" {value = data.azurerm_resource_group.build.id}
+output "publicIP" {value = azurerm_public_ip.myvm1publicip.id}
