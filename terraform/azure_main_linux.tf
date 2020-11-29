@@ -77,7 +77,7 @@ resource "azurerm_virtual_machine" "example" {
   location              = var.location
   resource_group_name   = data.azurerm_resource_group.build.name
   network_interface_ids = [azurerm_network_interface.myvm1nic.id]
-  vm_size               = "Standard_F8s_v2"
+  vm_size               = "Standard_A2_v2"
   tags = {
     tfState = "s3://gitdonkey/devops/${var.ImageName}-${local.timestamp_sanitized}.tfstate"
   }

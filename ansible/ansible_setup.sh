@@ -21,11 +21,11 @@ touch $ansibleHosts
 
 cat <<EOF > /etc/ansible/hosts
 [windows]
-10.1.0.8
+10.0.1.4
 
 [windows:vars]
- ansible_user=administrator@DEVOPSTECHIE.COM
- ansible_pass=SecretPasswordGoesHere
+ ansible_user=localadm 
+ ansible_pass=thisPassChange@End
  ansible_port=5986
  ansible_connection=winrm
  ansible_winrm_transport=credssp
