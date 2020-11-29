@@ -95,10 +95,13 @@ resource "azurerm_virtual_machine" "example" {
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
   }
+  os_profile_windows_config {
+    provision_vm_agent = true
+  }
 
   os_profile {
     computer_name  = "t${local.timestamp_sanitized}"
-    admin_username = "testadmin"
+    admin_username = "localadm"
     admin_password = data.aws_ssm_parameter.tf.value
   }
 

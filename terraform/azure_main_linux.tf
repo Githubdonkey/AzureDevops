@@ -98,7 +98,7 @@ resource "azurerm_virtual_machine" "example" {
 
   os_profile {
     computer_name  = "t${local.timestamp_sanitized}"
-    admin_username = "testadmin"
+    admin_username = "localadm"
     admin_password = data.aws_ssm_parameter.tf.value
   }
 
