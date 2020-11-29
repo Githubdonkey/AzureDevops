@@ -96,8 +96,9 @@ stages:
           sudo apt-get install ansible -y
           sudo apt-get install python-pip -y
           pip install --upgrade pip
-          pip install "pywinrm>=0.2.2"
+          pip install "pywinrm>=0.3.0"
           pip install "pyOpenSSL>=17.3.0"
+          pip install requests-credssp
           ansible --version
           pywinrm version
         displayName: 'ansibleInstall'

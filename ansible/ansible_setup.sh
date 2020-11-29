@@ -24,12 +24,12 @@ cat <<EOF > /etc/ansible/hosts
 10.0.1.4
 
 [windows:vars]
- ansible_user=localadm 
- ansible_pass=thisPassChange@End
- ansible_port=5986
- ansible_connection=winrm
- ansible_winrm_transport=credssp
- ansible_winrm_server_cert_validation=ignore
+ansible_user=localadm 
+ansible_password=thisPassChange@End
+ansible_port=5986
+ansible_connection=winrm
+ansible_winrm_transport=credssp
+ansible_winrm_server_cert_validation=ignore
 EOF
 
 #ansibleWindows="/etc/ansible/group_vars/windows.yaml"
