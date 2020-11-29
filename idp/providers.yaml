@@ -99,6 +99,7 @@ stages:
           pip install "pywinrm>=0.3.0"
           pip install "pyOpenSSL>=17.3.0"
           pip install requests-credssp
+          sudo apt-get install python-winrm
           ansible --version
         displayName: 'ansibleInstall'
     - job: 'ansibleConfigure'
