@@ -37,18 +37,10 @@ data "azurerm_resource_group" "build" {
   name = "AnsibleVM"
 }
 
-resource "azurerm_virtual_network" "myvnet" {
-  name = "vnet-${local.timestamp_sanitized}"
-  address_space = ["10.0.0.0/16"]
-  location = var.location
-  resource_group_name = data.azurerm_resource_group.build.name
-}
-
-resource "azurerm_subnet" "frontendsubnet" {
-  name = "frontendSubnet"
-  resource_group_name =  data.azurerm_resource_group.build.name
-  virtual_network_name = azurerm_virtual_network.myvnet.name
-  address_prefix = "10.0.1.0/24"
+data "azurerm_subnet" "AnsibleSubNet" {
+  name                 = "AnsibleSubNet"
+  virtual_network_name = "AnsibleVnet"
+  resource_group_name  = data.azurerm_resource_group.build.name
 }
 
 resource "azurerm_public_ip" "myvm1publicip" {
@@ -66,7 +58,7 @@ resource "azurerm_network_interface" "myvm1nic" {
 
   ip_configuration {
     name = "ipconfig-${local.timestamp_sanitized}"
-    subnet_id = azurerm_subnet.frontendsubnet.id
+    subnet_id = data.azurerm_subnet.AnsibleSubNet.id
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id = azurerm_public_ip.myvm1publicip.id
   }
