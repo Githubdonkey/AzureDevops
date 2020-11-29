@@ -45,7 +45,7 @@ if [ -f terraform.tfstate ]; then
 fi
 ls
 echo "sleep 2m"
-sleep 2m
-ls
-aws s3 cp "s3://gitdonkey/devops/tf_${packerImageName}.tfstate" terraform.tfstate
+#sleep 2m
+#ls
+#aws s3 cp "s3://gitdonkey/devops/tf_${packerImageName}.tfstate" terraform.tfstate
 #terraform destroy -auto-approve
