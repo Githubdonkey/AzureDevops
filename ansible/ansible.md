@@ -158,7 +158,7 @@ winrm set winrm/config/service/auth @{Basic="true"}
 
 ansible@AnsibleVM:~$ cat /etc/ansible/hosts
 [windows]
-10.1.0.8
+10.1.1.5
 [linux]
 10.1.0.6
 10.1.0.7
@@ -389,3 +389,140 @@ setup windows
 New-SelfSignedCertificate -DnsName "t20201129194145" -CertStoreLocation Cert:\LocalMachine\My
 
 winrm create winrm/config/Listener?Address=*+Transport=HTTPS '@{Hostname="t20201129194145"; CertificateThumbprint="935CE1CA3AB9182533BCD631423E7D1E48F8D618"}'
+
+
+# Create and export a self-signed certificate
+# Script by Tim Buntrock
+ 
+# Define certificate name
+$Certname = Read-Host “Enter Certificate Name”
+# Define expiration
+$YearsToExpire = Read-Host “How many years should this certificate be valid”
+Write-Host "Creating Certifcate $Certname" -ForegroundColor Green
+# Create certificate
+$Cert = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname $Certname -NotAfter (Get-Date).AddYears($YearsToExpire)
+Write-Host "Exporting Certificate $Certname to $env:USERPROFILE\Desktop\$Certname.pfx" -ForegroundColor Green
+# Set password to export certificate
+$pw = ConvertTo-SecureString -String "Pazzword" -Force -AsPlainText
+# Get thumbprint
+$thumbprint = $Cert.Thumbprint
+# Export certificate
+Export-PfxCertificate -cert cert:\localMachine\my\$thumbprint -FilePath $env:USERPROFILE\Desktop\$Certname.pfx -Password $pw
+
+
+#----------------------------------------------Ansible Setup-----------------------------------------------
+localadm@t20201129194543:~$ history
+    1  sudo apt-get update
+    2  sudo apt-get install ansible -y
+    3  sudo apt-get install python-pip -y
+    4  pip install --upgrade pip
+    5  pip install "pywinrm>=0.3.0"
+    6  pip install "pyOpenSSL>=17.3.0"
+    7  pip install requests-credssp
+
+ansible@AnsibleVM:~$ cat /etc/ansible/hosts
+[windows]
+10.1.1.5
+
+[windows:vars]
+ ansible_user=localadm
+ ansible_password=thisPassChange@End
+ ansible_port=5986
+ ansible_connection=winrm
+ ansible_winrm_server_cert_validation=ignore
+ ansible_winrm_transport=credssp
+
+ansible -m win_ping windows
+
+#----------------------------------------------Windows Ansible Client-----------------------------------------------
+New-NetFirewallRule -DisplayName "Allow inbound ICMPv4" -Direction Inbound -Protocol ICMPv4 -IcmpType 8 -RemoteAddress 10.1.1.4 -Action Allow
+New-SelfSignedCertificate -DnsName $env:COMPUTERNAME -CertStoreLocation Cert:\LocalMachine\My
+winrm delete winrm/config/Listener?Address=*+Transport=HTTPS
+winrm create winrm/config/Listener?Address=*+Transport=HTTPS '@{Hostname="t20201129215946"; CertificateThumbprint="FCF876DCED4D7DC3EA101203D1D203C73DD7A645"}'
+netsh advfirewall firewall add rule name="Windows Remote Management (HTTPS-In)" dir=in action=allow protocol=TCP localport=5986
+Enable-WSManCredSSP -Role Server -Force
+
+
+
+
+
+winrm quickconfig -transport:https
+winrm delete winrm/config/Listener?Address=*+Transport=HTTPS
+
+
+
+Enable-WSManCredSSP -Role Server -Force
+Set-Service -Name "WinRM" -StartupType Automatic
+Start-Service -Name "WinRM"
+
+#winrm get winrm/config
+#winrm quickconfig -transport:https
+
+New-SelfSignedCertificate -DnsName $env:COMPUTERNAME -CertStoreLocation Cert:\LocalMachine\My
+winrm create winrm/config/Listener?Address=*+Transport=HTTPS '@{Hostname="t20201129204436"; CertificateThumbprint="457E19F184DBFF447625970FEEFFEFBD31847A4D"}'
+
+$port=5986
+netsh advfirewall firewall add rule name="Windows Remote Management (HTTPS-In)" dir=in action=allow protocol=TCP localport=5986
+
+
+Function Enable-TLS12 {
+    param(
+        [ValidateSet("Server", "Client")]
+        [String]$Component = "Server"
+    )
+
+    $protocols_path = 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols'
+    New-Item -Path "$protocols_path\TLS 1.2\$Component" -Force
+    New-ItemProperty -Path "$protocols_path\TLS 1.2\$Component" -Name Enabled -Value 1 -Type DWORD -Force
+    New-ItemProperty -Path "$protocols_path\TLS 1.2\$Component" -Name DisabledByDefault -Value 0 -Type DWORD -Force
+}
+
+Enable-TLS12 -Component Server
+
+# Not required but highly recommended to enable the Client side TLS 1.2 components
+Enable-TLS12 -Component Client
+
+Enable-WSManCredSSP -Role Server -Force
+Set-Service -Name "WinRM" -StartupType Automatic
+Start-Service -Name "WinRM"
+
+if (-not (Get-PSSessionConfiguration) -or (-not (Get-ChildItem WSMan:\localhost\Listener))) {
+    ## Use SkipNetworkProfileCheck to make available even on Windows Firewall public profiles
+    ## Use Force to not be prompted if we're sure or not.
+    Enable-PSRemoting -SkipNetworkProfileCheck -Force
+}
+
+Function Enable-TLS12 {
+    param(
+        [ValidateSet("Server", "Client")]
+        [String]$Component = "Server"
+    )
+
+    $protocols_path = 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols'
+    New-Item -Path "$protocols_path\TLS 1.2\$Component" -Force
+    New-ItemProperty -Path "$protocols_path\TLS 1.2\$Component" -Name Enabled -Value 1 -Type DWORD -Force
+    New-ItemProperty -Path "$protocols_path\TLS 1.2\$Component" -Name DisabledByDefault -Value 0 -Type DWORD -Force
+}
+
+Enable-TLS12 -Component Server
+
+# Not required but highly recommended to enable the Client side TLS 1.2 components
+Enable-TLS12 -Component Client
+
+#Restart-Computer
+
+## Find all HTTPS listners
+$httpsListeners = Get-ChildItem -Path WSMan:\localhost\Listener\ | where-object { $_.Keys -match 'Transport=HTTPS' }
+
+## If not listeners are defined at all or no listener is configured to work with
+## the server cert created, create a new one with a Subject of the computer's host name
+## and bound to the server certificate.
+if ((-not $httpsListeners) -or -not (@($httpsListeners).where( { $_.CertificateThumbprint -ne $serverCert.Thumbprint }))) {
+    $newWsmanParams = @{
+        ResourceUri = 'winrm/config/Listener'
+        SelectorSet = @{ Transport = "HTTPS"; Address = "*" }
+        ValueSet    = @{ Hostname = $hostName; CertificateThumbprint = $serverCert.Thumbprint }
+        # UseSSL = $true
+    }
+    $null = New-WSManInstance @newWsmanParams
+}
