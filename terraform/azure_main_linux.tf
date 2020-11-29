@@ -26,7 +26,7 @@ variable "custom_image_resource_group_name" {
 #declare local
 locals {
   timestamp = timestamp()
-  timestamp_sanitized = "${replace(local.timestamp, "/[- TZ:]/", "")}"
+  timestamp_sanitized = replace(local.timestamp, "/[- TZ:]/", "")
 }
 
 data "aws_ssm_parameter" "tf" {
@@ -52,7 +52,7 @@ resource "azurerm_subnet" "frontendsubnet" {
 }
 
 resource "azurerm_public_ip" "myvm1publicip" {
-  name = "pip1"
+  name = "pip1-${local.timestamp_sanitized}"
   location = var.location
   resource_group_name = data.azurerm_resource_group.build.name
   allocation_method = "Dynamic"
