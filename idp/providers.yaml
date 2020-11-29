@@ -95,8 +95,11 @@ stages:
           sudo apt-get update
           sudo apt-get install ansible -y
           sudo apt-get install python-pip -y
-          sudo pip install pywinrm
+          pip install --upgrade pip
+          pip install "pywinrm>=0.2.2"
+          pip install "pyOpenSSL>=17.3.0"
           ansible --version
+          pywinrm version
         displayName: 'ansibleInstall'
     - job: 'ansibleConfigure'
       dependsOn: ansibleInstall
@@ -108,7 +111,7 @@ stages:
           # echo "Unzip File and move to local bin"
           # sudo unzip packer_${VER}_linux_amd64.zip -d /usr/local/bin
           # echo "Get version"
-          pywinrm
+          pywinrm version
           ansible --version
         displayName: 'ansibleConfigure'
     - job: 'ansibleRun'
