@@ -154,8 +154,19 @@ winrm set winrm/config/service/auth @{Basic="true"}
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 
+#----------------------------------------- Error in pipeline
+```
+10.1.1.5 | FAILED! => {
+    "msg": "winrm or requests is not installed: No module named winrm"
+}
+##[error]Bash exited with code '2'.
+Finishing: ansibleRun
+```
 
 
+
+
+#-------------------------------------------------- Testing Azure Scripts
 
 Azure VM scripts
 stop-AzVM -name ""
@@ -166,3 +177,4 @@ az vm get-instance-view --name vmName --resource-group resourceGroupName --query
 
 $getStatus=(Get-AzVM -ResourceGroupName "ANSIBLEVM" -Name "linux-test-2" -Status).Statuses[1].DisplayStatus
 Write-Host $getStatus
+
