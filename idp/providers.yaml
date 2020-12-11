@@ -10,8 +10,9 @@ stages:
         echo '${{ parameters.imageVarFile }}'
         echo '${{ parameters.providerMenu }}'
         echo '${{ parameters.runtime }}'
+        echo '${{ parameters.tenant }}'
+        echo '${{ parameters.job }}'
       displayName: 'Show variables used in menu'
-      condition: and( ne('${{ parameters.imagesMenu }}', 'all'), eq('${{ parameters.imagesMenu }}', 'ubuntu18_base') )
   - job: 'show_variables2'
     dependsOn: show_variables1
     condition: and( ne('${{ parameters.imagesMenu }}', 'all'), ne('${{ parameters.imagesMenu }}', 'ubuntu18_base') )
@@ -69,7 +70,7 @@ stages:
 
   - stage: ${{ provider.name }}Ansible
     displayName: ${{ provider.name }}Ansible
-    condition: and( eq('${{ parameters.providerMenu }}', 'azure'), eq('${{ parameters.imagesMenu }}', 'ubuntu18_base') )
+    condition: and( eq('${{ parameters.providerMenu }}', 'azure'), eq('${{ parameters.runtime }}', 'ansible') )
     jobs:
     - job: 'show_variables_ansible'
       steps:
@@ -128,7 +129,43 @@ stages:
         displayName: 'ansibleRun'
 
 
-
+  - stage: ${{ provider.name }}Services
+    displayName: ${{ provider.name }}Ansible
+    condition: and( ne('${{ parameters.tenant }}', 'default'), ne('${{ parameters.job }}', 'default') )
+    jobs:
+    - job: 'show_variables_services'
+      steps:
+      - script: |
+          echo '${{ parameters.platform }}'
+          echo '${{ parameters.imagesMenu }}'
+          echo '${{ parameters.osMenu }}'
+          echo '${{ parameters.imageVarFile }}'
+          echo '${{ parameters.providerMenu }}'
+          echo '${{ parameters.runtime }}'
+          echo '${{ parameters.tenant }}'
+          echo '${{ parameters.job }}'
+        displayName: 'show_variables_services'
+    - job: configCheck
+      dependsOn: show_variables_services
+      steps: 
+      - script: |
+          echo '${{ parameters.tenant }}'
+          echo '${{ parameters.job }}'
+        displayName: 'configCheck'
+    - job: 'servicesRun'
+      dependsOn: configCheck
+      steps: 
+      - script: |
+          echo '${{ parameters.tenant }}'
+          echo '${{ parameters.job }}'
+        displayName: 'servicesRun'
+    - job: 'servicesVerify'
+      dependsOn: servicesRun
+      steps: 
+      - script: |
+          echo '${{ parameters.tenant }}'
+          echo '${{ parameters.job }}'
+        displayName: 'servicesVerify'
 
 
 

@@ -54,6 +54,7 @@ parameters:
   - terraform
   - ansible
   - packer-terraform-ansible
+  - services
 - name: ansible
   displayName: Select Ansible Build
   type: string
@@ -66,6 +67,23 @@ parameters:
 - name: configs
   type: string
   default: 'x86,x64'
+- name: tenant
+  displayName: Select tenant
+  type: string
+  default: default
+  values:
+  - default
+  - KcStandAlone
+  - KcCluster
+- name: job
+  displayName: Select Job to Run
+  type: string
+  default: default
+  values:
+  - default
+  - poweron
+  - poweroff
+  - status
 
 trigger: none
 
@@ -86,3 +104,5 @@ stages:
     providerMenu: ${{ parameters.providerMenu }}
     runtime: ${{ parameters.runtime }}
     ansible: ${{ parameters.ansible }}
+    tenant: ${{ parameters.tenant }}
+    job: ${{ parameters.job }}
