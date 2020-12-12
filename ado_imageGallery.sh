@@ -1,5 +1,5 @@
 #az vm list --output table
-#az vm get-instance-view -g MyResourceGroup -n SICFactory-Windows2019-md-1592087421 --query id
+#az vm get-instance-view -g ANSIBLEVM -n t20201211221609 --query id
 
 #az sig list -o table
 

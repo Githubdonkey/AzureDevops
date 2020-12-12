@@ -130,7 +130,7 @@ stages:
 
 
   - stage: ${{ provider.name }}Services
-    displayName: ${{ provider.name }}Ansible
+    displayName: ${{ provider.name }}Services
     condition: and( ne('${{ parameters.tenant }}', 'default'), ne('${{ parameters.job }}', 'default') )
     jobs:
     - job: 'show_variables_services'
@@ -156,6 +156,15 @@ stages:
       dependsOn: configCheck
       steps: 
       - script: |
+          #aws ssm put-parameter --name "/builds/${packerProvider}/${packerOs}/${packerImage}/name" --value "${packerImageName}" --type String --overwrite
+          #aws ssm put-parameter --name "/builds/${packerProvider}/${packerOs}/${packerImage}/id" --value "${packerImageId}" --type String --overwrite
+          aws ssm get-parameter --name "MySecureStringParameter" --with-decryption
+          #echo "s3://gitdonkey/devops/${packerImageName}.html"
+          #aws s3 cp aliases.html "s3://gitdonkey/devops/${packerImageName}.html"
+          #echo "s3://gitdonkey/devops/${packerImageName}.json"
+          #aws s3 cp manifest.json "s3://gitdonkey/devops/${packerImageName}.json"
+          #echo "s3://gitdonkey/devops/${packerImageName}_packer_log.json"
+          #aws s3 cp packer.log "s3://gitdonkey/devops/${packerImageName}_packer_log.json"
           echo '${{ parameters.tenant }}'
           echo '${{ parameters.job }}'
         displayName: 'servicesRun'
